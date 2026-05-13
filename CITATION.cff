@@ -1,0 +1,73 @@
+cff-version: 1.2.0
+message: >
+  If you use the AIRBDS AI-Readiness Dataset Scoring Metric in your work,
+  please cite it using the metadata below.
+
+title: "AIRBDS AI-Readiness Dataset Scoring Metric"
+version: "0.3"
+date-released: "2025"
+license: CC-BY-4.0
+repository-code: "https://github.com/gavinf97/airbds-metric"
+url: "https://aibio.ac.uk/about/working-groups/airbds/"
+abstract: >
+  A structured, versioned checklist for evaluating the AI-readiness of
+  bioscience datasets. Questions are grouped into four scopes
+  (Infrastructure, Metadata, Content, Ethics) and weighted as Optional (2 pts),
+  Important (5 pts), or Critical (80 pts) to produce a composite score and
+  grade (Caution / Bronze / Silver / Gold). Developed by the AI-Ready
+  Bioscience Datasets (AIRBDS) working group of the AIBIO-UK network,
+  funded by BBSRC.
+
+keywords:
+  - AI-readiness
+  - bioscience datasets
+  - machine learning
+  - data quality
+  - FAIR data
+  - metadata
+  - scoring metric
+  - AIBIO-UK
+
+authors:
+  - name: "AIRBDS Working Group, AIBIO-UK"
+    website: "https://aibio.ac.uk/about/working-groups/airbds/"
+
+  - given-names: "Charlie"
+    family-names: "Harrison"
+    affiliation: "Aberystwyth University"
+    role: "Working Group Lead"
+
+  - given-names: "Ian"
+    family-names: "Overton"
+    affiliation: "Queen's University Belfast"
+
+  - given-names: "Reyer"
+    family-names: "Zwiggelaar"
+    affiliation: "Aberystwyth University"
+
+  - given-names: "Annalisa"
+    family-names: "Occhipinti"
+
+  - given-names: "Rachel"
+    family-names: "Rusholme-Pilcher"
+
+  - given-names: "Alexandra"
+    family-names: "Gibbs"
+
+  - given-names: "Matt"
+    family-names: "Spick"
+
+  - given-names: "Justin"
+    family-names: "Clark-Casey"
+
+references:
+  - type: website
+    title: "AIBIO-UK: AI-Ready Bioscience Datasets Working Group"
+    url: "https://aibio.ac.uk/about/working-groups/airbds/"
+    authors:
+      - name: "AIBIO-UK Network"
+
+  - type: grant
+    title: "AIBIO-UK: Connecting AI and biosciences"
+    institution:
+      name: "Biotechnology and Biological Sciences Research Council (BBSRC)"

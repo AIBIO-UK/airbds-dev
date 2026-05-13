@@ -1,0 +1,562 @@
+# =============================================================================
+# AIRBDS AI-Readiness Dataset Scoring Metric — v0.3
+# AI-Ready Bioscience Datasets Working Group (AIRBDS), AIBIO-UK
+# https://aibio.ac.uk/about/working-groups/airbds/
+# License: CC-BY-4.0
+# =============================================================================
+
+schema_version: "0.3"
+metric_name: "AIRBDS AI-Readiness Dataset Scoring Metric"
+short_name: "AIRBDS Metric"
+version: "0.3"
+release_date: "2025"
+license: "CC-BY-4.0"
+repository: "https://github.com/gavinf97/airbds-metric"
+contact: "info@aibio.ac.uk"
+
+description: >
+  A structured checklist for evaluating the AI-readiness of bioscience datasets.
+  Questions are grouped into four scopes (Infrastructure, Metadata, Content, Ethics)
+  and weighted as Optional, Important, or Critical to produce a composite score
+  and grade (Caution / Bronze / Silver / Gold).
+
+# =============================================================================
+# SCORING SYSTEM
+# =============================================================================
+scoring:
+  answer_values:
+    "Yes": 1
+    "No": 0
+
+  weight_points:
+    Optional: 2
+    Important: 5
+    Critical: 80
+
+  # Weighted score per question = answer_value * weight_points[weight]
+
+  grades:
+    - name: "Caution"
+      description: "May have serious issues"
+      thresholds:
+        critical_proportion: 0.0
+        important_proportion: 0.0
+        optional_proportion: 0.0
+
+    - name: "Bronze"
+      description: "Passes most Critical questions"
+      thresholds:
+        critical_proportion: 0.875   # 7/8 of Critical questions
+        important_proportion: 0.0
+        optional_proportion: 0.0
+
+    - name: "Silver"
+      description: "Passes all Critical plus at least 50% of Important questions (or equivalent)"
+      thresholds:
+        critical_proportion: 1.0
+        important_proportion: 0.5
+        optional_proportion: 0.0
+
+    - name: "Gold"
+      description: "Passes all Critical and Important questions, plus at least 50% Optional"
+      thresholds:
+        critical_proportion: 1.0
+        important_proportion: 1.0
+        optional_proportion: 0.5
+
+  note: >
+    Grade thresholds are calculated as a composite weighted score. Ethics questions
+    (scope: Ethics) are treated separately and may be omitted for datasets with no
+    human or animal subjects — such questions default to "Yes" where stated in the
+    guidance.
+
+# =============================================================================
+# SCOPES (top-level groupings)
+# =============================================================================
+scopes:
+  - id: Infrastructure
+    sort_order: 1
+    description: "Questions about how the dataset is hosted, accessed, and identified."
+  - id: Metadata
+    sort_order: 2
+    description: "Questions about the dataset's descriptive and contextual metadata."
+  - id: Content
+    sort_order: 3
+    description: "Questions about the quality, format, and consistency of the data itself."
+  - id: Ethics
+    sort_order: 4
+    description: "Questions about ethical, privacy, and security considerations. Applicable primarily to datasets containing human or animal subject data."
+
+# =============================================================================
+# QUESTIONS
+# =============================================================================
+questions:
+
+  # ── Infrastructure ──────────────────────────────────────────────────────────
+
+  - id: ACM-1
+    mapped_from: "ESIP-4.7"
+    theme: "Access"
+    scope: "Infrastructure"
+    weight: "Important"
+    weight_points: 5
+    question: >
+      Can the dataset be accessed in its entirety?
+    guidance: >
+      Every entry in the dataset should be accessible via direct download, API, or
+      in a cloud container. This metric is not applicable to datasets behind access
+      controls with an approval process, or in trusted research environments.
+    answer:
+      type: "boolean"
+      options: ["Yes", "No"]
+
+  - id: ACM-2
+    mapped_from: "FAIR-A.1"
+    theme: "Access"
+    scope: "Infrastructure"
+    weight: "Important"
+    weight_points: 5
+    question: >
+      Is there a standardised communications protocol for accessing the dataset?
+    guidance: >
+      For example, HTTPS, FTP, or an authenticated API. The protocol should be
+      open, free, and universally implementable.
+    answer:
+      type: "boolean"
+      options: ["Yes", "No"]
+
+  - id: ACM-3
+    mapped_from: "FAIR-A.1.2"
+    theme: "Access"
+    scope: "Infrastructure"
+    weight: "Optional"
+    weight_points: 2
+    question: >
+      Does the access protocol allow for authentication and authorisation where
+      necessary?
+    guidance: >
+      Some datasets require controlled access. The protocol should support
+      authentication where needed.
+    answer:
+      type: "boolean"
+      options: ["Yes", "No"]
+
+  - id: ACM-4
+    mapped_from: "MG-148"
+    theme: "License"
+    scope: "Infrastructure"
+    weight: "Critical"
+    weight_points: 80
+    question: >
+      Is the dataset provided with a clear data-use license?
+    guidance: >
+      The dataset should have a license that specifies how it may be used, shared,
+      and modified. A Creative Commons or Open Data Commons license is preferred.
+    answer:
+      type: "boolean"
+      options: ["Yes", "No"]
+
+  - id: ACM-5
+    mapped_from: "MG-159"
+    theme: "License"
+    scope: "Infrastructure"
+    weight: "Critical"
+    weight_points: 80
+    question: >
+      Does the dataset's license permit use in AI/ML model training?
+    guidance: >
+      Some licenses explicitly restrict use in AI training or commercial AI
+      applications. The license terms should be checked for such restrictions.
+    answer:
+      type: "boolean"
+      options: ["Yes", "No"]
+
+  - id: ACM-6
+    mapped_from: "ODI-3.a"
+    theme: "Download"
+    scope: "Infrastructure"
+    weight: "Important"
+    weight_points: 5
+    question: >
+      Is there a mechanism to download the entire dataset at once?
+    guidance: >
+      A bulk download option (e.g. archive file, rsync endpoint, or API with
+      pagination) should be available. Scraping individual entries is not
+      sufficient.
+    answer:
+      type: "boolean"
+      options: ["Yes", "No"]
+
+  - id: ACM-7
+    mapped_from: "MG-147"
+    theme: "Resource"
+    scope: "Infrastructure"
+    weight: "Optional"
+    weight_points: 2
+    question: >
+      Is the hosting resource specifically designed for scientific data?
+    guidance: >
+      e.g. a domain repository, data repository, or institutional repository.
+      General-purpose file sharing services (e.g. Google Drive, Dropbox) are
+      not considered scientific data hosting.
+    answer:
+      type: "boolean"
+      options: ["Yes", "No"]
+
+  - id: ACM-8
+    mapped_from: "FAIR-F.4"
+    theme: "Resource"
+    scope: "Infrastructure"
+    weight: "Optional"
+    weight_points: 2
+    question: >
+      Is the dataset hosted in a searchable infrastructure?
+    guidance: >
+      Infrastructures vary in the search functionality they offer, but it should
+      be possible to search for a dataset based on metadata properties as well as
+      looking it up directly via an ID or accession.
+    answer:
+      type: "boolean"
+      options: ["Yes", "No"]
+
+  - id: ACM-9
+    mapped_from: "MG-140"
+    theme: "UID"
+    scope: "Infrastructure"
+    weight: "Critical"
+    weight_points: 80
+    question: >
+      Does the dataset have a globally unique, persistent identifier?
+    guidance: >
+      A URL does not count as a persistent identifier. An accession assigned by a
+      repository is acceptable, as long as the combination of repository+accession
+      uniquely identifies the dataset. While FAIR-compliant archives provide UIDs,
+      not all archives do (e.g. Kaggle).
+    answer:
+      type: "boolean"
+      options: ["Yes", "No"]
+
+  - id: ACM-10
+    mapped_from: "ODI-3.c"
+    theme: "Updates"
+    scope: "Infrastructure"
+    weight: "Optional"
+    weight_points: 2
+    question: >
+      If the dataset is subject to updates, does it use a version control system?
+    guidance: >
+      If the dataset will not be updated, mark this question "Yes".
+    answer:
+      type: "boolean"
+      options: ["Yes", "No"]
+
+  # ── Metadata ────────────────────────────────────────────────────────────────
+
+  - id: ACM-11
+    mapped_from: "MG-94 / MG-98"
+    theme: "Bias"
+    scope: "Metadata"
+    weight: "Important"
+    weight_points: 5
+    question: >
+      Is consideration of bias documented in the metadata?
+    guidance: >
+      An accompanying research article does not form part of the metadata.
+    answer:
+      type: "boolean"
+      options: ["Yes", "No"]
+
+  - id: ACM-12
+    mapped_from: "MG-66"
+    theme: "Metadata"
+    scope: "Metadata"
+    weight: "Critical"
+    weight_points: 80
+    question: >
+      Does the dataset use a machine-readable, domain-appropriate metadata standard?
+    guidance: >
+      Metadata should include a domain-appropriate set of information about the
+      dataset, following a standard. For example, Minimum Information Standards
+      (e.g. MIAME, MIAPE). Variable names should be self-explanatory.
+    answer:
+      type: "boolean"
+      options: ["Yes", "No"]
+
+  - id: ACM-13
+    mapped_from: "FAIR-F.3"
+    theme: "Metadata"
+    scope: "Metadata"
+    weight: "Critical"
+    weight_points: 80
+    question: >
+      Does the metadata include the identifier of the dataset?
+    guidance: >
+      The metadata should be clearly linked to the dataset with a unique identifier.
+      If the dataset has no unique identifier, mark this question "No". A URL does
+      not qualify as a unique identifier.
+    answer:
+      type: "boolean"
+      options: ["Yes", "No"]
+
+  - id: ACM-14
+    mapped_from: "MG-77"
+    theme: "Metadata"
+    scope: "Metadata"
+    weight: "Optional"
+    weight_points: 2
+    question: >
+      Does the metadata specify intended access controls?
+    guidance: >
+      e.g. "public", "controlled access only", etc. If the data is publicly
+      available with no limitations on use, this should be specified.
+    answer:
+      type: "boolean"
+      options: ["Yes", "No"]
+
+  - id: ACM-15
+    mapped_from: "ODI-2.c.i"
+    theme: "Metadata"
+    scope: "Metadata"
+    weight: "Optional"
+    weight_points: 2
+    question: >
+      Does the metadata document the modalities used?
+    guidance: >
+      e.g. RNA sequence, molecular structure, spectrum, image.
+    answer:
+      type: "boolean"
+      options: ["Yes", "No"]
+
+  - id: ACM-16
+    mapped_from: "MG-33"
+    theme: "Preprocessing"
+    scope: "Metadata"
+    weight: "Important"
+    weight_points: 5
+    question: >
+      Are transformation and preprocessing steps documented well enough to
+      reproduce them?
+    guidance: >
+      Either with software in a repository, or with a detailed description.
+    answer:
+      type: "boolean"
+      options: ["Yes", "No"]
+
+  - id: ACM-17
+    mapped_from: "MG-37 / ODI-2.c.vi"
+    theme: "Provenance"
+    scope: "Metadata"
+    weight: "Critical"
+    weight_points: 80
+    question: >
+      Is the provenance of the dataset clearly documented?
+    guidance: >
+      This should include who generated or collected it, how it has been processed,
+      whether it has been published before, whether it contains data from other
+      sources, whether and how it was measured or simulated. If any of these things
+      is missing, mark the question "No".
+    answer:
+      type: "boolean"
+      options: ["Yes", "No"]
+
+  # ── Content ─────────────────────────────────────────────────────────────────
+
+  - id: ACM-18
+    mapped_from: "AIDRIN-1.c"
+    theme: "Quality"
+    scope: "Content"
+    weight: "Important"
+    weight_points: 5
+    question: >
+      Is the dataset free of duplicate records?
+    guidance: >
+      Repeated records or files is a common mistake that damages the quality of a
+      dataset.
+    answer:
+      type: "boolean"
+      options: ["Yes", "No"]
+
+  - id: ACM-19
+    mapped_from: "AIDRIN-1.a"
+    theme: "Quality"
+    scope: "Content"
+    weight: "Important"
+    weight_points: 5
+    question: >
+      Does the dataset include all expected records and content?
+    guidance: >
+      The expected content is defined by the metadata. If the dataset has no
+      metadata, mark this question "No".
+    answer:
+      type: "boolean"
+      options: ["Yes", "No"]
+
+  - id: ACM-20
+    mapped_from: "ESIP-2.12 / MG-91"
+    theme: "Format"
+    scope: "Content"
+    weight: "Critical"
+    weight_points: 80
+    question: >
+      Are units, data types and parameter names consistent between entries?
+    guidance: >
+      Data types and vocabularies should be used consistently, even if a dataset
+      combines data from multiple sources.
+    answer:
+      type: "boolean"
+      options: ["Yes", "No"]
+
+  - id: ACM-21
+    mapped_from: "MG-20"
+    theme: "Standards"
+    scope: "Content"
+    weight: "Important"
+    weight_points: 5
+    question: >
+      Does the dataset follow domain standards with respect to units, data types,
+      parameter names?
+    guidance: >
+      This could be indicated by a schema or domain-specific minimum information
+      standard.
+    answer:
+      type: "boolean"
+      options: ["Yes", "No"]
+
+  - id: ACM-22
+    mapped_from: "MG-164"
+    theme: "Format"
+    scope: "Content"
+    weight: "Optional"
+    weight_points: 2
+    question: >
+      Does the data use an appropriate file format?
+    guidance: >
+      Particularly with respect to efficiency and suitability. The appropriate
+      format is specific to the modality, domain, and intended use.
+    answer:
+      type: "boolean"
+      options: ["Yes", "No"]
+
+  - id: ACM-23
+    mapped_from: "ESIP-4.3"
+    theme: "Format"
+    scope: "Content"
+    weight: "Optional"
+    weight_points: 2
+    question: >
+      Is the data available in at least one open, non-proprietary format?
+    guidance: >
+      It should be possible to read a dataset and write it to a different format
+      without the use of proprietary software.
+    answer:
+      type: "boolean"
+      options: ["Yes", "No"]
+
+  # ── Ethics ──────────────────────────────────────────────────────────────────
+
+  - id: ACM-24
+    mapped_from: "MG-10"
+    theme: "Ethics"
+    scope: "Ethics"
+    weight: "Critical"
+    weight_points: 80
+    question: >
+      If the dataset contains data from animal or human subjects, does the dataset
+      include an ethical assessment that covers acquisition?
+    guidance: >
+      This includes consent, sampling methods, regulatory compliance, and funding
+      sources. The acquisition should be described along accepted principles, like
+      the Belmont, Menlo, or CARE principles, sufficient for its proper evaluation
+      in context of intended use. If the dataset contains no human or animal data,
+      mark the question "Yes".
+    answer:
+      type: "boolean"
+      options: ["Yes", "No"]
+    not_applicable_default: "Yes"
+
+  - id: ACM-25
+    mapped_from: "MG-6"
+    theme: "Privacy"
+    scope: "Ethics"
+    weight: "Critical"
+    weight_points: 80
+    question: >
+      If the dataset contains data from human subjects, does the dataset preserve
+      the privacy of subjects?
+    guidance: >
+      The risk of reidentification when the data is used to train AI should also
+      be considered. If the dataset contains no human data, mark the question "Yes".
+    answer:
+      type: "boolean"
+      options: ["Yes", "No"]
+    not_applicable_default: "Yes"
+
+  - id: ACM-26
+    mapped_from: "Bridge2AI-4.b"
+    theme: "Ethics"
+    scope: "Ethics"
+    weight: "Important"
+    weight_points: 5
+    question: >
+      If the dataset contains data from human subjects, does the dataset include an
+      ethical assessment that covers data management?
+    guidance: >
+      Management includes processing, storage, access and use. The management plan
+      should indicate privacy-protection processing, if any, sufficient to evaluate
+      ethical status for intended use, e.g. "anonymized" vs. "limited data set" vs.
+      "non-PHI dataset". If the dataset contains no human data, mark the question
+      "Yes".
+    answer:
+      type: "boolean"
+      options: ["Yes", "No"]
+    not_applicable_default: "Yes"
+
+  - id: ACM-27
+    mapped_from: "MG-1"
+    theme: "Security"
+    scope: "Ethics"
+    weight: "Important"
+    weight_points: 5
+    question: >
+      If the dataset contains data from human subjects, does the dataset have the
+      necessary authentication and access controls?
+    guidance: >
+      The appropriate level of access security depends on the dataset. If the
+      dataset contains no human data, mark the question "Yes".
+    answer:
+      type: "boolean"
+      options: ["Yes", "No"]
+    not_applicable_default: "Yes"
+
+  - id: ACM-28
+    mapped_from: "ODI-2.e.iii"
+    theme: "Metadata"
+    scope: "Ethics"
+    weight: "Optional"
+    weight_points: 2
+    question: >
+      If the dataset contains data from human subjects, does the metadata document
+      data protection declarations?
+    guidance: >
+      The metadata should specify what consent was given by participants and the
+      legal basis for collection and processing. If the dataset contains no human
+      data, mark the question "Yes".
+    answer:
+      type: "boolean"
+      options: ["Yes", "No"]
+    not_applicable_default: "Yes"
+
+# =============================================================================
+# QUESTION SUMMARY
+# Total questions: 28
+# Infrastructure:  10  (ACM-1  – ACM-10)
+# Metadata:         7  (ACM-11 – ACM-17)
+# Content:          6  (ACM-18 – ACM-23)
+# Ethics:           5  (ACM-24 – ACM-28)
+#
+# Weight breakdown (all 28 questions):
+#   Critical:   8   × 80 pts = 640 pts maximum
+#   Important:  11  × 5  pts = 55  pts maximum
+#   Optional:   9   × 2  pts = 18  pts maximum
+#   TOTAL maximum (incl. Ethics): 713 pts
+# =============================================================================
