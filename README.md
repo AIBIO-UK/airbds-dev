@@ -179,13 +179,16 @@ Group, AIBIO-UK:
 | Name | Affiliation | Role |
 |---|---|---|
 | Charlie Harrison | Aberystwyth University | Working Group Lead |
+| Justin Clark-Casey | BioFAIR | Member |
+| Gavin Farrell | University of Padova; EMBL-EBI | Member |
+| Alexandra Gibbs | University of Nottingham | Member |
+| Annalisa Occhipinti | Teesside University | Member |
 | Ian Overton | Queen's University Belfast | Member |
+| Rachel Rusholme Pilcher | Earlham Institute | Member |
+| Matt Spick | University of Surrey | Member |
+| Tulsi Suchak | University of Surrey | Member |
+| Melanie Vollmar | EMBL-EBI | Member |
 | Reyer Zwiggelaar | Aberystwyth University | Member |
-| Annalisa Occhipinti | — | Member |
-| Rachel Rusholme-Pilcher | — | Member |
-| Alexandra Gibbs | — | Member |
-| Matt Spick | — | Member |
-| Justin Clark-Casey | — | Member |
 
 AIBIO-UK is funded by the Biotechnology and Biological Sciences Research
 Council (BBSRC).

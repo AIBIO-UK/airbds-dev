@@ -29,36 +29,53 @@ keywords:
   - AIBIO-UK
 
 authors:
-  - name: "AIRBDS Working Group, AIBIO-UK"
-    website: "https://aibio.ac.uk/about/working-groups/airbds/"
-
+  # Working Group Lead — listed first
   - given-names: "Charlie"
     family-names: "Harrison"
     affiliation: "Aberystwyth University"
-    role: "Working Group Lead"
+    alias: "AIRBDS Working Group Lead"
+
+  # Co-authors — sorted alphabetically by family name
+  - given-names: "Justin"
+    family-names: "Clark-Casey"
+    affiliation: "BioFAIR"
+
+  - given-names: "Gavin"
+    family-names: "Farrell"
+    affiliation: "University of Padova; EMBL-EBI"
+    orcid: "https://orcid.org/0000-0002-0803-1530"
+
+  - given-names: "Alexandra"
+    family-names: "Gibbs"
+    affiliation: "University of Nottingham"
+
+  - given-names: "Annalisa"
+    family-names: "Occhipinti"
+    affiliation: "Teesside University"
 
   - given-names: "Ian"
     family-names: "Overton"
     affiliation: "Queen's University Belfast"
 
-  - given-names: "Reyer"
-    family-names: "Zwiggelaar"
-    affiliation: "Aberystwyth University"
-
-  - given-names: "Annalisa"
-    family-names: "Occhipinti"
-
   - given-names: "Rachel"
-    family-names: "Rusholme-Pilcher"
-
-  - given-names: "Alexandra"
-    family-names: "Gibbs"
+    family-names: "Rusholme Pilcher"
+    affiliation: "Earlham Institute"
 
   - given-names: "Matt"
     family-names: "Spick"
+    affiliation: "University of Surrey"
 
-  - given-names: "Justin"
-    family-names: "Clark-Casey"
+  - given-names: "Tulsi"
+    family-names: "Suchak"
+    affiliation: "University of Surrey"
+
+  - given-names: "Melanie"
+    family-names: "Vollmar"
+    affiliation: "EMBL-EBI"
+
+  - given-names: "Reyer"
+    family-names: "Zwiggelaar"
+    affiliation: "Aberystwyth University"
 
 references:
   - type: website
