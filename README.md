@@ -3,6 +3,7 @@
 [![License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
 [![Version](https://img.shields.io/badge/metric%20version-v0.3-blue)](CHANGELOG.md)
 [![AIBIO-UK](https://img.shields.io/badge/AIBIO--UK-AIRBDS%20Working%20Group-green)](https://aibio.ac.uk/about/working-groups/airbds/)
+[![Tutorial site](https://img.shields.io/badge/Tutorial-GitHub%20Pages-orange)](https://aibio-uk.github.io/airbds-metric/)
 
 A versioned, machine-readable scoring metric for evaluating the **AI-readiness
 of bioscience datasets**. Developed by the
@@ -74,10 +75,14 @@ airbds-metric/
 
 The metric is available in two formats. Both cover the same 28 questions and produce the same grade — choose whichever suits your workflow.
 
-| Format | Best for | Template | Tutorial |
+**[→ Open the interactive tutorial site](https://aibio-uk.github.io/airbds-metric/)** — built with the ELIXIR Training Lesson template, hosted on GitHub Pages. Start there to choose your format and follow a step-by-step guide.
+
+| Format | Best for | Template | Direct link |
 |---|---|---|---|
-| **CSV** | Beginners · Excel or Google Sheets · no coding required | [review_template.csv](metric/review_template.csv) | [Beginner CSV Tutorial](docs/tutorial-csv.md) |
-| **YAML** | Intermediate · text editor / command line | [review_template.yaml](metric/review_template.yaml) | [Intermediate YAML Tutorial](docs/tutorial-yaml.md) |
+| **CSV** | Beginners · Excel or Google Sheets · no coding required | [review_template.csv](metric/review_template.csv) | [CSV Tutorial](https://aibio-uk.github.io/airbds-metric/chapters/chapter_02_csv/) |
+| **YAML** | Intermediate · text editor / command line | [review_template.yaml](metric/review_template.yaml) | [YAML Tutorial](https://aibio-uk.github.io/airbds-metric/chapters/chapter_03_yaml/) |
+
+> **First-time setup (repo admins only):** After pushing, enable GitHub Pages in the repository Settings → Pages → Source: `gh-pages` branch → `/` (root). The GitHub Actions workflow then rebuilds the site automatically on every push to `main`.
 
 ---
 

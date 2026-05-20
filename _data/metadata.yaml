@@ -1,0 +1,16 @@
+@context: https://schema.org/
+@type: LearningResource
+@id: https://aibio-uk.github.io/airbds-metric/
+conformsTo: https://bioschemas.org/profiles/TrainingMaterial/1.0-RELEASE
+description: >
+  Step-by-step tutorial for scoring bioscience datasets using the AIRBDS
+  AI-Readiness Metric. Covers both a beginner CSV (spreadsheet) path and an
+  intermediate YAML (command-line) path. Developed by the AIRBDS Working Group
+  of AIBIO-UK, funded by BBSRC.
+keywords: AI-readiness, bioscience datasets, FAIR data, machine learning, scoring metric, AIBIO-UK, BBSRC
+name: AIRBDS AI-Readiness Dataset Scoring — Tutorial
+license: CC-BY-4.0
+url: https://aibio-uk.github.io/airbds-metric/
+authors:
+  - name: AIRBDS Working Group
+    url: https://aibio.ac.uk/about/working-groups/airbds/
