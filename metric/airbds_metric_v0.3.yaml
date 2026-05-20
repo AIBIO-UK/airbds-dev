@@ -465,9 +465,9 @@ questions:
       include an ethical assessment that covers acquisition?
     guidance: >
       This includes consent, sampling methods, regulatory compliance, and funding
-      sources. The acquisition should be described along accepted principles, like
-      the Belmont, Menlo, or CARE principles, sufficient for its proper evaluation
-      in context of intended use. If the dataset contains no human or animal data,
+      sources. The acquisition should be described using an appropriate framework,
+      like the Belmont, Menlo, or CARE principles, sufficient for its proper evaluation
+      in context of intended use. If the dataset contains no human or animal data, 
       mark the question "Yes".
     answer:
       type: "boolean"
