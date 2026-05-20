@@ -2,6 +2,8 @@
 
 **Format: YAML · Intermediate · Requires a text editor and basic command-line familiarity**
 
+> **Full interactive version:** [airbds-metric-tutorial](https://gavinf97.github.io/airbds-metric-tutorial/chapters/chapter_03_yaml/) — rendered lesson site with navigation, tips, and format chooser.
+
 This tutorial walks you through scoring a bioscience dataset for AI-readiness using the YAML workflow. It assumes you are comfortable opening a terminal, running basic commands, and editing plain text files.
 
 ---

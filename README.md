@@ -74,10 +74,12 @@ airbds-metric/
 
 The metric is available in two formats. Both cover the same 28 questions and produce the same grade — choose whichever suits your workflow.
 
+**[→ Interactive tutorial site](https://gavinf97.github.io/airbds-metric-tutorial/)** — step-by-step guide that helps you choose the right format and walks you through the full review process.
+
 | Format | Best for | Template | Tutorial |
 |---|---|---|---|
-| **CSV** | Beginners · Excel or Google Sheets · no coding required | [review_template.csv](metric/review_template.csv) | [Beginner CSV Tutorial](docs/tutorial-csv.md) |
-| **YAML** | Intermediate · text editor / command line | [review_template.yaml](metric/review_template.yaml) | [Intermediate YAML Tutorial](docs/tutorial-yaml.md) |
+| **CSV** | Beginners · Excel or Google Sheets · no coding required | [review_template.csv](metric/review_template.csv) | [Beginner CSV Tutorial](https://gavinf97.github.io/airbds-metric-tutorial/chapters/chapter_02_csv/) |
+| **YAML** | Intermediate · text editor / command line | [review_template.yaml](metric/review_template.yaml) | [Intermediate YAML Tutorial](https://gavinf97.github.io/airbds-metric-tutorial/chapters/chapter_03_yaml/) |
 
 ---
 

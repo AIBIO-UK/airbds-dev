@@ -2,6 +2,8 @@
 
 **Format: CSV · Beginner · No coding required · Works in Excel or Google Sheets**
 
+> **Full interactive version:** [airbds-metric-tutorial](https://gavinf97.github.io/airbds-metric-tutorial/chapters/chapter_02_csv/) — rendered lesson site with navigation, tips, and format chooser.
+
 This tutorial walks you through scoring a bioscience dataset for AI-readiness using a spreadsheet. No programming knowledge is needed — you only need Excel, Google Sheets, or any equivalent tool.
 
 ---
