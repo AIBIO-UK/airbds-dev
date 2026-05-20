@@ -48,10 +48,16 @@ Questions are grouped into **four scopes** and **three weight tiers**:
 ```
 airbds-metric/
 ├── metric/
-│   ├── airbds_metric_v0.3.yaml   # Canonical metric — all 28 questions
-│   ├── scoring_schema.yaml       # Grade thresholds, weight definitions
-│   └── review_template.yaml      # Blank template for new dataset reviews
-├── reviews/                      # Completed dataset review files (YAML)
+│   ├── airbds_metric_v0.3.yaml   # Canonical metric — all 28 questions (YAML)
+│   ├── airbds_metric_v0.3.csv    # Canonical metric — all 28 questions (CSV)
+│   ├── scoring_schema.yaml       # Grade thresholds, weight definitions (YAML)
+│   ├── scoring_schema.csv        # Grade thresholds, weight definitions (CSV)
+│   ├── review_template.yaml      # Blank review template (YAML)
+│   └── review_template.csv       # Blank review template (CSV / spreadsheet)
+├── reviews/                      # Completed dataset review files
+├── docs/
+│   ├── tutorial-csv.md           # Beginner tutorial — Excel / Google Sheets
+│   └── tutorial-yaml.md          # Intermediate tutorial — text editor / CLI
 ├── AIRBDS Core Metric scoring v0.3 - _initials_-_#_ TEMPLATE.xlsx
 │                                 # Original working-group spreadsheet (archived)
 ├── CHANGELOG.md
@@ -64,7 +70,20 @@ airbds-metric/
 
 ---
 
-## Quick Start: Scoring a Dataset
+## Formats & Tutorials
+
+The metric is available in two formats. Both cover the same 28 questions and produce the same grade — choose whichever suits your workflow.
+
+| Format | Best for | Template | Tutorial |
+|---|---|---|---|
+| **CSV** | Beginners · Excel or Google Sheets · no coding required | [review_template.csv](metric/review_template.csv) | [Beginner CSV Tutorial](docs/tutorial-csv.md) |
+| **YAML** | Intermediate · text editor / command line | [review_template.yaml](metric/review_template.yaml) | [Intermediate YAML Tutorial](docs/tutorial-yaml.md) |
+
+---
+
+## Quick Start (YAML)
+
+For the spreadsheet workflow, see the [Beginner CSV Tutorial](docs/tutorial-csv.md).
 
 1. **Copy the template:**
    ```bash
@@ -133,7 +152,8 @@ Full reviewer instructions are in [`metric/scoring_schema.yaml`](metric/scoring_
 † *Default answer "Yes" if dataset contains no human or animal subject data.*
 
 Full questions with complete guidance text are in
-[`metric/airbds_metric_v0.3.yaml`](metric/airbds_metric_v0.3.yaml).
+[`metric/airbds_metric_v0.3.yaml`](metric/airbds_metric_v0.3.yaml) (YAML) and
+[`metric/airbds_metric_v0.3.csv`](metric/airbds_metric_v0.3.csv) (CSV).
 
 ---
 
@@ -165,7 +185,7 @@ If you use this metric, please cite it as:
 
 > AIRBDS Working Group, AIBIO-UK. (2025). *AIRBDS AI-Readiness Dataset
 > Scoring Metric* (v0.3). GitHub.
-> <https://github.com/gavinf97/airbds-metric>
+> <https://github.com/AIBIO-UK/airbds-metric>
 
 Full citation metadata (including all working group members) is available in
 [`CITATION.cff`](CITATION.cff) and is automatically recognised by GitHub's
