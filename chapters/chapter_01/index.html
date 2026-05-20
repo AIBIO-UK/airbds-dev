@@ -1,0 +1,809 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://aibio-uk.github.io/airbds-metric/chapters/chapter_01/">
+      
+      
+        <link rel="prev" href="../..">
+      
+      
+        <link rel="next" href="../chapter_02_csv/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/elixir_favicon.ico">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>1. Getting Started — Choose Your Format - AIRBDS AI-Readiness Dataset Scoring Metric</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Lato";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/neoteroi-mkdocs.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#getting-started-choose-your-format" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+        <aside class="md-banner">
+          <div class="md-banner__inner md-grid md-typeset">
+            
+            
+This tutorial is in active development. Questions or contributions welcome at <a href="https://github.com/AIBIO-UK/airbds-metric" style="color: white;">github.com/AIBIO-UK/airbds-metric</a>.
+
+          </div>
+          
+        </aside>
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="AIRBDS AI-Readiness Dataset Scoring Metric" class="md-header__button md-logo" aria-label="AIRBDS AI-Readiness Dataset Scoring Metric" data-md-component="logo">
+      
+  <img src="../../assets/images/white-orange-logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            AIRBDS AI-Readiness Dataset Scoring Metric
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              1. Getting Started — Choose Your Format
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/AIBIO-UK/airbds-metric" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    AIBIO-UK/airbds-metric
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="AIRBDS AI-Readiness Dataset Scoring Metric" class="md-nav__button md-logo" aria-label="AIRBDS AI-Readiness Dataset Scoring Metric" data-md-component="logo">
+      
+  <img src="../../assets/images/white-orange-logo.png" alt="logo">
+
+    </a>
+    AIRBDS AI-Readiness Dataset Scoring Metric
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/AIBIO-UK/airbds-metric" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    AIBIO-UK/airbds-metric
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Course Content
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Course Content
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1. Getting Started — Choose Your Format
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1. Getting Started — Choose Your Format
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-format-do-i-need-to-choose" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What format do I need to choose?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#which-format-should-i-use" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Which format should I use?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-you-will-need" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What you will need
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../chapter_02_csv/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2. CSV Walkthrough (Beginner)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../chapter_03_yaml/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3. YAML Walkthrough (Intermediate)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../references/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    References
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../follow_up_training/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Further Resources
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  <nav class="md-tags" >
+    
+      
+      
+      
+      
+        <a href="../../keywords/#tag:csv" class="md-tag">CSV</a>
+      
+    
+      
+      
+      
+      
+        <a href="../../keywords/#tag:yaml" class="md-tag">YAML</a>
+      
+    
+      
+      
+      
+      
+        <a href="../../keywords/#tag:format-choice" class="md-tag">format choice</a>
+      
+    
+  </nav>
+
+
+  
+  
+
+
+<div><h1 id="getting-started-choose-your-format">Getting Started — Choose Your Format</h1>
+<div class="admonition overview">
+<p class="admonition-title">Overview</p>
+<p><strong>Questions:</strong></p>
+<ul>
+<li>What is the difference between CSV and YAML?</li>
+<li>Which format is right for me?</li>
+</ul>
+<p><strong>Learning Objectives</strong></p>
+<p>By the end of this chapter, you will be able to:</p>
+<ol>
+<li>Explain in plain terms what CSV and YAML files are</li>
+<li>Select the format that best matches your technical background</li>
+<li>Navigate to the correct walkthrough chapter</li>
+</ol>
+<p><strong>Time:</strong> 5 minutes</p>
+</div>
+<hr>
+<h2 id="what-format-do-i-need-to-choose">What format do I need to choose?</h2>
+<p>The AIRBDS metric is available in two file formats. Both ask exactly the same 28 questions and produce the same grade — the only difference is how you open and fill in the template.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked id="__tabbed_1_1" name="__tabbed_1" type="radio"><input id="__tabbed_1_2" name="__tabbed_1" type="radio"><div class="tabbed-labels"><label for="__tabbed_1_1">What is CSV?</label><label for="__tabbed_1_2">What is YAML?</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p><strong>CSV</strong> stands for <strong>Comma-Separated Values</strong>.</p>
+<p>It is a plain-text table that opens directly in <strong>Microsoft Excel</strong>, <strong>Google Sheets</strong>, or any other spreadsheet program. Each row is a question; you type <code>Yes</code> or <code>No</code> in a column.</p>
+<p>You do <strong>not</strong> need to install any software or use a terminal. If you can use a spreadsheet, you can use the CSV format.</p>
+<p>Example of what it looks like in Excel:</p>
+<table>
+<thead>
+<tr>
+<th>question_id</th>
+<th>weight</th>
+<th>question</th>
+<th>answer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ACM-1</td>
+<td>Important</td>
+<td>Can the dataset be accessed in its entirety?</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>ACM-4</td>
+<td>Critical</td>
+<td>Is the dataset provided with a clear data-use license?</td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="tabbed-block">
+<p><strong>YAML</strong> stands for <strong>YAML Ain’t Markup Language</strong>.</p>
+<p>It is a structured plain-text format widely used in scientific computing and software development. You open it in a <strong>text editor</strong> (VS Code, Sublime Text, nano, vim) and edit fields by hand. You also use a <strong>terminal</strong> to copy files, validate them, and submit via Git.</p>
+<p>You need basic familiarity with the command line (e.g. <code>cp</code>, <code>git add</code>, <code>git push</code>).</p>
+<p>Example of what it looks like in a text editor:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">ACM-1</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">answer</span><span class="p">:</span><span class="w"> </span><span class="s">"Yes"</span>
+<span class="w">  </span><span class="nt">comments</span><span class="p">:</span><span class="w"> </span><span class="s">"Dataset</span><span class="nv"> </span><span class="s">available</span><span class="nv"> </span><span class="s">via</span><span class="nv"> </span><span class="s">FTP."</span>
+<span class="nt">ACM-4</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">answer</span><span class="p">:</span><span class="w"> </span><span class="s">"No"</span>
+<span class="w">  </span><span class="nt">comments</span><span class="p">:</span><span class="w"> </span><span class="s">"License</span><span class="nv"> </span><span class="s">not</span><span class="nv"> </span><span class="s">clearly</span><span class="nv"> </span><span class="s">stated."</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<hr>
+<h2 id="which-format-should-i-use">Which format should I use?</h2>
+<div class="admonition tip">
+<p class="admonition-title">Recommendation</p>
+<p><strong>Never used a terminal or command line?</strong> → Use <strong>CSV</strong> (Chapter 2).</p>
+<p><strong>Comfortable opening a terminal and running commands?</strong> → Use <strong>YAML</strong> (Chapter 3).</p>
+<p>Both formats produce an identical review. You can always switch later.</p>
+</div>
+<p>:::cards cols=2</p>
+<ul>
+<li>
+<p>title: “📊 CSV — Beginner”
+  content: “Open in Excel or Google Sheets. Type Yes/No in a table. No installation required. Recommended if you are new to this workflow.”
+  url: chapter_02_csv.md</p>
+</li>
+<li>
+<p>title: “🗂 YAML — Intermediate”
+  content: “Edit in a text editor. Submit via Git. Requires basic command-line familiarity. Recommended for researchers comfortable with version control.”
+  url: chapter_03_yaml.md</p>
+</li>
+</ul>
+<p>:::</p>
+<hr>
+<h2 id="what-you-will-need">What you will need</h2>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked id="__tabbed_2_1" name="__tabbed_2" type="radio"><input id="__tabbed_2_2" name="__tabbed_2" type="radio"><div class="tabbed-labels"><label for="__tabbed_2_1">For the CSV path</label><label for="__tabbed_2_2">For the YAML path</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<ul>
+<li>The <a href="https://github.com/AIBIO-UK/airbds-metric/raw/main/metric/review_template.csv">review_template.csv</a> file (download from the repository)</li>
+<li>Microsoft Excel, Google Sheets, LibreOffice Calc, or equivalent</li>
+<li>The dataset you want to evaluate (its landing page / documentation)</li>
+</ul>
+</div>
+<div class="tabbed-block">
+<ul>
+<li><a href="https://git-scm.com/">Git</a> installed on your machine</li>
+<li>A plain-text editor (VS Code, Sublime Text, nano, vim, or similar)</li>
+<li>Python 3 (for YAML validation — run <code>python3 --version</code> to check)</li>
+<li>The dataset you want to evaluate</li>
+</ul>
+</div>
+</div>
+</div>
+<hr>
+<div class="admonition info">
+<p class="admonition-title">Ethics questions (ACM-24 to ACM-28)</p>
+<p>Five of the 28 questions cover ethics, privacy, and security. These apply <strong>only to datasets containing human or animal subject data</strong>. If your dataset has no such data, you answer “Yes” and mark them as not applicable. Both tutorials explain this step clearly.</p>
+</div>
+<hr>
+<p><strong>Ready? Jump to your chapter:</strong></p>
+<ul>
+<li><a href="../chapter_02_csv/">Chapter 2 — CSV Walkthrough (Beginner, no coding)</a></li>
+<li><a href="../chapter_03_yaml/">Chapter 3 — YAML Walkthrough (Intermediate, command line)</a></li>
+</ul></div>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../.." class="md-footer__link md-footer__link--prev" aria-label="Previous: About">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                About
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../chapter_02_csv/" class="md-footer__link md-footer__link--next" aria-label="Next: 2. CSV Walkthrough (Beginner)">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                2. CSV Walkthrough (Beginner)
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      By the AIRBDS Working Group, AIBIO-UK (CC BY 4.0)
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.top", "navigation.footer", "toc.integrate"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

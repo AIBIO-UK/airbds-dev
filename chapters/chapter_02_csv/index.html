@@ -1,0 +1,1090 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://aibio-uk.github.io/airbds-metric/chapters/chapter_02_csv/">
+      
+      
+        <link rel="prev" href="../chapter_01/">
+      
+      
+        <link rel="next" href="../chapter_03_yaml/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/elixir_favicon.ico">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>2. CSV Walkthrough (Beginner) - AIRBDS AI-Readiness Dataset Scoring Metric</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Lato";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/neoteroi-mkdocs.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#csv-walkthrough" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+        <aside class="md-banner">
+          <div class="md-banner__inner md-grid md-typeset">
+            
+            
+This tutorial is in active development. Questions or contributions welcome at <a href="https://github.com/AIBIO-UK/airbds-metric" style="color: white;">github.com/AIBIO-UK/airbds-metric</a>.
+
+          </div>
+          
+        </aside>
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="AIRBDS AI-Readiness Dataset Scoring Metric" class="md-header__button md-logo" aria-label="AIRBDS AI-Readiness Dataset Scoring Metric" data-md-component="logo">
+      
+  <img src="../../assets/images/white-orange-logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            AIRBDS AI-Readiness Dataset Scoring Metric
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              2. CSV Walkthrough (Beginner)
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/AIBIO-UK/airbds-metric" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    AIBIO-UK/airbds-metric
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="AIRBDS AI-Readiness Dataset Scoring Metric" class="md-nav__button md-logo" aria-label="AIRBDS AI-Readiness Dataset Scoring Metric" data-md-component="logo">
+      
+  <img src="../../assets/images/white-orange-logo.png" alt="logo">
+
+    </a>
+    AIRBDS AI-Readiness Dataset Scoring Metric
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/AIBIO-UK/airbds-metric" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    AIBIO-UK/airbds-metric
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Course Content
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Course Content
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../chapter_01/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    1. Getting Started — Choose Your Format
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2. CSV Walkthrough (Beginner)
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2. CSV Walkthrough (Beginner)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#step-1-download-the-template" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 1 — Download the template
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-2-open-in-excel-or-google-sheets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 2 — Open in Excel or Google Sheets
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-3-fill-in-section-a-your-details" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 3 — Fill in Section A: your details
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-4-answer-the-28-questions-section-b" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 4 — Answer the 28 questions (Section B)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-5-handle-ethics-questions-acm-24-to-acm-28" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 5 — Handle Ethics questions (ACM-24 to ACM-28)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-6-calculate-your-score" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 6 — Calculate your score
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-7-determine-the-grade" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 7 — Determine the grade
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-8-save-and-name-your-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 8 — Save and name your file
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-9-submit-your-review" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Step 9 — Submit your review
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../chapter_03_yaml/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    3. YAML Walkthrough (Intermediate)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../references/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    References
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../follow_up_training/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Further Resources
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  <nav class="md-tags" >
+    
+      
+      
+      
+      
+        <a href="../../keywords/#tag:csv" class="md-tag">CSV</a>
+      
+    
+      
+      
+      
+      
+        <a href="../../keywords/#tag:excel" class="md-tag">Excel</a>
+      
+    
+      
+      
+      
+      
+        <a href="../../keywords/#tag:google-sheets" class="md-tag">Google Sheets</a>
+      
+    
+      
+      
+      
+      
+        <a href="../../keywords/#tag:beginner" class="md-tag">beginner</a>
+      
+    
+  </nav>
+
+
+  
+  
+
+
+<div><h1 id="csv-walkthrough">CSV Walkthrough</h1>
+<p><strong>Beginner · No coding required · Works in Excel or Google Sheets</strong></p>
+<div class="admonition overview">
+<p class="admonition-title">Overview</p>
+<p><strong>Questions:</strong></p>
+<ul>
+<li>How do I download and open the CSV template?</li>
+<li>How do I fill in my reviewer details and answer all 28 questions?</li>
+<li>How do I calculate my score and grade?</li>
+<li>How do I save and submit my review?</li>
+</ul>
+<p><strong>Learning Objectives</strong></p>
+<p>By the end of this chapter, you will be able to:</p>
+<ol>
+<li>Open the review template in a spreadsheet application</li>
+<li>Fill in all 28 questions with Yes/No answers</li>
+<li>Correctly handle the Ethics questions (ACM-24–28)</li>
+<li>Calculate a weighted score and assign a grade</li>
+<li>Save and name your file ready for submission</li>
+</ol>
+<p><strong>Time:</strong> 30–60 minutes per dataset review (depending on how well you know the dataset)</p>
+<p><strong>Prerequisite:</strong> Complete <a href="../chapter_01/">Chapter 1</a> to confirm CSV is the right format for you.</p>
+</div>
+<hr>
+<h2 id="step-1-download-the-template">Step 1 — Download the template</h2>
+<p>Download the blank review template:</p>
+<p><strong><a href="https://github.com/AIBIO-UK/airbds-metric/raw/main/metric/review_template.csv">metric/review_template.csv</a></strong></p>
+<p>On GitHub: click the link, then click the <strong>Download raw file</strong> button (down-arrow icon, top-right of the file view).</p>
+<div class="admonition tip">
+<p class="admonition-title">Reference file</p>
+<p>The full question reference — with complete guidance text, weights, and source mappings — is also available as a CSV:
+<a href="https://github.com/AIBIO-UK/airbds-metric/raw/main/metric/airbds_metric_v0.3.csv">metric/airbds_metric_v0.3.csv</a></p>
+</div>
+<hr>
+<h2 id="step-2-open-in-excel-or-google-sheets">Step 2 — Open in Excel or Google Sheets</h2>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked id="__tabbed_1_1" name="__tabbed_1" type="radio"><input id="__tabbed_1_2" name="__tabbed_1" type="radio"><div class="tabbed-labels"><label for="__tabbed_1_1">Microsoft Excel</label><label for="__tabbed_1_2">Google Sheets</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p>File → Open → browse to the downloaded <code>.csv</code> file. If prompted about the file format, choose to keep it as CSV.</p>
+</div>
+<div class="tabbed-block">
+<ol>
+<li>Go to <a href="https://sheets.google.com">sheets.google.com</a></li>
+<li>Click <strong>Blank</strong></li>
+<li>File → Import → Upload the <code>.csv</code> file</li>
+<li>Choose <strong>Comma</strong> as the separator type</li>
+<li>Click <strong>Import data</strong></li>
+</ol>
+</div>
+</div>
+</div>
+<p>Once open, you will see two sections:</p>
+<table>
+<thead>
+<tr>
+<th>Rows</th>
+<th>Content</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1–12</td>
+<td><strong>Section A</strong> — Reviewer and dataset information (fill in the <code>value</code> column)</td>
+</tr>
+<tr>
+<td>13</td>
+<td>Blank separator row</td>
+</tr>
+<tr>
+<td>14</td>
+<td>Column headers for the answer table</td>
+</tr>
+<tr>
+<td>15–42</td>
+<td><strong>Section B</strong> — 28 questions (fill in <code>answer</code> and <code>comments</code> columns)</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="step-3-fill-in-section-a-your-details">Step 3 — Fill in Section A: your details</h2>
+<p>Click in the <strong><code>value</code></strong> cell next to each field and type your information:</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>What to enter</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>schema_version</code></td>
+<td>Leave as <code>0.3</code></td>
+</tr>
+<tr>
+<td><code>reviewer_name</code></td>
+<td>Your full name</td>
+</tr>
+<tr>
+<td><code>reviewer_initials</code></td>
+<td>Your initials (e.g. <code>CH</code>)</td>
+</tr>
+<tr>
+<td><code>reviewer_orcid</code></td>
+<td>Your ORCID (e.g. <code>0000-0000-0000-0000</code>) — leave blank if none</td>
+</tr>
+<tr>
+<td><code>reviewer_affiliation</code></td>
+<td>Your institution</td>
+</tr>
+<tr>
+<td><code>review_date</code></td>
+<td>Today’s date in <code>YYYY-MM-DD</code> format (e.g. <code>2025-06-01</code>)</td>
+</tr>
+<tr>
+<td><code>dataset_name</code></td>
+<td>Name of the dataset you are reviewing</td>
+</tr>
+<tr>
+<td><code>dataset_url</code></td>
+<td>URL of the dataset’s landing page</td>
+</tr>
+<tr>
+<td><code>dataset_accession</code></td>
+<td>Accession number (e.g. <code>E-MTAB-1234</code>) if available</td>
+</tr>
+<tr>
+<td><code>hosting_resource</code></td>
+<td>Where the dataset is hosted (e.g. <code>ArrayExpress</code>, <code>Zenodo</code>)</td>
+</tr>
+<tr>
+<td><code>process_comments</code></td>
+<td>Any notes about your review process (optional)</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="step-4-answer-the-28-questions-section-b">Step 4 — Answer the 28 questions (Section B)</h2>
+<p>Scroll to <strong>row 15</strong>. You will see the answer table:</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>question_id</code></td>
+<td>Question code (ACM-1 to ACM-28) — <strong>do not edit</strong></td>
+</tr>
+<tr>
+<td><code>scope</code></td>
+<td>Topic area — <strong>do not edit</strong></td>
+</tr>
+<tr>
+<td><code>theme</code></td>
+<td>Sub-topic — <strong>do not edit</strong></td>
+</tr>
+<tr>
+<td><code>weight</code></td>
+<td>Critical / Important / Optional — <strong>do not edit</strong></td>
+</tr>
+<tr>
+<td><code>question</code></td>
+<td>The question text — <strong>read this</strong></td>
+</tr>
+<tr>
+<td><code>guidance</code></td>
+<td>Detailed explanation to help you decide — <strong>read this</strong></td>
+</tr>
+<tr>
+<td><strong><code>answer</code></strong></td>
+<td><strong>Type <code>Yes</code> or <code>No</code> here</strong></td>
+</tr>
+<tr>
+<td><strong><code>not_applicable</code></strong></td>
+<td><strong>See Step 5 (Ethics questions only)</strong></td>
+</tr>
+<tr>
+<td><strong><code>comments</code></strong></td>
+<td><strong>Optional: add any notes about your answer</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Work through each of the 28 rows. Read the <code>question</code> and <code>guidance</code> columns, then type <code>Yes</code> or <code>No</code> in the <code>answer</code> column.</p>
+<div class="admonition tip">
+<p class="admonition-title">Hide the guidance column</p>
+<p>Once you have read the guidance, you can hide that column to make the table less cluttered.
+Right-click the column header → <strong>Hide column</strong> (Excel) or <strong>Hide column</strong> (Google Sheets).</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Weight matters</p>
+<p>Questions marked <strong>Critical</strong> carry 80 points each. Getting one wrong has a large effect on the grade. Read the guidance carefully for ACM-4, ACM-5, ACM-9, ACM-12, ACM-13, ACM-17, ACM-20, and ACM-24/25.</p>
+</div>
+<hr>
+<h2 id="step-5-handle-ethics-questions-acm-24-to-acm-28">Step 5 — Handle Ethics questions (ACM-24 to ACM-28)</h2>
+<p>The last five questions apply only to datasets that contain <strong>human or animal subject data</strong>.</p>
+<div class="admonition info">
+<p class="admonition-title">Does your dataset contain human or animal subjects?</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked id="__tabbed_2_1" name="__tabbed_2" type="radio"><input id="__tabbed_2_2" name="__tabbed_2" type="radio"><div class="tabbed-labels"><label for="__tabbed_2_1">No human or animal subjects</label><label for="__tabbed_2_2">Human or animal subjects present</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p>For each of ACM-24 to ACM-28:</p>
+<ul>
+<li>Type <strong><code>Yes</code></strong> in the <code>answer</code> column</li>
+<li>Type <strong><code>TRUE</code></strong> in the <code>not_applicable</code> column</li>
+<li>Optionally add a comment such as “No human or animal subject data in this dataset”</li>
+</ul>
+</div>
+<div class="tabbed-block">
+<p>Answer each of ACM-24 to ACM-28 normally (<code>Yes</code> or <code>No</code>) based on what you find in the dataset documentation. Leave <code>not_applicable</code> as <code>FALSE</code>.</p>
+</div>
+</div>
+</div>
+</div>
+<hr>
+<h2 id="step-6-calculate-your-score">Step 6 — Calculate your score</h2>
+<p>The score for each question = <strong>1</strong> (if <code>Yes</code>) or <strong>0</strong> (if <code>No</code>), multiplied by the weight points.</p>
+<table>
+<thead>
+<tr>
+<th>Weight tier</th>
+<th>Points</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Critical</td>
+<td>80</td>
+</tr>
+<tr>
+<td>Important</td>
+<td>5</td>
+</tr>
+<tr>
+<td>Optional</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<p>Use these copy-paste formulas (assumes <code>weight</code> is in column D, <code>answer</code> in column G, rows 15–42):</p>
+<p><strong>Count Yes answers per tier:</strong>
+</p><div class="highlight"><pre><span></span><code>=COUNTIFS(D15:D42,"Critical",G15:G42,"Yes")
+=COUNTIFS(D15:D42,"Important",G15:G42,"Yes")
+=COUNTIFS(D15:D42,"Optional",G15:G42,"Yes")
+</code></pre></div>
+<p><strong>Pass rates per tier (proportion answered Yes):</strong>
+</p><div class="highlight"><pre><span></span><code>Critical pass rate:  =COUNTIFS(D15:D42,"Critical",G15:G42,"Yes") / COUNTIF(D15:D42,"Critical")
+Important pass rate: =COUNTIFS(D15:D42,"Important",G15:G42,"Yes") / COUNTIF(D15:D42,"Important")
+Optional pass rate:  =COUNTIFS(D15:D42,"Optional",G15:G42,"Yes") / COUNTIF(D15:D42,"Optional")
+</code></pre></div>
+<p><strong>Total weighted score in one formula:</strong>
+</p><div class="highlight"><pre><span></span><code>=SUMPRODUCT(
+  (G15:G42="Yes") * (D15:D42="Critical") * 80
+  + (G15:G42="Yes") * (D15:D42="Important") * 5
+  + (G15:G42="Yes") * (D15:D42="Optional") * 2
+)
+</code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">Adjusting column letters</p>
+<p>The formulas above assume the standard column layout of the template. If you have added extra columns, update the column letters (D, G) to match your spreadsheet.</p>
+</div>
+<hr>
+<h2 id="step-7-determine-the-grade">Step 7 — Determine the grade</h2>
+<p>Look up your pass rates in this table:</p>
+<table>
+<thead>
+<tr>
+<th>Grade</th>
+<th>Critical pass rate</th>
+<th>Important pass rate</th>
+<th>Optional pass rate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>🔴 <strong>Caution</strong></td>
+<td>&lt; 0.875 (&lt; 7/8)</td>
+<td>any</td>
+<td>any</td>
+</tr>
+<tr>
+<td>🟤 <strong>Bronze</strong></td>
+<td>≥ 0.875 (≥ 7/8)</td>
+<td>any</td>
+<td>any</td>
+</tr>
+<tr>
+<td>⚪ <strong>Silver</strong></td>
+<td>= 1.0 (all 8)</td>
+<td>≥ 0.5</td>
+<td>any</td>
+</tr>
+<tr>
+<td>🟡 <strong>Gold</strong></td>
+<td>= 1.0 (all 8)</td>
+<td>= 1.0 (all 11)</td>
+<td>≥ 0.5</td>
+</tr>
+</tbody>
+</table>
+<p>The full grade reference is in <a href="https://github.com/AIBIO-UK/airbds-metric/blob/main/metric/scoring_schema.csv"><code>metric/scoring_schema.csv</code></a>.</p>
+<hr>
+<h2 id="step-8-save-and-name-your-file">Step 8 — Save and name your file</h2>
+<p>Save your completed spreadsheet as a <strong>CSV</strong> file using this naming convention:</p>
+<div class="highlight"><pre><span></span><code>&lt;dataset_accession&gt;_&lt;your_initials&gt;_&lt;review_number&gt;.csv
+</code></pre></div>
+<p>Examples:
+- <code>E-MTAB-1234_CH_1.csv</code>
+- <code>PRJNA987654_GF_1.csv</code></p>
+<p>If there is no accession number, use a short descriptive name for the dataset.</p>
+<p>In Excel: File → Save As → select <strong>CSV (Comma delimited)</strong> as the file type.
+In Google Sheets: File → Download → <strong>Comma-separated values (.csv)</strong>.</p>
+<hr>
+<h2 id="step-9-submit-your-review">Step 9 — Submit your review</h2>
+<p>Completed reviews are stored in the <a href="https://github.com/AIBIO-UK/airbds-metric/tree/main/reviews"><code>reviews/</code></a> folder.</p>
+<p>See <a href="https://github.com/AIBIO-UK/airbds-metric/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a> for full submission instructions. The short version:</p>
+<ol>
+<li>Fork the repository on GitHub</li>
+<li>Add your CSV to the <code>reviews/</code> folder</li>
+<li>Open a pull request against <code>main</code></li>
+</ol>
+<div class="admonition tip">
+<p class="admonition-title">Not sure how to use GitHub?</p>
+<p>If pull requests are unfamiliar, you can email your completed CSV to the working group. Contact details are at <a href="https://aibio.ac.uk/about/working-groups/airbds/">aibio.ac.uk/about/working-groups/airbds/</a>.</p>
+</div>
+<hr>
+<p>Well done — you have completed a dataset review using the CSV format! 🎉</p>
+<p>Continue to <a href="../../follow_up_training/">Further Resources</a> or return to the <a href="../../">About page</a>.</p></div>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../chapter_01/" class="md-footer__link md-footer__link--prev" aria-label="Previous: 1. Getting Started — Choose Your Format">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                1. Getting Started — Choose Your Format
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../chapter_03_yaml/" class="md-footer__link md-footer__link--next" aria-label="Next: 3. YAML Walkthrough (Intermediate)">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                3. YAML Walkthrough (Intermediate)
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      By the AIRBDS Working Group, AIBIO-UK (CC BY 4.0)
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.top", "navigation.footer", "toc.integrate"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
