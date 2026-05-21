@@ -11,7 +11,7 @@ short_name: "AIRBDS Metric"
 version: "0.3"
 release_date: "2025"
 license: "CC-BY-4.0"
-repository: "https://github.com/gavinf97/airbds-metric"
+repository: "https://github.com/AIBIO-UK/airbds-metric"
 contact: "info@aibio.ac.uk"
 
 description: >

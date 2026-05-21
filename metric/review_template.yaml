@@ -1,7 +1,7 @@
 # Review template — AIRBDS AI-Readiness Dataset Scoring Metric v0.3
 # Fill in all fields. For each question, set answer to "Yes" or "No".
 # See scoring_schema.yaml for grade calculation details.
-# Submit completed file as a PR to https://github.com/gavinf97/airbds-metric
+# Submit completed file as a PR to https://github.com/AIBIO-UK/airbds-metric
 
 schema_version: "0.3"
 

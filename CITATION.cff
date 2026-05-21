@@ -7,7 +7,7 @@ title: "AIRBDS AI-Readiness Dataset Scoring Metric"
 version: "0.3"
 date-released: "2025"
 license: CC-BY-4.0
-repository-code: "https://github.com/gavinf97/airbds-metric"
+repository-code: "https://github.com/AIBIO-UK/airbds-metric"
 url: "https://aibio.ac.uk/about/working-groups/airbds/"
 abstract: >
   A structured, versioned checklist for evaluating the AI-readiness of
