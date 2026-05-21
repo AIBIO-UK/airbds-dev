@@ -1,0 +1,56 @@
+# Review — AIRBDS AI-Readiness Dataset Scoring Metric v0.3
+# Example: fully compliant YAML review (all 28 questions answered)
+# Expected outcome: renamed to E-MTAB-0001_TS_1_713_Gold.yaml, CSV companion generated
+
+schema_version: "0.3"
+
+reviewer:
+  name: "Test Submitter"
+  initials: "TS"
+  orcid: "0000-0000-0000-0001"
+  affiliation: "AIBIO-UK Test Institution"
+  review_date: "2026-05-22"
+
+dataset:
+  name: "Example Bioscience Dataset"
+  url: "https://www.ebi.ac.uk/arrayexpress/experiments/E-MTAB-0001/"
+  hosting_resource: "ArrayExpress"
+  accession: "E-MTAB-0001"
+  comments: "This is a synthetic example dataset for workflow testing."
+
+process_comments: "Review conducted against metric v0.3. Dataset contains no human or animal subjects."
+
+answers:
+  ACM-1:  { answer: "Yes", comments: "Full dataset available via bulk download." }
+  ACM-2:  { answer: "Yes", comments: "Accessible via HTTPS." }
+  ACM-3:  { answer: "Yes", comments: "Supports authentication for controlled-access tier." }
+  ACM-4:  { answer: "Yes", comments: "CC-BY-4.0 license clearly stated." }
+  ACM-5:  { answer: "Yes", comments: "License explicitly permits AI/ML training use." }
+  ACM-6:  { answer: "Yes", comments: "Archive download available." }
+  ACM-7:  { answer: "Yes", comments: "ArrayExpress is a domain repository for functional genomics." }
+  ACM-8:  { answer: "Yes", comments: "Searchable by metadata fields and accession." }
+  ACM-9:  { answer: "Yes", comments: "ArrayExpress accession E-MTAB-0001 is a globally unique persistent identifier." }
+  ACM-10: { answer: "Yes", comments: "Dataset is versioned; updates tracked by ArrayExpress." }
+  ACM-11: { answer: "Yes", comments: "Bias considerations documented in metadata." }
+  ACM-12: { answer: "Yes", comments: "Follows MIAME standard for microarray data." }
+  ACM-13: { answer: "Yes", comments: "Accession E-MTAB-0001 links metadata to dataset uniquely." }
+  ACM-14: { answer: "Yes", comments: "Metadata specifies public access with no restrictions." }
+  ACM-15: { answer: "Yes", comments: "Modalities documented: RNA microarray." }
+  ACM-16: { answer: "Yes", comments: "Preprocessing pipeline available in linked GitHub repository." }
+  ACM-17: { answer: "Yes", comments: "Full provenance documented: origin, collection method, processing steps, publication status." }
+  ACM-18: { answer: "Yes", comments: "No duplicate records detected." }
+  ACM-19: { answer: "Yes", comments: "All expected records present per metadata definition." }
+  ACM-20: { answer: "Yes", comments: "Units and parameter names consistent throughout." }
+  ACM-21: { answer: "Yes", comments: "Follows MIAME domain standard." }
+  ACM-22: { answer: "Yes", comments: "Data in CEL and TXT formats, appropriate for modality." }
+  ACM-23: { answer: "Yes", comments: "TXT format is open and non-proprietary." }
+  # Ethics — dataset contains no human or animal subjects
+  ACM-24: { answer: "Yes", comments: "No human/animal subjects — not applicable.", not_applicable: true }
+  ACM-25: { answer: "Yes", comments: "No human subjects — not applicable.", not_applicable: true }
+  ACM-26: { answer: "Yes", comments: "No human subjects — not applicable.", not_applicable: true }
+  ACM-27: { answer: "Yes", comments: "No human subjects — not applicable.", not_applicable: true }
+  ACM-28: { answer: "Yes", comments: "No human subjects — not applicable.", not_applicable: true }
+
+result:
+  weighted_score: null
+  grade: ""

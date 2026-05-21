@@ -1,0 +1,44 @@
+field,value
+schema_version,0.3
+reviewer_name,
+reviewer_initials,TS
+reviewer_orcid,
+reviewer_affiliation,AIBIO-UK Test Institution
+review_date,22/05/2026
+dataset_name,Example Dataset with CSV Errors
+dataset_url,www.ebi.ac.uk/arrayexpress/experiments/E-MTAB-0004/
+dataset_accession,E-MTAB-0004
+hosting_resource,ArrayExpress
+process_comments,
+weighted_score,
+grade,
+
+question_id,scope,theme,weight,question,guidance,answer,not_applicable,comments
+ACM-1,Infrastructure,Access,Important,"Can the dataset be accessed in its entirety?","Every entry in the dataset should be accessible via direct download, API, or in a cloud container.",Yes,FALSE,
+ACM-2,Infrastructure,Access,Important,"Is there a standardised communications protocol for accessing the dataset?","For example, HTTPS, FTP, or an authenticated API.",Yes,FALSE,
+ACM-3,Infrastructure,Access,Optional,"Does the access protocol allow for authentication and authorisation where necessary?","Some datasets require controlled access.",No,FALSE,
+ACM-4,Infrastructure,License,Critical,"Is the dataset provided with a clear data-use license?","The dataset should have a license that specifies how it may be used, shared, and modified.",Yes,FALSE,
+ACM-5,Infrastructure,License,Critical,"Does the dataset's license permit use in AI/ML model training?","Some licenses explicitly restrict use in AI training or commercial AI applications.",Yes,FALSE,
+ACM-6,Infrastructure,Download,Important,"Is there a mechanism to download the entire dataset at once?","A bulk download option (e.g. archive file, rsync endpoint, or API with pagination) should be available.",Yes,FALSE,
+ACM-7,Infrastructure,Resource,Optional,"Is the hosting resource specifically designed for scientific data?","e.g. a domain repository, data repository, or institutional repository.",Yes,FALSE,
+ACM-8,Infrastructure,Resource,Optional,"Is the dataset hosted in a searchable infrastructure?","It should be possible to search for a dataset based on metadata properties as well as looking it up directly via an ID or accession.",Yes,FALSE,
+ACM-9,Infrastructure,UID,Critical,"Does the dataset have a globally unique, persistent identifier?","A URL does not count as a persistent identifier.",Yes,FALSE,
+ACM-10,Infrastructure,Updates,Optional,"If the dataset is subject to updates, does it use a version control system?","If the dataset will not be updated, mark this question ""Yes"".",Yes,FALSE,
+ACM-11,Metadata,Bias,Important,"Is consideration of bias documented in the metadata?","An accompanying research article does not form part of the metadata.",No,FALSE,
+ACM-12,Metadata,Metadata,Critical,"Does the dataset use a machine-readable, domain-appropriate metadata standard?","Metadata should include a domain-appropriate set of information about the dataset.",YES,FALSE,
+ACM-13,Metadata,Metadata,Critical,"Does the metadata include the identifier of the dataset?","The metadata should be clearly linked to the dataset with a unique identifier.",Yes,FALSE,
+ACM-14,Metadata,Metadata,Optional,"Does the metadata specify intended access controls?","e.g. ""public"", ""controlled access only"", etc.",Yes,FALSE,
+ACM-15,Metadata,Metadata,Optional,"Does the metadata document the modalities used?","e.g. RNA sequence, molecular structure, spectrum, image.",Yes,FALSE,
+ACM-16,Metadata,Preprocessing,Important,"Are transformation and preprocessing steps documented well enough to reproduce them?","Either with software in a repository, or with a detailed description.",No,FALSE,
+ACM-17,Metadata,Provenance,Critical,"Is the provenance of the dataset clearly documented?","This should include who generated or collected it, how it has been processed, whether it has been published before, whether it contains data from other sources.",Yes,FALSE,
+ACM-18,Content,Quality,Important,"Is the dataset free of duplicate records?","Repeated records or files is a common mistake that damages the quality of a dataset.",Yes,FALSE,
+ACM-19,Content,Quality,Important,"Does the dataset include all expected records and content?","The expected content is defined by the metadata.",Yes,FALSE,
+ACM-20,Content,Format,Critical,"Are units, data types and parameter names consistent between entries?","Data types and vocabularies should be used consistently.",Yes,FALSE,
+ACM-21,Content,Standards,Important,"Does the dataset follow domain standards with respect to units, data types, parameter names?","This could be indicated by a schema or domain-specific minimum information standard.",No,FALSE,
+ACM-22,Content,Format,Optional,"Does the data use an appropriate file format?","Particularly with respect to efficiency and suitability.",Yes,FALSE,
+ACM-23,Content,Format,Optional,"Is the data available in at least one open, non-proprietary format?","It should be possible to read a dataset and write it to a different format without the use of proprietary software.",Yes,FALSE,
+ACM-24,Ethics,Ethics,Critical,"If the dataset contains data from animal or human subjects, does the dataset include an ethical assessment that covers acquisition?","If the dataset contains no human or animal data, set not_applicable to TRUE and answer to Yes.",Yes,TRUE,No human or animal subjects.
+ACM-25,Ethics,Privacy,Critical,"If the dataset contains data from human subjects, does the dataset preserve the privacy of subjects?","If the dataset contains no human data, set not_applicable to TRUE and answer to Yes.",Yes,TRUE,No human subjects.
+ACM-26,Ethics,Ethics,Important,"If the dataset contains data from human subjects, does the dataset include an ethical assessment that covers data management?","If the dataset contains no human data, set not_applicable to TRUE and answer to Yes.",Yes,TRUE,No human subjects.
+ACM-27,Ethics,Security,Important,"If the dataset contains data from human subjects, does the dataset have the necessary authentication and access controls?","If the dataset contains no human data, set not_applicable to TRUE and answer to Yes.",Yes,TRUE,No human subjects.
+ACM-28,Ethics,Metadata,Optional,"If the dataset contains data from human subjects, does the metadata document data protection declarations?","If the dataset contains no human data, set not_applicable to TRUE and answer to Yes.",Yes,TRUE,No human subjects.

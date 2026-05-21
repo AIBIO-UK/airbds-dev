@@ -3,6 +3,7 @@
 [![License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
 [![Version](https://img.shields.io/badge/metric%20version-v0.3-blue)](CHANGELOG.md)
 [![AIBIO-UK](https://img.shields.io/badge/AIBIO--UK-AIRBDS%20Working%20Group-green)](https://aibio.ac.uk/about/working-groups/airbds/)
+[![Review Check](https://github.com/AIBIO-UK/airbds-metric/actions/workflows/review-check.yml/badge.svg)](https://github.com/AIBIO-UK/airbds-metric/actions/workflows/review-check.yml)
 
 A versioned, machine-readable scoring metric for evaluating the **AI-readiness
 of bioscience datasets**. Developed by the
@@ -92,10 +93,8 @@ For the spreadsheet workflow, see the [Beginner CSV Tutorial](docs/tutorial-csv.
    cp metric/review_template.yaml reviews/<accession>_<initials>_1.yaml
    ```
 2. **Answer all 28 questions** (`"Yes"` or `"No"`) in your copy.
-3. **Calculate score:** multiply each answer (1/0) by its weight points
-   (Critical=80, Important=5, Optional=2) and sum.
-4. **Assign grade** using the thresholds in `metric/scoring_schema.yaml`.
-5. **Submit a PR** — see [CONTRIBUTING.md](CONTRIBUTING.md).
+3. **Submit a PR** — see [CONTRIBUTING.md](CONTRIBUTING.md).
+4. **Automated processing** handles the rest: score calculation, grade assignment, CSV conversion, and file renaming — see [Automated Review Processing](#automated-review-processing) below.
 
 Full reviewer instructions are in [`metric/scoring_schema.yaml`](metric/scoring_schema.yaml).
 
@@ -178,6 +177,48 @@ Completed reviews reference the metric version they were scored with via the
 We welcome contributions including dataset reviews, metric improvements, and
 documentation fixes. Please read [CONTRIBUTING.md](CONTRIBUTING.md) before
 opening a PR. All contributors must abide by our [Code of Conduct](CODE_OF_CONDUCT.md).
+
+---
+
+## Automated Review Processing
+
+When a pull request or push adds or modifies a file under `reviews/`, a
+GitHub Actions workflow ([`.github/workflows/review-check.yml`](.github/workflows/review-check.yml))
+runs automatically to:
+
+1. **Validate the filename** — checks it follows `<accession>_<INITIALS>_<n>.yaml` convention
+2. **Validate all required fields** — checks `reviewer`, `dataset`, and `answers` blocks are complete and correctly formatted
+3. **Check every answer** — flags answers that are not exactly `"Yes"` or `"No"` (case-sensitive, quoted strings)
+4. **Calculate the weighted score and grade** — fills in the `result:` block automatically
+5. **Generate the companion format** — if you submit YAML, a matching CSV is created (and vice versa)
+6. **Rename the file** to include the score and grade as a postfix:
+   ```
+   E-MTAB-1234_GF_1.yaml  →  E-MTAB-1234_GF_1_595_Silver.yaml
+   ```
+
+If validation fails, the workflow reports detailed errors in the **Actions** tab
+of your pull request. Fix the reported issues and push again — the check re-runs
+automatically.
+
+**You do not need to calculate your score manually** — leave the `result:` block
+as `null` / `""` and the workflow fills it in.
+
+The workflow only processes files that changed in the current push (incremental),
+so it remains fast even as the `reviews/` directory grows.
+
+### Running the processor locally
+
+```bash
+pip install pyyaml
+
+echo "reviews/your_file.yaml" > /tmp/files.txt
+python3 scripts/review_processor.py \
+    --files /tmp/files.txt \
+    --metric metric/airbds_metric_v0.3.yaml
+```
+
+Example test files demonstrating compliant and non-compliant inputs are in
+[`reviews/examples/`](reviews/examples/).
 
 ---
 

@@ -1,0 +1,59 @@
+# Review — AIRBDS AI-Readiness Dataset Scoring Metric v0.3
+# Example: NON-COMPLIANT — bad filename
+#
+# Problem: "noinit" is all lowercase — initials must be 2-6 uppercase letters (A-Z).
+# Correct filename would be: bad-filename_XX_1.yaml  (where XX = uppercase initials)
+#
+# Expected workflow outcome: FAILS filename validation, no scoring attempted.
+
+schema_version: "0.3"
+
+reviewer:
+  name: "Test Submitter"
+  initials: "TS"
+  orcid: ""
+  affiliation: "AIBIO-UK Test Institution"
+  review_date: "2026-05-22"
+
+dataset:
+  name: "Example Dataset"
+  url: "https://example.org/dataset"
+  hosting_resource: "Example Repository"
+  accession: ""
+  comments: ""
+
+process_comments: ""
+
+answers:
+  ACM-1:  { answer: "Yes", comments: "" }
+  ACM-2:  { answer: "Yes", comments: "" }
+  ACM-3:  { answer: "Yes", comments: "" }
+  ACM-4:  { answer: "Yes", comments: "" }
+  ACM-5:  { answer: "Yes", comments: "" }
+  ACM-6:  { answer: "Yes", comments: "" }
+  ACM-7:  { answer: "Yes", comments: "" }
+  ACM-8:  { answer: "Yes", comments: "" }
+  ACM-9:  { answer: "Yes", comments: "" }
+  ACM-10: { answer: "Yes", comments: "" }
+  ACM-11: { answer: "Yes", comments: "" }
+  ACM-12: { answer: "Yes", comments: "" }
+  ACM-13: { answer: "Yes", comments: "" }
+  ACM-14: { answer: "Yes", comments: "" }
+  ACM-15: { answer: "Yes", comments: "" }
+  ACM-16: { answer: "Yes", comments: "" }
+  ACM-17: { answer: "Yes", comments: "" }
+  ACM-18: { answer: "Yes", comments: "" }
+  ACM-19: { answer: "Yes", comments: "" }
+  ACM-20: { answer: "Yes", comments: "" }
+  ACM-21: { answer: "Yes", comments: "" }
+  ACM-22: { answer: "Yes", comments: "" }
+  ACM-23: { answer: "Yes", comments: "" }
+  ACM-24: { answer: "Yes", comments: "", not_applicable: true }
+  ACM-25: { answer: "Yes", comments: "", not_applicable: true }
+  ACM-26: { answer: "Yes", comments: "", not_applicable: true }
+  ACM-27: { answer: "Yes", comments: "", not_applicable: true }
+  ACM-28: { answer: "Yes", comments: "", not_applicable: true }
+
+result:
+  weighted_score: null
+  grade: ""

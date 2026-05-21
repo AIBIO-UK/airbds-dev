@@ -1,0 +1,62 @@
+# Review — AIRBDS AI-Readiness Dataset Scoring Metric v0.3
+# Example: NON-COMPLIANT YAML — multiple content errors
+#
+# Intentional errors in this file (4 distinct issues):
+#   1. reviewer.name is empty (required field)
+#   2. reviewer.review_date uses non-ISO format: "2025-6-1" instead of "2025-06-01"
+#   3. answers.ACM-4.answer is "yes" (lowercase) — must be exactly "Yes"
+#   4. answers.ACM-17 block is missing entirely
+#
+# Expected workflow outcome: FAILS content validation with 4 errors listed.
+
+schema_version: "0.3"
+
+reviewer:
+  name: ""                # ERROR 1: required field is empty
+  initials: "TS"
+  orcid: ""
+  affiliation: "AIBIO-UK Test Institution"
+  review_date: "2025-6-1" # ERROR 2: not zero-padded (should be "2025-06-01")
+
+dataset:
+  name: "Example Dataset with Errors"
+  url: "https://www.ebi.ac.uk/arrayexpress/experiments/E-MTAB-0003/"
+  hosting_resource: "ArrayExpress"
+  accession: "E-MTAB-0003"
+  comments: ""
+
+process_comments: ""
+
+answers:
+  ACM-1:  { answer: "Yes", comments: "" }
+  ACM-2:  { answer: "Yes", comments: "" }
+  ACM-3:  { answer: "No", comments: "" }
+  ACM-4:  { answer: "yes", comments: "" }  # ERROR 3: lowercase "yes" — invalid
+  ACM-5:  { answer: "Yes", comments: "" }
+  ACM-6:  { answer: "Yes", comments: "" }
+  ACM-7:  { answer: "No", comments: "" }
+  ACM-8:  { answer: "Yes", comments: "" }
+  ACM-9:  { answer: "Yes", comments: "" }
+  ACM-10: { answer: "Yes", comments: "" }
+  ACM-11: { answer: "No", comments: "" }
+  ACM-12: { answer: "Yes", comments: "" }
+  ACM-13: { answer: "Yes", comments: "" }
+  ACM-14: { answer: "No", comments: "" }
+  ACM-15: { answer: "Yes", comments: "" }
+  ACM-16: { answer: "No", comments: "" }
+  # ERROR 4: ACM-17 block is missing entirely
+  ACM-18: { answer: "Yes", comments: "" }
+  ACM-19: { answer: "Yes", comments: "" }
+  ACM-20: { answer: "Yes", comments: "" }
+  ACM-21: { answer: "No", comments: "" }
+  ACM-22: { answer: "Yes", comments: "" }
+  ACM-23: { answer: "Yes", comments: "" }
+  ACM-24: { answer: "Yes", comments: "", not_applicable: true }
+  ACM-25: { answer: "Yes", comments: "", not_applicable: true }
+  ACM-26: { answer: "Yes", comments: "", not_applicable: true }
+  ACM-27: { answer: "Yes", comments: "", not_applicable: true }
+  ACM-28: { answer: "Yes", comments: "", not_applicable: true }
+
+result:
+  weighted_score: null
+  grade: ""

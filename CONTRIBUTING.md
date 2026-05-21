@@ -38,18 +38,29 @@ The primary contribution type is a completed dataset review scored using the
 AIRBDS metric.
 
 1. **Copy the template:** Start from
-   [`metric/review_template.yaml`](metric/review_template.yaml).
+   [`metric/review_template.yaml`](metric/review_template.yaml) (YAML) or
+   [`metric/review_template.csv`](metric/review_template.csv) (CSV spreadsheet).
 2. **Name your file:** Use the convention
    `reviews/<dataset_accession>_<reviewer_initials>_<n>.yaml`  
-   e.g. `reviews/E-MTAB-1234_CH_1.yaml`
-3. **Fill in all fields:** Answer all 28 questions ("Yes" or "No"). For Ethics
+   e.g. `reviews/E-MTAB-1234_CH_1.yaml`  
+   Initials must be **uppercase letters only** (A-Z, 2–6 characters).
+3. **Fill in all fields:** Answer all 28 questions (`"Yes"` or `"No"`, case-sensitive, quoted). For Ethics
    questions (ACM-24 to ACM-28), if the dataset contains no human or animal
    subject data record the answer as `"Yes"` and set `not_applicable: true`
    with a brief comment.
-4. **Calculate your score:** Use the weights in
-   [`metric/scoring_schema.yaml`](metric/scoring_schema.yaml). Record the total
-   weighted score and grade in the `result` block.
+4. **Leave the `result:` block empty** — the automated workflow calculates your
+   weighted score and grade when you open a pull request. You do not need to
+   fill in `weighted_score` or `grade` manually.
 5. **Submit a PR** — see [Pull Requests](#pull-requests).
+
+Once your PR is open, the [Review Check workflow](.github/workflows/review-check.yml) will:
+- Validate your filename and all required fields
+- Calculate your score and grade
+- Generate the companion format (YAML ↔ CSV)
+- Rename the file to include the score and grade (e.g. `E-MTAB-1234_CH_1_595_Silver.yaml`)
+- Commit the changes back to your branch
+
+If validation fails, the **Actions** tab of your PR shows a full error report.
 
 Inter-rater reliability is important. Where possible, datasets should be
 reviewed independently by at least two members before the review is merged.

@@ -1,0 +1,108 @@
+name: Review Processor Test
+
+on:
+  workflow_dispatch:
+    inputs:
+      restore_examples:
+        description: 'Restore example files to original state after test'
+        required: false
+        default: 'true'
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  test-compliant-yaml:
+    name: Test — compliant YAML
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install pyyaml
+      - name: Run processor on compliant YAML
+        run: |
+          cp reviews/examples/E-MTAB-0001_TS_1.yaml /tmp/test_yaml.yaml
+          echo "/tmp/test_yaml.yaml" > /tmp/files.txt
+          python3 scripts/review_processor.py \
+            --files /tmp/files.txt \
+            --metric metric/airbds_metric_v0.3.yaml
+          echo "Exit code: $? (expected: 0)"
+          ls /tmp/test_yaml*.yaml /tmp/test_yaml*.csv 2>/dev/null && echo "Companion files generated."
+
+  test-compliant-csv:
+    name: Test — compliant CSV
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install pyyaml
+      - name: Run processor on compliant CSV
+        run: |
+          cp reviews/examples/E-MTAB-0002_TS_1.csv /tmp/test_csv.csv
+          echo "/tmp/test_csv.csv" > /tmp/files.txt
+          python3 scripts/review_processor.py \
+            --files /tmp/files.txt \
+            --metric metric/airbds_metric_v0.3.yaml
+          echo "Exit code: $? (expected: 0)"
+
+  test-bad-filename:
+    name: Test — bad filename
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install pyyaml
+      - name: Run processor on bad filename (should exit 1)
+        run: |
+          cp reviews/examples/bad-filename_noinit.yaml /tmp/bad-filename_noinit.yaml
+          echo "/tmp/bad-filename_noinit.yaml" > /tmp/files.txt
+          python3 scripts/review_processor.py \
+            --files /tmp/files.txt \
+            --metric metric/airbds_metric_v0.3.yaml && \
+            { echo "ERROR: expected exit code 1, got 0"; exit 1; } || \
+            echo "Correctly failed with exit code 1."
+
+  test-bad-yaml-content:
+    name: Test — bad YAML content
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install pyyaml
+      - name: Run processor on non-compliant YAML (should exit 1 with 4 errors)
+        run: |
+          cp reviews/examples/E-MTAB-0003_TS_1.yaml /tmp/E-MTAB-0003_TS_1.yaml
+          echo "/tmp/E-MTAB-0003_TS_1.yaml" > /tmp/files.txt
+          python3 scripts/review_processor.py \
+            --files /tmp/files.txt \
+            --metric metric/airbds_metric_v0.3.yaml && \
+            { echo "ERROR: expected exit code 1, got 0"; exit 1; } || \
+            echo "Correctly failed with exit code 1."
+
+  test-bad-csv-content:
+    name: Test — bad CSV content
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install pyyaml
+      - name: Run processor on non-compliant CSV (should exit 1 with 4 errors)
+        run: |
+          cp reviews/examples/E-MTAB-0004_TS_1.csv /tmp/E-MTAB-0004_TS_1.csv
+          echo "/tmp/E-MTAB-0004_TS_1.csv" > /tmp/files.txt
+          python3 scripts/review_processor.py \
+            --files /tmp/files.txt \
+            --metric metric/airbds_metric_v0.3.yaml && \
+            { echo "ERROR: expected exit code 1, got 0"; exit 1; } || \
+            echo "Correctly failed with exit code 1."
