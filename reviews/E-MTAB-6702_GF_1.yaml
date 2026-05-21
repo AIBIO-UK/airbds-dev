@@ -5,7 +5,7 @@ reviewer:
   initials: "GF"
   orcid: "0000-0000-0000-0000"
   affiliation: "University of Padova; EMBL-EBI"
-  review_date: "2026-05-22"
+  review_date: "2025-05-21"
 
 dataset:
   name: "Single-cell RNA-seq of mouse embryonic stem cells under different culture conditions"
@@ -40,7 +40,6 @@ answers:
   ACM-21: { answer: "Yes", comments: "Follows MINSEQE standard." }
   ACM-22: { answer: "Yes", comments: "FASTQ for raw data, MEX format for count matrices — both appropriate." }
   ACM-23: { answer: "Yes", comments: "FASTQ and plain-text MEX are open, non-proprietary formats." }
-  # Ethics — mouse cell line data, no human subjects
   ACM-24: { answer: "Yes", comments: "Mouse cell line data only; no human or animal subject ethics applies.", not_applicable: true }
   ACM-25: { answer: "Yes", comments: "No human subjects.", not_applicable: true }
   ACM-26: { answer: "Yes", comments: "No human subjects.", not_applicable: true }

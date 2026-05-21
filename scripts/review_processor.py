@@ -278,10 +278,6 @@ def _validate_date(value: str, field: str, errors: list) -> None:
             errors.append(
                 f"`{field}`: `{value}` is before 2024 — check if this is correct"
             )
-        if parsed > date.today():
-            errors.append(
-                f"`{field}`: `{value}` is in the future"
-            )
     except ValueError:
         errors.append(f"`{field}`: `{value}` is not a valid calendar date")
 
