@@ -1,0 +1,114 @@
+# Review — AIRBDS AI-Readiness Dataset Scoring Metric v0.3
+# Auto-processed by AIRBDS Review Processor
+
+schema_version: "0.3"
+reviewer:
+  name: Gavin Farrell
+  initials: GF
+  orcid: 0000-0000-0000-0000
+  affiliation: University of Padova; EMBL-EBI
+  review_date: '2025-05-21'
+dataset:
+  name: Single-cell RNA-seq of mouse embryonic stem cells under different culture
+    conditions
+  url: https://www.ebi.ac.uk/arrayexpress/experiments/E-MTAB-6702/
+  hosting_resource: ArrayExpress
+  accession: E-MTAB-6702
+  comments: Publicly released dataset, no human or animal subjects with ethical concerns
+    beyond standard mouse work.
+process_comments: Review conducted against AIRBDS Metric v0.3. Dataset contains mouse
+  (non-human) cell line data.
+answers:
+  ACM-1:
+    answer: "Yes"
+    comments: Full dataset accessible via ArrayExpress bulk download.
+  ACM-2:
+    answer: "Yes"
+    comments: Accessible over HTTPS.
+  ACM-3:
+    answer: "Yes"
+    comments: ArrayExpress supports authenticated access for embargoed submissions.
+  ACM-4:
+    answer: "Yes"
+    comments: CC-BY-4.0 license stated on the ArrayExpress record.
+  ACM-5:
+    answer: "Yes"
+    comments: CC-BY-4.0 permits use in AI/ML training without restriction.
+  ACM-6:
+    answer: "Yes"
+    comments: Archive download available via ArrayExpress FTP.
+  ACM-7:
+    answer: "Yes"
+    comments: ArrayExpress is a EMBL-EBI domain repository for functional genomics.
+  ACM-8:
+    answer: "Yes"
+    comments: Searchable by accession, organism, assay type, and metadata fields.
+  ACM-9:
+    answer: "Yes"
+    comments: E-MTAB-6702 is a globally unique, persistent ArrayExpress accession.
+  ACM-10:
+    answer: "Yes"
+    comments: Dataset is static post-publication; no updates expected.
+  ACM-11:
+    answer: "No"
+    comments: No explicit bias documentation in the metadata record.
+  ACM-12:
+    answer: "Yes"
+    comments: Follows MINSEQE minimum information standard for sequencing experiments.
+  ACM-13:
+    answer: "Yes"
+    comments: Accession E-MTAB-6702 is present in the metadata.
+  ACM-14:
+    answer: "Yes"
+    comments: Metadata states publicly available.
+  ACM-15:
+    answer: "Yes"
+    comments: 'Modality documented: single-cell RNA-seq (10x Chromium).'
+  ACM-16:
+    answer: "Yes"
+    comments: Preprocessing steps described in methods of linked publication.
+  ACM-17:
+    answer: "Yes"
+    comments: 'Provenance documented: originating lab, collection protocol, published
+      in Nature Cell Biology.'
+  ACM-18:
+    answer: "Yes"
+    comments: No duplicate records found.
+  ACM-19:
+    answer: "Yes"
+    comments: All expected FASTQ and processed matrix files are present.
+  ACM-20:
+    answer: "Yes"
+    comments: Consistent naming and units throughout the dataset.
+  ACM-21:
+    answer: "Yes"
+    comments: Follows MINSEQE standard.
+  ACM-22:
+    answer: "Yes"
+    comments: FASTQ for raw data, MEX format for count matrices — both appropriate.
+  ACM-23:
+    answer: "Yes"
+    comments: FASTQ and plain-text MEX are open, non-proprietary formats.
+  ACM-24:
+    answer: "Yes"
+    comments: Mouse cell line data only; no human or animal subject ethics applies.
+    not_applicable: true
+  ACM-25:
+    answer: "Yes"
+    comments: No human subjects.
+    not_applicable: true
+  ACM-26:
+    answer: "Yes"
+    comments: No human subjects.
+    not_applicable: true
+  ACM-27:
+    answer: "Yes"
+    comments: No human subjects — public dataset with no access controls required.
+    not_applicable: true
+  ACM-28:
+    answer: "Yes"
+    comments: No human subjects.
+    not_applicable: true
+result:
+  weighted_score: 783
+  grade: Silver

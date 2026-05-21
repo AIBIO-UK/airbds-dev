@@ -1,0 +1,116 @@
+# Review — AIRBDS AI-Readiness Dataset Scoring Metric v0.3
+# Auto-processed by AIRBDS Review Processor
+
+schema_version: "0.3"
+reviewer:
+  name: Gavin Farrell
+  initials: GF
+  orcid: 0000-0000-0000-0000
+  affiliation: University of Padova; EMBL-EBI
+  review_date: '2025-05-21'
+dataset:
+  name: Pan-cancer proteogenomics — CPTAC breast cancer cohort
+  url: https://proteomics.cancer.gov/data-portal/cptac/brca
+  hosting_resource: PRIDE / CPTAC Data Portal
+  accession: PXD001819
+  comments: ""
+process_comments: Review conducted against AIRBDS Metric v0.3. Dataset contains human
+  tumour samples — ethics questions answered in full.
+answers:
+  ACM-1:
+    answer: "Yes"
+    comments: Full dataset downloadable via PRIDE and CPTAC data portal.
+  ACM-2:
+    answer: "Yes"
+    comments: Accessible via HTTPS and FTP.
+  ACM-3:
+    answer: "Yes"
+    comments: PRIDE supports authenticated access; CPTAC portal requires registration
+      for some files.
+  ACM-4:
+    answer: "Yes"
+    comments: CC-BY-4.0 applied via CPTAC data use agreement.
+  ACM-5:
+    answer: "Yes"
+    comments: License permits non-commercial research including AI/ML.
+  ACM-6:
+    answer: "Yes"
+    comments: Bulk download available via PRIDE FTP and CPTAC download tool.
+  ACM-7:
+    answer: "Yes"
+    comments: PRIDE is a domain repository; CPTAC Data Portal is purpose-built for
+      cancer proteogenomics.
+  ACM-8:
+    answer: "Yes"
+    comments: Searchable by accession
+  ACM-9:
+    answer: "Yes"
+    comments: PXD001819 is a persistent PRIDE accession.
+  ACM-10:
+    answer: "Yes"
+    comments: Static post-publication dataset; no updates expected.
+  ACM-11:
+    answer: "No"
+    comments: No explicit bias statement in the metadata record.
+  ACM-12:
+    answer: "Yes"
+    comments: Follows MIAPE standard for proteomics; mzIdentML and mzTab used.
+  ACM-13:
+    answer: "Yes"
+    comments: PXD001819 accession present in metadata.
+  ACM-14:
+    answer: "Yes"
+    comments: Access level stated as public with registration required for some files.
+  ACM-15:
+    answer: "Yes"
+    comments: 'Modality documented: mass spectrometry-based proteomics (TMT-labelled).'
+  ACM-16:
+    answer: "Yes"
+    comments: Preprocessing pipeline described in linked publication and supplementary
+      methods.
+  ACM-17:
+    answer: "Yes"
+    comments: 'Full provenance: CPTAC consortium'
+  ACM-18:
+    answer: "Yes"
+    comments: No duplicate records identified.
+  ACM-19:
+    answer: "Yes"
+    comments: All expected raw and processed files present per metadata.
+  ACM-20:
+    answer: "Yes"
+    comments: Consistent parameter naming and units across all samples.
+  ACM-21:
+    answer: "Yes"
+    comments: Follows HUPO-PSI mzML and mzIdentML standards.
+  ACM-22:
+    answer: "Yes"
+    comments: mzML for spectra
+  ACM-23:
+    answer: "Yes"
+    comments: mzML and mzIdentML are open XML-based formats.
+  ACM-24:
+    answer: "Yes"
+    comments: IRB approval documented; informed consent obtained from all patients
+      per CPTAC protocols.
+    not_applicable: false
+  ACM-25:
+    answer: "Yes"
+    comments: De-identified proteomics data; reidentification risk assessed and mitigated.
+    not_applicable: false
+  ACM-26:
+    answer: "Yes"
+    comments: CPTAC data use agreement covers storage
+    not_applicable: false
+  ACM-27:
+    answer: "Yes"
+    comments: Registration required; controlled access tier available for raw clinical
+      data.
+    not_applicable: false
+  ACM-28:
+    answer: "Yes"
+    comments: Consent type and legal basis documented in CPTAC data use agreement.
+    not_applicable: false
+result:
+  weighted_score: 783
+  grade: Silver
