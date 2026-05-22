@@ -10,9 +10,9 @@ We recommend you use the most capable model you have to perform the assessment.
 
 # Installation instructions
 
-There are currently only installation instructions for Claude Web.
+Below there are some instructions for using the skills with different AI assistant providers (e.g. Google, Anthropic).
 
-Other instructions to follow.
+Other instructions to follow. Pull requests containing instructions or code for getting these skills to work with other assistants very welcome.
 
 When a skill is installed the assistant will automtically pick it up when relevant. So to perform an assessment you can prompt something like "Please perform an AIRBDS assessment on <dataset-url>", e.g. "Please perform an AIRBDS assessment on https://www.gbif.org/dataset/50c9509d-22c7-4a22-a47d-8c48425ef4a7"
 
