@@ -249,7 +249,7 @@ Group, AIBIO-UK:
 | Name | Affiliation | Role |
 |---|---|---|
 | Charlie Harrison | Aberystwyth University | Working Group Lead |
-| Justin Clark-Casey | BioFAIR | Member |
+| Justin Clark-Casey | Honest but Curious Consulting | Member |
 | Gavin Farrell | University of Padova; EMBL-EBI | Member |
 | Alexandra Gibbs | University of Nottingham | Member |
 | Annalisa Occhipinti | Teesside University | Member |
