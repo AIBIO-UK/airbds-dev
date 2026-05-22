@@ -1,0 +1,35 @@
+name: Continuous AIRBDS Assessment Testing Skill Release
+
+# Trigger the workflow when changes are pushed to the main branch
+on:
+  push:
+    branches:
+      - main
+      - skill-testing
+    paths:
+      - 'skills/testing/airbds-assessment-skill/SKILL.md'
+      - 'skills/testing/airbds-assessment-skill/templates/*'
+
+jobs:
+  latest-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Create ZIP file
+        run: |
+          # The -j flag ignores the directory structure, putting files at the root of the zip
+          zip -jr airbds-assessment-skill.zip skills/testing/airbds-assessment-skill
+        
+      - name: Update Test Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: testing
+          name: "Latest Testing Skill Build"
+          draft: false
+          prerelease: true
+          files: airbds-assessment-skill.zip
