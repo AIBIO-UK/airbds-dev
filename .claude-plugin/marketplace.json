@@ -1,0 +1,12 @@
+{
+  "name": "airbds-marketplace",
+  "owner": { "name": "AIBIO-UK" },
+  "plugins": [
+    {
+      "name": "airbds-assessment",
+      "source": "./",
+      "description": "Assess datasets against AIRBDS AI-Ready criteria",
+      "skills": ["./skills/testing/airbds-assessment-skill"]
+    }
+  ]
+}
