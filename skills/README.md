@@ -38,3 +38,12 @@ The skill appears in your Skills list, enabled by default.
 ### Reference
 
 Anthropic's full guide: <https://support.claude.com/en/articles/12512180-use-skills-in-claude>
+
+## Gemini
+
+For Gemini, the skill has to be run as a 'Gem'. This either has to be done:
+
+- By going to [this shared Google Gem URL](https://gemini.google.com/gem/14YUoz1uJqOSO0YA0jty4vrux3FoU_dBU?usp=sharing) or
+- Manually from this repository, using the contents of the SKILL.md and uploading the template file
+
+You will need to have already registered for Google Gemini for the link to work. We strongly recommend that you use the latest Pro model to run the assessment.
