@@ -30,8 +30,8 @@ You need **Code execution and file creation** turned on:
 
 1. [Download Testing Skill](https://github.com/AIBIO-UK/airbds-metric/releases/download/testing/airbds-assessment-skill.zip)
 2. Go to [Customize → Skills](https://claude.ai/customize/skills).
-3. Click the **+** button, then **Browse skills**.
-4. Install the downloaded skill.
+3. Click the **+** button, then **Create skill → Upload a skill**.
+4. Upload the skill.
 
 The skill appears in your Skills list, enabled by default.
 
