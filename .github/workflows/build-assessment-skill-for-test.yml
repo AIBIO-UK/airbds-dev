@@ -1,4 +1,4 @@
-name: Continuous AIRBDS Assessment Testing Skill Release
+name: Build Assessment Skill for Test
 
 # Trigger the workflow when changes are pushed to the main branch
 on:
