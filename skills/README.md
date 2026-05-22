@@ -16,6 +16,15 @@ Other instructions to follow.
 
 When a skill is installed the assistant will automtically pick it up when relevant. So to perform an assessment you can prompt something like "Please perform an AIRBDS assessment on <dataset-url>", e.g. "Please perform an AIRBDS assessment on https://www.gbif.org/dataset/50c9509d-22c7-4a22-a47d-8c48425ef4a7"
 
+## Gemini
+
+For Gemini, the skill has to be run as a 'Gem'. This either has to be done:
+
+- By going to [this shared Google Gem URL](https://gemini.google.com/gem/14YUoz1uJqOSO0YA0jty4vrux3FoU_dBU?usp=sharing) or
+- Manually from this repository, using the contents of the SKILL.md and uploading the template file
+
+You will need to have already registered for Google Gemini for the link to work. We strongly recommend that you use the latest Pro model to run the assessment.
+
 ## Claude Web (claude.ai) and Claude Desktop
 
 ### Before you start
@@ -28,13 +37,20 @@ You need **Code execution and file creation** turned on:
 
 ### Install the skill
 
-1. Clone this repository
+1. [Download the skill](https://github.com/AIBIO-UK/airbds-metric/releases/download/testing/airbds-assessment-skill.zip)
 2. Go to [Customize → Skills](https://claude.ai/customize/skills).
-3. Click the **+** button, then **Browse skills**.
-4. Install `skills/testing/airbds-assessment-skill.zip
+3. Click the **+** button, then **Create skill → Upload a skill**.
+4. Upload the skill.
 
 The skill appears in your Skills list, enabled by default.
 
 ### Reference
 
 Anthropic's full guide: <https://support.claude.com/en/articles/12512180-use-skills-in-claude>
+
+## Claude Code
+
+```
+/plugin marketplace add AIBIO-UK/airbds-metric
+/plugin install airbds-assessment@airbds-metric
+```
