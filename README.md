@@ -56,6 +56,7 @@ airbds-metric/
 │   ├── review_template.yaml      # Blank review template (YAML)
 │   └── review_template.csv       # Blank review template (CSV / spreadsheet)
 ├── reviews/                      # Completed dataset review files
+├── skills/                       # AI agent skills for performing assessments and installation instructions
 ├── docs/
 │   ├── tutorial-csv.md           # Beginner tutorial — Excel / Google Sheets
 │   └── tutorial-yaml.md          # Intermediate tutorial — text editor / CLI
@@ -155,6 +156,12 @@ Full reviewer instructions are in [`metric/scoring_schema.yaml`](metric/scoring_
 Full questions with complete guidance text are in
 [`metric/airbds_metric_v0.3.yaml`](metric/airbds_metric_v0.3.yaml) (YAML) and
 [`metric/airbds_metric_v0.3.csv`](metric/airbds_metric_v0.3.csv) (CSV).
+
+---
+
+## AI Assessment
+
+This repository also contains experimental skills for performing AIRBDS assessments via AI assistants. Please see the `skills/` directory for instructions.
 
 ---
 
