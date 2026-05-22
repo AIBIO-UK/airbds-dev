@@ -54,4 +54,4 @@ b) After the table you must also give the final score and a summary justificatio
 
 ## Files:
 
-The template worksheet is at `templates/AIRBDS Core Metric scoring v0.3 - _initials_-_#_ TEMPLATE.xlsx
+The template worksheet is at `templates/AIRBDS-Core-Metric-scoring-v0.3.xlsx`
