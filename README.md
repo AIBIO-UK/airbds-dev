@@ -159,9 +159,9 @@ Full questions with complete guidance text are in
 
 ---
 
-## AI Assessment
+## Skills for AI Assessment
 
-This repository also contains experimental skills for performing AIRBDS assessments via AI assistants. Please see the `skills/` directory for instructions.
+This repository also contains experimental skills for performing AIRBDS assessments via AI assistants. Please see the `skills/` directory for installation and use instructions.
 
 ---
 
