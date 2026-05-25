@@ -56,6 +56,12 @@ FILENAME_RE = re.compile(
 )
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
+# Strict match for a *fully scored* filename: requires both score AND grade components.
+# Groups: (1) base stem, (2) score as string, (3) grade, (4) extension
+FULL_SCORED_FILENAME_RE = re.compile(
+    r"^(.+_[A-Z]{1,6}_\d+)_(\d+)_(Caution|Bronze|Silver|Gold)\.(yaml|csv)$"
+)
+
 CSV_SECTION_A_FIELDS = [
     "schema_version", "reviewer_name", "reviewer_initials", "reviewer_orcid",
     "reviewer_affiliation", "review_date", "dataset_name", "dataset_url",
@@ -515,6 +521,67 @@ def group_by_stem(file_list: list) -> dict:
     return groups
 
 
+# ── Compliance check ──────────────────────────────────────────────────────────
+
+
+def is_already_compliant(path: str) -> tuple:
+    """Return (compliant, score, grade) if the file is already fully scored.
+
+    A file is compliant when:
+    1. Its filename already contains score AND grade components
+       (matches FULL_SCORED_FILENAME_RE).
+    2. The internal result.weighted_score matches the filename score.
+
+    Returns (False, None, None) if either condition fails or if the file
+    cannot be parsed, allowing normal processing to proceed.
+    """
+    basename = os.path.basename(path)
+    m = FULL_SCORED_FILENAME_RE.match(basename)
+    if not m:
+        return False, None, None
+
+    try:
+        filename_score = int(m.group(2))
+    except (ValueError, IndexError):
+        return False, None, None
+
+    filename_grade = m.group(3)
+    ext = m.group(4)
+
+    try:
+        if ext == "yaml":
+            with open(path, encoding="utf-8") as f:
+                data = yaml.safe_load(f)
+            if not isinstance(data, dict):
+                return False, None, None
+            result_block = data.get("result")
+            if not isinstance(result_block, dict):
+                return False, None, None
+            internal_score = result_block.get("weighted_score")
+            if internal_score is None:
+                return False, None, None
+            if int(internal_score) == filename_score:
+                return True, filename_score, filename_grade
+            return False, None, None
+
+        else:  # csv
+            with open(path, newline="", encoding="utf-8") as f:
+                reader = csv.reader(f)
+                for row in reader:
+                    if len(row) >= 2 and row[0].strip() == "weighted_score":
+                        try:
+                            internal_score = int(row[1].strip())
+                        except ValueError:
+                            return False, None, None
+                        if internal_score == filename_score:
+                            return True, filename_score, filename_grade
+                        return False, None, None
+            return False, None, None
+
+    except Exception:
+        return False, None, None
+
+
 # ── GitHub helpers ─────────────────────────────────────────────────────────────
 
 def emit_annotation(path: str, message: str) -> None:
@@ -530,7 +597,12 @@ def write_step_summary(results: list) -> None:
     error_sections = []
     for r in results:
         fname = os.path.basename(r["path"])
-        status = "✅ Pass" if r["status"] == "pass" else "❌ Fail"
+        if r["status"] == "pass":
+            status = "✅ Pass"
+        elif r["status"] == "skip":
+            status = "⏭ Skip"
+        else:
+            status = "❌ Fail"
         score = str(r["score"]) if r["score"] is not None else "—"
         grade = r["grade"] or "—"
         notes = "; ".join(r["notes"]) if r["notes"] else ""
@@ -602,6 +674,24 @@ def main() -> None:
         else:
             primary_path = formats["csv"]
             primary_fmt = "csv"
+
+        # 0. Compliance shortcut — skip files that are already fully scored.
+        # A file is compliant if its filename has the score+grade suffix AND
+        # the internal result.weighted_score matches the filename score.
+        # Skipped files do not set has_changes, so no auto-commit occurs.
+        compliant, c_score, c_grade = is_already_compliant(primary_path)
+        if compliant:
+            print(f"[skip] already compliant: {os.path.basename(primary_path)}", flush=True)
+            results.append({
+                "path": primary_path,
+                "fmt": primary_fmt,
+                "status": "skip",
+                "score": c_score,
+                "grade": c_grade,
+                "errors": [],
+                "notes": ["Already compliant — skipped"],
+            })
+            continue
 
         result: dict = {
             "path": primary_path,
