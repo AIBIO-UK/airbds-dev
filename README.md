@@ -54,9 +54,13 @@ airbds-metric/
 │   ├── scoring_schema.yaml       # Grade thresholds, weight definitions (YAML)
 │   ├── scoring_schema.csv        # Grade thresholds, weight definitions (CSV)
 │   ├── review_template.yaml      # Blank review template (YAML)
-│   └── review_template.csv       # Blank review template (CSV / spreadsheet)
+│   ├── review_template.csv       # Blank review template (CSV / spreadsheet)
+│   ├── README.md                 # Contributor guide — file coupling rules & update workflow
+│   └── SKILL.md                  # AI agent skill — propagates metric changes across the repo
 ├── reviews/                      # Completed dataset review files
 ├── skills/                       # AI agent skills for performing assessments and installation instructions
+│   ├── testing/                  # Team testing skill (beta) — Gemini, Claude Web, Claude Code
+│   └── GF/                       # GF personal variant (experimental) — YAML-based, writes review files
 ├── docs/
 │   ├── tutorial-csv.md           # Beginner tutorial — Excel / Google Sheets
 │   └── tutorial-yaml.md          # Intermediate tutorial — text editor / CLI
@@ -161,7 +165,95 @@ Full questions with complete guidance text are in
 
 ## Skills for AI Assessment
 
-This repository also contains experimental skills for performing AIRBDS assessments via AI assistants. Please see the `skills/` directory for installation and use instructions.
+> **⚠️ Beta — not yet production-ready.**
+> The AI assessment skills are under active development and have not been formally validated for general use. Results should be treated as draft assessments and reviewed by a human before submission. Breaking changes may occur between versions. See individual skill pages for known limitations.
+
+AI assistant skills allow you to run an AIRBDS assessment by simply providing a dataset URL in conversation — the assistant works through all 28 questions, scores the dataset, and (depending on the skill) writes a ready-to-submit review file.
+
+There are currently **two skills** in different stages of development:
+
+| | Team Testing Skill | GF Personal Variant |
+|---|---|---|
+| **Status** | 🟡 Beta (team-agreed, under test) | 🟠 Experimental (personal, not team-agreed) |
+| **Version** | v0.1.2 | v0.1.0-GF |
+| **Scoring reference** | XLSX spreadsheet template | YAML metric files (`metric/`) |
+| **Output** | Assessment table in chat only | Assessment table + YAML review file written to `reviews/` |
+| **Reviewer metadata** | Not collected | Collected (name, initials, ORCID, affiliation, review number) |
+| **Claude Code** | ✅ | ✅ |
+| **Claude Web / Desktop** | ✅ | ✅ (requires Code execution + file creation) |
+| **Gemini** | ✅ | — |
+| **Skill file** | [`skills/testing/airbds-assessment-skill/SKILL.md`](skills/testing/airbds-assessment-skill/SKILL.md) | [`skills/GF/GF-airbds-assessment-skill/SKILL.md`](skills/GF/GF-airbds-assessment-skill/SKILL.md) |
+
+**Which should I use?**
+- If you want the team-agreed route on Gemini, Claude Web, or Claude Desktop → use the **Team Testing Skill** below.
+- If you are working in Claude Code inside this repository and want the skill to write a `reviews/` file automatically → use the **GF Personal Variant** below.
+
+Full setup and known-issues documentation is in [`skills/README.md`](skills/README.md).
+
+---
+
+### Team Testing Skill (v0.1.2) — Gemini · Claude Web · Claude Desktop · Claude Code
+
+> **⚠️ Beta.** Known limitations: XLOOKUP formulas in the XLSX template are not recalculated by the Claude Web execution engine; scoring figures may differ from the canonical YAML-based score. Treat output as a draft requiring human verification. See [`skills/testing/ISSUES.md`](skills/testing/ISSUES.md) for the full list.
+
+#### Gemini
+
+- [**Open the shared Gem →**](https://gemini.google.com/gem/14YUoz1uJqOSO0YA0jty4vrux3FoU_dBU?usp=sharing) *(requires a Google Gemini account)*
+- Or install manually: create a new Gem, paste the contents of [`skills/testing/airbds-assessment-skill/SKILL.md`](skills/testing/airbds-assessment-skill/SKILL.md), and upload the XLSX template from [`skills/testing/airbds-assessment-skill/templates/`](skills/testing/airbds-assessment-skill/templates/).
+
+We recommend using the latest Gemini Pro model.
+
+#### Claude Web or Claude Desktop
+
+1. **Enable Code execution and file creation:**
+   - *Free / Pro / Max:* [Settings → Capabilities](https://claude.ai/settings/capabilities) → toggle on.
+   - *Team:* enabled by default.
+   - *Enterprise:* an Owner must enable **Code execution and file creation** and **Skills** in [Organisation settings → Skills](https://claude.ai/admin-settings/skills).
+2. [**Download the skill ZIP →**](https://github.com/AIBIO-UK/airbds-metric/releases/download/testing/airbds-assessment-skill.zip)
+3. Go to [Customize → Skills](https://claude.ai/customize/skills), click **+**, then **Create skill → Upload a skill**, and upload the ZIP.
+
+The skill activates automatically when you ask about an AIRBDS assessment. Try:
+> *"Please perform an AIRBDS assessment on https://www.ebi.ac.uk/arrayexpress/experiments/E-MTAB-6702/"*
+
+Full reference: [Anthropic Skills guide](https://support.claude.com/en/articles/12512180-use-skills-in-claude)
+
+#### Claude Code (marketplace)
+
+```bash
+/plugin marketplace add AIBIO-UK/airbds-metric
+/plugin install airbds-assessment@airbds-metric
+```
+
+---
+
+### GF Personal Variant (v0.1.0-GF) — Claude Code · Claude Web
+
+> **⚠️ Experimental — personal variant, not yet agreed with the team.** Uses the canonical YAML metric files (`metric/`) directly instead of the XLSX spreadsheet. Designed for contributors working inside this repository. Output is a submission-ready YAML file written directly to `reviews/`.
+
+This variant collects reviewer metadata (name, initials, ORCID, affiliation, review number) before the assessment, then writes the completed review to `reviews/<accession>_<INITIALS>_<n>.yaml` — ready for automated scoring by the `review-check` workflow.
+
+#### Claude Code (recommended — works directly in this repo)
+
+Open Claude Code in the repository root and prompt:
+
+```
+Please read skills/GF/GF-airbds-assessment-skill/SKILL.md and follow its instructions
+to assess: https://www.ebi.ac.uk/arrayexpress/experiments/E-MTAB-6702/
+```
+
+Claude Code will read the canonical YAML metric, walk through the 28 questions, produce the assessment, and write the review file to `reviews/`.
+
+#### Claude Web (with Code execution + file creation)
+
+Follow the same **Enable Code execution and file creation** step as the team skill above, then prompt:
+
+```
+Please read the SKILL.md I'm about to paste and follow its instructions…
+```
+
+and paste the contents of [`skills/GF/GF-airbds-assessment-skill/SKILL.md`](skills/GF/GF-airbds-assessment-skill/SKILL.md).
+
+Full notes and comparison with the team skill are in [`skills/GF/README.md`](skills/GF/README.md).
 
 ---
 

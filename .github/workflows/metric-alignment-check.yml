@@ -1,0 +1,384 @@
+name: Metric Alignment Check
+
+# Runs whenever any file under metric/ changes.
+# Verifies that YAML/CSV pairs are updated together and that new metric
+# versions are accompanied by CHANGELOG.md and README.md updates.
+# On misalignment: creates a GitHub Issue and (for PRs) posts a PR comment.
+# On alignment restored: closes the open metric-alignment issue if one exists.
+
+on:
+  push:
+    paths:
+      - 'metric/**'
+  pull_request:
+    paths:
+      - 'metric/**'
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  check-metric-alignment:
+    runs-on: ubuntu-latest
+
+    steps:
+      # -----------------------------------------------------------------------
+      - name: Checkout (full history)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # -----------------------------------------------------------------------
+      # Determine the comparison base — same logic as review-check.yml.
+      # Push events use event.before; PR events use the PR base SHA.
+      - name: Determine base SHA
+        id: base
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE="${{ github.event.pull_request.base.sha }}"
+          elif [ "${{ github.event.before }}" = "0000000000000000000000000000000000000000" ]; then
+            BASE="HEAD~1"
+          else
+            BASE="${{ github.event.before }}"
+          fi
+          echo "base_sha=$BASE" >> "$GITHUB_OUTPUT"
+          echo "Comparing against base: $BASE"
+
+      # -----------------------------------------------------------------------
+      # Collect changed files under metric/ (Added, Copied, Modified, Renamed).
+      # Exclude metric/README.md and metric/SKILL.md — documentation files
+      # that have no YAML/CSV counterpart and are not subject to pair-checking.
+      - name: Collect changed metric files
+        id: collect
+        run: |
+          BASE="${{ steps.base.outputs.base_sha }}"
+
+          git diff --name-only --diff-filter=ACMR "$BASE" HEAD -- 'metric/**' \
+            | grep -E '\.(yaml|csv)$' \
+            > /tmp/changed_metric_files.txt || true
+
+          COUNT=$(wc -l < /tmp/changed_metric_files.txt | tr -d ' ')
+          echo "changed_count=$COUNT" >> "$GITHUB_OUTPUT"
+          echo "Changed metric YAML/CSV files ($COUNT):"
+          cat /tmp/changed_metric_files.txt || echo "(none)"
+
+          # Also collect new (Added) versioned metric YAMLs for downstream check
+          git diff --name-only --diff-filter=A "$BASE" HEAD \
+            | grep -E '^metric/airbds_metric_v[0-9]+\.[0-9]+\.yaml$' \
+            > /tmp/new_metric_yamls.txt || true
+
+          NEW_COUNT=$(wc -l < /tmp/new_metric_yamls.txt | tr -d ' ')
+          echo "new_metric_yaml_count=$NEW_COUNT" >> "$GITHUB_OUTPUT"
+          echo "New versioned metric YAMLs ($NEW_COUNT):"
+          cat /tmp/new_metric_yamls.txt || echo "(none)"
+
+      # -----------------------------------------------------------------------
+      # Run the alignment check.
+      # Writes mismatches to /tmp/alignment_mismatches.txt (one per line).
+      - name: Run alignment check
+        id: check
+        run: |
+          touch /tmp/alignment_mismatches.txt
+
+          python3 - <<'EOF'
+          import re, sys
+
+          try:
+              with open('/tmp/changed_metric_files.txt') as f:
+                  changed = [line.strip() for line in f if line.strip()]
+          except FileNotFoundError:
+              changed = []
+
+          yaml_files = {f for f in changed if f.endswith('.yaml')}
+          csv_files  = {f for f in changed if f.endswith('.csv')}
+          mismatches = []
+
+          # -- Group A: versioned metric pairs (airbds_metric_vX.Y.yaml / .csv) --
+          metric_yaml = {f for f in yaml_files
+                         if re.match(r'^metric/airbds_metric_v[\d.]+\.yaml$', f)}
+          metric_csv  = {f for f in csv_files
+                         if re.match(r'^metric/airbds_metric_v[\d.]+\.csv$', f)}
+
+          for f in metric_yaml:
+              companion = f.replace('.yaml', '.csv')
+              if companion not in metric_csv:
+                  mismatches.append(
+                      f'YAML changed without companion CSV: {f}\n'
+                      f'  → expected also changed: {companion}'
+                  )
+          for f in metric_csv:
+              companion = f.replace('.csv', '.yaml')
+              if companion not in metric_yaml:
+                  mismatches.append(
+                      f'CSV changed without companion YAML: {f}\n'
+                      f'  → expected also changed: {companion}'
+                  )
+
+          # -- Group B: scoring_schema pair --
+          for y, c in [('metric/scoring_schema.yaml', 'metric/scoring_schema.csv')]:
+              if y in yaml_files and c not in csv_files:
+                  mismatches.append(
+                      f'YAML changed without companion CSV: {y}\n'
+                      f'  → expected also changed: {c}'
+                  )
+              if c in csv_files and y not in yaml_files:
+                  mismatches.append(
+                      f'CSV changed without companion YAML: {c}\n'
+                      f'  → expected also changed: {y}'
+                  )
+
+          # -- Group C: review_template pair --
+          for y, c in [('metric/review_template.yaml', 'metric/review_template.csv')]:
+              if y in yaml_files and c not in csv_files:
+                  mismatches.append(
+                      f'YAML changed without companion CSV: {y}\n'
+                      f'  → expected also changed: {c}'
+                  )
+              if c in csv_files and y not in yaml_files:
+                  mismatches.append(
+                      f'CSV changed without companion YAML: {c}\n'
+                      f'  → expected also changed: {y}'
+                  )
+
+          with open('/tmp/alignment_mismatches.txt', 'w') as out:
+              out.write('\n'.join(mismatches) + ('\n' if mismatches else ''))
+
+          sys.exit(0)  # exit code handled by later steps
+          EOF
+
+          # -- Group D: new-version downstream check --
+          # If a brand-new versioned metric YAML was added, CHANGELOG.md and
+          # README.md must also appear in the full repo diff for this push/PR.
+          NEW_COUNT="${{ steps.collect.outputs.new_metric_yaml_count }}"
+          if [ "$NEW_COUNT" -gt "0" ]; then
+            BASE="${{ steps.base.outputs.base_sha }}"
+            FULL_CHANGED=$(git diff --name-only "$BASE" HEAD)
+
+            if ! echo "$FULL_CHANGED" | grep -qx "CHANGELOG.md"; then
+              echo "New metric version file detected, but CHANGELOG.md was not updated." \
+                >> /tmp/alignment_mismatches.txt
+              echo "  → CHANGELOG.md must include a new entry for the new metric version." \
+                >> /tmp/alignment_mismatches.txt
+            fi
+
+            if ! echo "$FULL_CHANGED" | grep -qx "README.md"; then
+              echo "New metric version file detected, but README.md was not updated." \
+                >> /tmp/alignment_mismatches.txt
+              echo "  → README.md must reference the new metric version." \
+                >> /tmp/alignment_mismatches.txt
+            fi
+          fi
+
+          MISMATCH_COUNT=$(grep -c . /tmp/alignment_mismatches.txt 2>/dev/null || echo 0)
+          echo "mismatch_count=$MISMATCH_COUNT" >> "$GITHUB_OUTPUT"
+          echo "Total mismatches: $MISMATCH_COUNT"
+          if [ "$MISMATCH_COUNT" -gt "0" ]; then
+            echo "--- Mismatches ---"
+            cat /tmp/alignment_mismatches.txt
+          fi
+
+      # -----------------------------------------------------------------------
+      # Create or update a GitHub Issue when misalignment is detected.
+      # Deduplication: if an open metric-alignment issue already exists for
+      # this PR or commit SHA, add a comment instead of creating a new issue.
+      - name: Create or update GitHub Issue (misalignment)
+        if: steps.check.outputs.mismatch_count != '0'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const mismatches = fs.readFileSync('/tmp/alignment_mismatches.txt', 'utf8').trim();
+            const sha7 = context.sha.slice(0, 7);
+            const prNumber = context.payload.pull_request?.number;
+            const dedupKey = prNumber ? `PR #${prNumber}` : `push ${sha7}`;
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+
+            // Ensure the metric-alignment label exists
+            try {
+              await github.rest.issues.createLabel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                name: 'metric-alignment',
+                color: 'd93f0b',
+                description: 'Partial metric update detected — files out of sync'
+              });
+            } catch (e) {
+              // Label already exists — fine to continue
+            }
+
+            // Check for an existing open issue with this dedup key
+            const openIssues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: 'metric-alignment',
+              state: 'open',
+              per_page: 20
+            });
+            const existing = openIssues.data.find(i => i.title.includes(dedupKey));
+
+            if (existing) {
+              // Update existing issue with a new comment
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existing.number,
+                body: `**Still misaligned** after commit ${sha7}.\n\nOut-of-sync files:\n\`\`\`\n${mismatches}\n\`\`\`\n\nSee [workflow run](${runUrl}) for details.`
+              });
+              console.log(`Updated existing issue #${existing.number}`);
+            } else {
+              // Create a new issue
+              const issueBody = `## Metric File Alignment Check Failed
+
+**Event:** ${dedupKey}
+**Commit:** [\`${sha7}\`](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/commit/${context.sha})
+**Workflow run:** [View run](${runUrl})
+
+The following metric files are out of sync — a partial update was detected:
+
+\`\`\`
+${mismatches}
+\`\`\`
+
+---
+
+### What this means
+
+Files in \`metric/\` must always be updated in coupled pairs (YAML + CSV). When a new metric version is released, \`CHANGELOG.md\` and \`README.md\` must also be updated in the same commit range. See [**metric/README.md**](https://github.com/${context.repo.owner}/${context.repo.repo}/blob/main/metric/README.md) for the full Coupled File Groups manifest.
+
+### How to fix
+
+**Option 1 — Use the agent skill (Claude Code users):**
+Open Claude Code in this repository and run:
+> "Use the metric/SKILL.md skill to propagate the metric change to all coupled files."
+
+The skill will automatically identify what changed, regenerate companion files, and update downstream references.
+
+**Option 2 — Fix manually:**
+Update the missing files listed above, then push to the same branch/PR.
+
+Refer to the **[Coupled File Groups manifest](https://github.com/${context.repo.owner}/${context.repo.repo}/blob/main/metric/README.md#coupled-file-groups-manifest)** for the complete list of files that must change together.
+
+---
+
+### Versioning reminder
+
+| Change type | Files to update |
+|-------------|-----------------|
+| **PATCH** (guidance only) | Groups A, B, C — YAML/CSV pairs only |
+| **MINOR** (question change) | Groups A, B, C, D — all pairs + downstream files |
+| **MAJOR** (weight/threshold) | Groups A, B, C, D — all pairs + downstream files |
+
+---
+
+_This issue was created automatically by the [metric-alignment-check workflow](${runUrl}). It will be closed automatically when the misalignment is resolved._`;
+
+              const created = await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: `[metric-alignment] Out-of-sync metric files detected (${dedupKey})`,
+                body: issueBody,
+                labels: ['metric-alignment']
+              });
+              console.log(`Created issue #${created.data.number}`);
+            }
+
+      # -----------------------------------------------------------------------
+      # Post a PR comment when misalignment is detected on a pull request.
+      - name: Post PR comment (misalignment)
+        if: >
+          steps.check.outputs.mismatch_count != '0' &&
+          github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const mismatches = fs.readFileSync('/tmp/alignment_mismatches.txt', 'utf8').trim();
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `## ⚠️ Metric Alignment Check — Files Out of Sync
+
+The following metric files are **out of sync** in this PR:
+
+\`\`\`
+${mismatches}
+\`\`\`
+
+Files in \`metric/\` must be updated in coupled pairs (YAML + CSV). When a new metric version is added, \`CHANGELOG.md\` and \`README.md\` must also be updated in the same commit range.
+
+**To fix:**
+1. Update the missing files listed above and push to this branch.
+2. See [\`metric/README.md\`](../blob/main/metric/README.md#coupled-file-groups-manifest) for the full Coupled File Groups manifest.
+3. Claude Code users: use the [\`metric/SKILL.md\`](../blob/main/metric/SKILL.md) skill to propagate changes automatically.
+
+This check must pass before the PR can be merged. See [workflow run](${runUrl}) for details.`
+            });
+
+      # -----------------------------------------------------------------------
+      # When alignment is restored, close any open metric-alignment issue
+      # for this PR or commit SHA.
+      - name: Close resolved alignment issue
+        if: steps.check.outputs.mismatch_count == '0'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const sha7 = context.sha.slice(0, 7);
+            const prNumber = context.payload.pull_request?.number;
+            const dedupKey = prNumber ? `PR #${prNumber}` : `push ${sha7}`;
+
+            const openIssues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: 'metric-alignment',
+              state: 'open',
+              per_page: 20
+            });
+            const existing = openIssues.data.find(i => i.title.includes(dedupKey));
+
+            if (existing) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existing.number,
+                body: `✅ **Alignment restored** — all metric file pairs are in sync after commit \`${sha7}\`. Closing this issue.`
+              });
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existing.number,
+                state: 'closed'
+              });
+              console.log(`Closed issue #${existing.number} — alignment restored.`);
+            } else {
+              console.log('No open metric-alignment issue found for this event — nothing to close.');
+            }
+
+      # -----------------------------------------------------------------------
+      # Write a step summary on success.
+      - name: Write success summary
+        if: steps.check.outputs.mismatch_count == '0'
+        run: |
+          echo "## ✅ Metric Alignment Check Passed" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "All metric file pairs are aligned." >> "$GITHUB_STEP_SUMMARY"
+          if [ "${{ steps.collect.outputs.changed_count }}" = "0" ]; then
+            echo "(No YAML/CSV metric files were changed in this event.)" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      # -----------------------------------------------------------------------
+      # Fail the workflow when misalignment is detected so the check blocks
+      # PR merges (if branch protection rules require this check to pass).
+      - name: Fail on misalignment
+        if: steps.check.outputs.mismatch_count != '0'
+        run: |
+          MISMATCH_COUNT="${{ steps.check.outputs.mismatch_count }}"
+          echo "::error::Metric alignment check failed — ${MISMATCH_COUNT} issue(s) found."
+          echo "See the GitHub Issue and PR comment created by this run."
+          echo "Refer to metric/README.md for the Coupled File Groups manifest."
+          echo "Use metric/SKILL.md (Claude Code) to propagate changes automatically."
+          exit 1
