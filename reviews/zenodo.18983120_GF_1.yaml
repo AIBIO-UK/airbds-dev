@@ -1,0 +1,59 @@
+schema_version: "0.3"
+
+reviewer:
+  name: "Gavin Farrell"
+  initials: "GF"
+  orcid: "0000-0001-5166-8551"
+  affiliation: "University of Padova"
+  review_date: "2026-05-25"
+
+dataset:
+  name: "DOME Copilot - Data Files (V1)"
+  url: "https://zenodo.org/records/18983120"
+  hosting_resource: "Zenodo"
+  accession: "zenodo.18983120"
+  comments: >
+    Self-assessment: reviewer (GF) is a creator of this dataset. Dataset contains
+    scientific publication metadata from PubMed Central, not human or animal subject data.
+    This is v3 of the dataset (concept DOI: 10.5281/zenodo.18615687); a prior review of
+    an earlier version exists as zenodo.18973687_GF_1 (Bronze, 698 pts).
+
+process_comments: >
+  Review conducted against AIRBDS Metric v0.3 using the GF personal skill
+  (skills/GF/GF-airbds-assessment-skill/SKILL.md). Assessment based on publicly
+  visible Zenodo record metadata at https://zenodo.org/records/18983120 and the linked
+  GitHub analysis repository at https://github.com/gavinf97/DOME-Copilot-Data-Analysis.
+
+answers:
+  ACM-1:  { answer: "Yes",  comments: "Dataset is openly accessible on Zenodo; no approval process required." }
+  ACM-2:  { answer: "Yes",  comments: "Zenodo serves files over HTTPS, a standardised, open, universally implementable protocol." }
+  ACM-3:  { answer: "Yes",  comments: "Zenodo supports OAuth2 authentication and can enforce access controls on restricted deposits." }
+  ACM-4:  { answer: "Yes",  comments: "Creative Commons Attribution 4.0 International (CC-BY-4.0) license is explicitly stated on the Zenodo record." }
+  ACM-5:  { answer: "Yes",  comments: "CC-BY-4.0 imposes no restriction on AI/ML training use; attribution is required but does not prevent training." }
+  ACM-6:  { answer: "Yes",  comments: "A single archive (DOME_Copilot_Data_Package.zip, 7.0 GB) is provided for bulk download of the entire dataset." }
+  ACM-7:  { answer: "Yes",  comments: "Zenodo is CERN's open-access repository specifically designed for scientific data and research outputs." }
+  ACM-8:  { answer: "Yes",  comments: "Zenodo provides full-text search across titles, descriptions, keywords, and DOIs; the record is publicly searchable." }
+  ACM-9:  { answer: "Yes",  comments: "DOI 10.5281/zenodo.18983120 is a globally unique, persistent identifier issued and maintained by Zenodo/DataCite." }
+  ACM-10: { answer: "Yes",  comments: "Zenodo provides DOI-based versioning; this record is v3 of concept DOI 10.5281/zenodo.18615687, confirming version control is in use." }
+  ACM-11: { answer: "No",   comments: "No explicit bias documentation is present in the Zenodo record metadata or description; an accompanying research article does not constitute metadata per the rubric." }
+  ACM-12: { answer: "Yes",  comments: "Zenodo uses the DataCite metadata schema (machine-readable JSON/XML); a Croissant machine-readable descriptor (croissant_metadata.json) is provided via the linked GitHub repository; data content follows the DOME Registry structured JSON schema." }
+  ACM-13: { answer: "Yes",  comments: "The DOI 10.5281/zenodo.18983120 is embedded in the Zenodo record metadata and uniquely identifies this dataset." }
+  ACM-14: { answer: "Yes",  comments: "The Zenodo record metadata specifies access_right as 'open', clearly documenting that the dataset is publicly available with no restrictions." }
+  ACM-15: { answer: "Yes",  comments: "The description documents data modalities: human-annotated JSON metadata, AI-generated DOME JSON outputs, a CSV metadata index, and PDF full texts from PubMed Central." }
+  ACM-16: { answer: "Yes",  comments: "The linked GitHub repository (github.com/gavinf97/DOME-Copilot-Data-Analysis) provides modular Python/Jupyter pipelines for data download, AI processing, and human evaluation, documented in the README with sufficient detail for reproduction." }
+  ACM-17: { answer: "Yes",  comments: "The record documents creators (7 authors with ORCIDs), source materials (PubMed Central), data types (AI outputs, human annotations), the AI-assisted workflow methodology, and links to analysis code; origin from the DOME Registry is acknowledged." }
+  ACM-18: { answer: "Yes",  comments: "Records are indexed by PubMed Central IDs (PMCIDs); identifier-based organisation makes duplicates structurally unlikely and none are indicated." }
+  ACM-19: { answer: "Yes",  comments: "The metadata CSV maps PMCIDs to all components; cohort sizes (258 human-annotated, 1012+222 AI-generated, 30 evaluation subset) are stated and the archive appears complete as described." }
+  ACM-20: { answer: "Yes",  comments: "Data uses the DOME Registry JSON schema consistently across all entries; structured JSON enforces type and naming consistency." }
+  ACM-21: { answer: "Yes",  comments: "The DOME Registry is the domain standard for machine learning experiment metadata in bioscience; the dataset explicitly follows this standard." }
+  ACM-22: { answer: "Yes",  comments: "JSON for structured metadata, CSV for the index file, and PDF for full texts are all appropriate formats for their respective content types." }
+  ACM-23: { answer: "Yes",  comments: "JSON, CSV, and PDF are all open, non-proprietary formats readable without commercial software." }
+  ACM-24: { answer: "Yes",  comments: "Dataset contains scientific publication metadata from PubMed Central, not data from animal or human research subjects; ethics question not applicable.", not_applicable: true }
+  ACM-25: { answer: "Yes",  comments: "No human subjects data in this dataset; privacy question not applicable.", not_applicable: true }
+  ACM-26: { answer: "Yes",  comments: "No human subjects data in this dataset; data management ethics question not applicable.", not_applicable: true }
+  ACM-27: { answer: "Yes",  comments: "No human subjects data in this dataset; access control ethics question not applicable.", not_applicable: true }
+  ACM-28: { answer: "Yes",  comments: "No human subjects data in this dataset; data protection declaration question not applicable.", not_applicable: true }
+
+result:
+  weighted_score: 783
+  grade: "Silver"
