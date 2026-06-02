@@ -57,7 +57,9 @@ airbds-metric/
 │   ├── review_template.yaml      # Blank review template (YAML)
 │   ├── review_template.csv       # Blank review template (CSV / spreadsheet)
 │   ├── README.md                 # Contributor guide — file coupling rules & update workflow
-│   └── SKILL.md                  # AI agent skill — propagates metric changes across the repo
+│   ├── SKILL.md                  # AI agent skill — propagates metric changes across the repo
+│   └── source/                   # Source spreadsheet that generates the metric YAML/CSV
+│       └── AIRBDS Core Metric scoring v0.3 - _initials_-_#_ TEMPLATE.xlsx
 ├── reviews/                      # Completed dataset review files
 ├── skills/                       # AI agent skills for performing assessments and installation instructions
 │   ├── testing/                  # Team testing skill (beta) — Gemini, Claude Web, Claude Code
@@ -65,8 +67,6 @@ airbds-metric/
 ├── docs/
 │   ├── tutorial-csv.md           # Beginner tutorial — Excel / Google Sheets
 │   └── tutorial-yaml.md          # Intermediate tutorial — text editor / CLI
-├── AIRBDS Core Metric scoring v0.3 - _initials_-_#_ TEMPLATE.xlsx
-│                                 # Original working-group spreadsheet (archived)
 ├── CHANGELOG.md
 ├── CITATION.cff
 ├── CODE_OF_CONDUCT.md

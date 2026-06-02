@@ -205,15 +205,14 @@ This file contains multiple version-specific references. Update the following:
 
 Use `grep -n "v0\.3\|0\.3\|0\.1\.0-GF" skills/GF/GF-airbds-assessment-skill/SKILL.md` to locate all occurrences before editing.
 
-#### O. Update `skills/testing/airbds-assessment-skill/SKILL.md`
+#### O. Update the testing and development assessment skills
 
-> **Important:** This skill references an XLSX spreadsheet template. Do NOT update the template filename in this SKILL.md unless the XLSX file has also been regenerated. Updating the path to a non-existent XLSX will silently break the testing skill.
+`skills/testing/airbds-assessment-skill/` and `skills/development/airbds-assessment-skill/` bundle the canonical metric as `templates/airbds_metric_v0.3.yaml` — a symlink to `metric/airbds_metric_v0.3.yaml`. For an in-place PATCH the symlink already tracks the canonical file, so nothing changes.
 
-If the XLSX has been regenerated with the new version, update:
-- The template filename reference (e.g. `AIRBDS-Core-Metric-scoring-v0.3.xlsx` → `vNEW.xlsx`)
-
-If the XLSX has **not** been regenerated:
-- Add a comment inline in the SKILL.md noting: `# NOTE: This skill still references the v0.3 XLSX template. Update when XLSX is regenerated for vNEW.`
+If a new metric version creates a new file (`metric/airbds_metric_vNEW.yaml`):
+- Repoint each skill's `templates/airbds_metric_v0.3.yaml` symlink to the new file.
+- Update the `templates/airbds_metric_v0.3.yaml` path references in each SKILL.md body to `vNEW`.
+- Bump each skill's `version:` if its behaviour or bundled metric changed.
 
 #### P. Update `docs/tutorial-yaml.md`
 
@@ -245,20 +244,17 @@ Search for any `v0.3` version references in `metric/README.md` (the contributor 
 When the metric version changes:
 - The **metric version** always increments (PATCH/MINOR/MAJOR as classified in Step 1)
 - The **skill version** increments **only if the skill's embedded content changed** as a result — which is true for all MINOR and MAJOR metric changes (embedded question table, YAML templates, file paths all need updating)
-- The **testing skill version** (`skills/testing/airbds-assessment-skill/SKILL.md`) increments only if the testing skill's XLSX content or behaviour changed
+- The **testing/development skill versions** increment only if the skill's behaviour or bundled metric changed
 
 ---
 
-## Step 4 — XLSX Caveat
+## Step 4 — The source spreadsheet
 
-The root-level file `AIRBDS Core Metric scoring v0.3 - _initials_-_#_ TEMPLATE.xlsx` is **not programmatically regenerated** by this skill. It is an archived working-group spreadsheet that carries the version in its filename.
+`metric/source/AIRBDS Core Metric scoring v0.3 - _initials_-_#_ TEMPLATE.xlsx` is the hand-edited source of truth for the metric content. The metric YAML and CSV are generated **from** it by `scripts/build_metric_yaml_and_csv_from_spreadsheet_v0.3.py` (see "How the v0.3 metric files are generated" in `metric/README.md`); the spreadsheet itself is not programmatically regenerated.
 
-If a new metric version is released and the team decides to update the XLSX:
-1. Open the XLSX in a spreadsheet application and make the necessary changes manually
-2. Rename the file: `AIRBDS Core Metric scoring vNEW - _initials_-_#_ TEMPLATE.xlsx`
-3. Then update `skills/testing/airbds-assessment-skill/SKILL.md` to reference the new filename (Step O above)
-
-**Do not update the testing skill's XLSX path until the XLSX file actually exists.**
+If a new metric version is released:
+1. Edit the spreadsheet in `metric/source/` (the `Scoring` and `Lookups` sheets), or copy it to a new versioned filename.
+2. Regenerate the YAML/CSV with the build script rather than hand-editing them.
 
 ---
 
@@ -292,8 +288,8 @@ After completing all applicable steps, produce a structured summary for the cont
 - metric/README.md — version references updated
 
 ### Files NOT updated and why:
-- skills/testing/airbds-assessment-skill/SKILL.md — XLSX not regenerated; left a NOTE comment
-- AIRBDS Core Metric scoring v0.3...xlsx — requires manual regeneration
+- skills/testing & skills/development assessment skills — bundle the metric via a symlink that already tracks the canonical YAML (repoint only on a new version file)
+- metric/source/AIRBDS Core Metric scoring v0.3...xlsx — hand-edited source; the YAML/CSV are regenerated from it with the build script
 
 ### Next step:
 Open a pull request referencing the originating GitHub Issue (#N):

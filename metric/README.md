@@ -29,7 +29,7 @@ Changes to this folder have a disproportionate downstream impact. Multiple files
 
 ## How the v0.3 metric files are generated
 
-`airbds_metric_v0.3.yaml` and `airbds_metric_v0.3.csv` are **generated, not hand-edited.** Both are produced from a single source — the scoring spreadsheet (`AIRBDS Core Metric scoring v0.3 - _initials_-_#_ TEMPLATE.xlsx` in the repo root) — by one script:
+`airbds_metric_v0.3.yaml` and `airbds_metric_v0.3.csv` are **generated, not hand-edited.** Both are produced from a single source — the scoring spreadsheet (`AIRBDS Core Metric scoring v0.3 - _initials_-_#_ TEMPLATE.xlsx` in `metric/source/`) — by one script:
 
 ```
 scripts/build_metric_yaml_and_csv_from_spreadsheet_v0.3.py

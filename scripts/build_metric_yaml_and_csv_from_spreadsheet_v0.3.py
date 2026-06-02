@@ -6,7 +6,7 @@ metric-alignment-check workflow requires them to change together. This script
 regenerates BOTH from the same source so they can never drift apart.
 
 Usage:
-    # Regenerate metric/airbds_metric_v0.3.{yaml,csv} from the root workbook
+    # Regenerate metric/airbds_metric_v0.3.{yaml,csv} from the source workbook
     python3 scripts/build_metric_yaml_and_csv_from_spreadsheet_v0.3.py
 
     # Verify both committed files are in sync with the spreadsheet (CI-friendly)
@@ -14,7 +14,7 @@ Usage:
 
     # Custom paths
     python3 scripts/build_metric_yaml_and_csv_from_spreadsheet_v0.3.py \
-        --workbook "AIRBDS Core Metric scoring v0.3 - _initials_-_#_ TEMPLATE.xlsx" \
+        --workbook "metric/source/AIRBDS Core Metric scoring v0.3 - _initials_-_#_ TEMPLATE.xlsx" \
         --output metric/airbds_metric_v0.3.yaml \
         --output-csv metric/airbds_metric_v0.3.csv
 
@@ -63,7 +63,7 @@ SCRIPT_PATH = f"scripts/{Path(__file__).name}"
 
 VERSION = "0.3"
 
-DEFAULT_WORKBOOK = REPO_ROOT / "AIRBDS Core Metric scoring v0.3 - _initials_-_#_ TEMPLATE.xlsx"
+DEFAULT_WORKBOOK = REPO_ROOT / "metric" / "source" / "AIRBDS Core Metric scoring v0.3 - _initials_-_#_ TEMPLATE.xlsx"
 DEFAULT_OUTPUT = REPO_ROOT / "metric" / "airbds_metric_v0.3.yaml"
 DEFAULT_OUTPUT_CSV = REPO_ROOT / "metric" / "airbds_metric_v0.3.csv"
 
