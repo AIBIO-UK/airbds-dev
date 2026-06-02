@@ -31,7 +31,7 @@ jobs:
       - name: Update Development Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: development
+          tag_name: assessment-skill-development
           name: "AIRBDS assessment development skill zip"
           draft: false
           prerelease: true

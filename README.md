@@ -210,7 +210,7 @@ We recommend using the latest Gemini Pro model.
    - *Free / Pro / Max:* [Settings → Capabilities](https://claude.ai/settings/capabilities) → toggle on.
    - *Team:* enabled by default.
    - *Enterprise:* an Owner must enable **Code execution and file creation** and **Skills** in [Organisation settings → Skills](https://claude.ai/admin-settings/skills).
-2. [**Download the skill ZIP →**](https://github.com/AIBIO-UK/airbds-metric/releases/download/testing/airbds-assessment-skill.zip)
+2. [**Download the skill ZIP →**](https://github.com/AIBIO-UK/airbds-metric/releases/download/assessment-skill-testing/airbds-assessment-skill.zip)
 3. Go to [Customize → Skills](https://claude.ai/customize/skills), click **+**, then **Create skill → Upload a skill**, and upload the ZIP.
 
 The skill activates automatically when you ask about an AIRBDS assessment. Try:
