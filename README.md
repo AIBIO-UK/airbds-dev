@@ -4,6 +4,7 @@
 [![Version](https://img.shields.io/badge/metric%20version-v0.3-blue)](CHANGELOG.md)
 [![AIBIO-UK](https://img.shields.io/badge/AIBIO--UK-AIRBDS%20Working%20Group-green)](https://aibio.ac.uk/about/working-groups/airbds/)
 [![Review Check](https://github.com/AIBIO-UK/airbds-metric/actions/workflows/review-check.yml/badge.svg)](https://github.com/AIBIO-UK/airbds-metric/actions/workflows/review-check.yml)
+[![Metric Alignment Check](https://github.com/AIBIO-UK/airbds-metric/actions/workflows/metric-alignment-check.yml/badge.svg)](https://github.com/AIBIO-UK/airbds-metric/actions/workflows/metric-alignment-check.yml)
 
 A versioned, machine-readable scoring metric for evaluating the **AI-readiness
 of bioscience datasets**. Developed by the
