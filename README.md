@@ -62,8 +62,13 @@ airbds-metric/
 │       └── AIRBDS Core Metric scoring v0.3 - _initials_-_#_ TEMPLATE.xlsx
 ├── reviews/                      # Completed dataset review files
 ├── skills/                       # AI agent skills for performing assessments and installation instructions
-│   ├── testing/                  # Team testing skill (beta) — Gemini, Claude Web, Claude Code
-│   └── GF/                       # GF personal variant (experimental) — YAML-based, writes review files
+│   ├── README.md                 # Skills setup & known issues
+│   ├── testing/                  # Skill versions under test — Gemini, Claude Web, Claude Code
+│   ├── development/              # Skill versions under active development
+│   └── GF/                       # GF (Gavin) personal variant — YAML-based, writes review files
+├── scripts/                      # Tooling for the metric and reviews
+│   ├── review_processor.py       # Validates, scores & converts review files (CI + local)
+│   └── build_metric_yaml_and_csv_from_spreadsheet_v0.3.py   # Regenerates the metric YAML+CSV from the source spreadsheet
 ├── docs/
 │   ├── tutorial-csv.md           # Beginner tutorial — Excel / Google Sheets
 │   └── tutorial-yaml.md          # Intermediate tutorial — text editor / CLI
@@ -208,7 +213,7 @@ runs automatically to:
 5. **Generate the companion format** — if you submit YAML, a matching CSV is created (and vice versa)
 6. **Rename the file** to include the score and grade as a postfix:
    ```
-   E-MTAB-1234_GF_1.yaml  →  E-MTAB-1234_GF_1_595_Silver.yaml
+   E-MTAB-1234_GF_1.yaml  →  E-MTAB-1234_GF_1_690_Silver.yaml
    ```
 
 If validation fails, the workflow reports detailed errors in the **Actions** tab
