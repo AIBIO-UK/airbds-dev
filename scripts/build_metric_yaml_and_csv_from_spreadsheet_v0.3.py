@@ -1,17 +1,22 @@
 #!/usr/bin/env python3
-"""Build the canonical metric YAML from the scoring spreadsheet.
+"""Build the canonical metric YAML and CSV from the scoring spreadsheet.
+
+The YAML and CSV are a coupled pair (see metric/README.md) and the
+metric-alignment-check workflow requires them to change together. This script
+regenerates BOTH from the same source so they can never drift apart.
 
 Usage:
-    # Regenerate metric/airbds_metric_v0.3.yaml from the root template workbook
-    python3 scripts/build_metric_yaml_from_spreadsheet_v0.3.py
+    # Regenerate metric/airbds_metric_v0.3.{yaml,csv} from the root workbook
+    python3 scripts/build_metric_yaml_and_csv_from_spreadsheet_v0.3.py
 
-    # Verify the committed YAML is in sync with the spreadsheet (CI-friendly)
-    python3 scripts/build_metric_yaml_from_spreadsheet_v0.3.py --check
+    # Verify both committed files are in sync with the spreadsheet (CI-friendly)
+    python3 scripts/build_metric_yaml_and_csv_from_spreadsheet_v0.3.py --check
 
     # Custom paths
-    python3 scripts/build_metric_yaml_from_spreadsheet_v0.3.py \
+    python3 scripts/build_metric_yaml_and_csv_from_spreadsheet_v0.3.py \
         --workbook "AIRBDS Core Metric scoring v0.3 - _initials_-_#_ TEMPLATE.xlsx" \
-        --output metric/airbds_metric_v0.3.yaml
+        --output metric/airbds_metric_v0.3.yaml \
+        --output-csv metric/airbds_metric_v0.3.csv
 
 What comes from where
     The spreadsheet is the source of truth for everything that varies per
@@ -22,7 +27,10 @@ What comes from where
                           (min_proportion_yes + min_score, with descriptions).
     Document-level metadata that does NOT live in the spreadsheet (licence,
     repository, contact, the prose description, scope descriptions, and the
-    banner comments) is held in the CONFIG block below — edit it there.
+    banner comments) is held in the CONFIG block below — edit it there. CSV is a
+    flat format with no comments, so the YAML's generated-file banner has no CSV
+    counterpart; the pairing rule is satisfied because both files regenerate
+    together from this script.
 
     The QUESTION SUMMARY footer is computed from the question table, so it can
     never drift out of sync with the questions above it.
@@ -30,12 +38,14 @@ What comes from where
 Requires: openpyxl, PyYAML.
 
 Exit codes:
-    0 — wrote the file (default), or --check found it already in sync
-    1 — --check found the committed file differs from the spreadsheet
+    0 — wrote the files (default), or --check found both already in sync
+    1 — --check found a committed file differs from the spreadsheet
     2 — the spreadsheet failed a sanity check (e.g. an unexpected scope)
 """
 
 import argparse
+import csv
+import io
 import re
 import sys
 from pathlib import Path
@@ -55,6 +65,14 @@ VERSION = "0.3"
 
 DEFAULT_WORKBOOK = REPO_ROOT / "AIRBDS Core Metric scoring v0.3 - _initials_-_#_ TEMPLATE.xlsx"
 DEFAULT_OUTPUT = REPO_ROOT / "metric" / "airbds_metric_v0.3.yaml"
+DEFAULT_OUTPUT_CSV = REPO_ROOT / "metric" / "airbds_metric_v0.3.csv"
+
+# Column order of the companion CSV. "weight"/"weight_points" mirror the YAML's
+# grade/grade_points; mapped_from is the verbatim "A / B" spreadsheet form.
+CSV_COLUMNS = [
+    "question_id", "scope", "theme", "weight", "weight_points",
+    "mapped_from", "question", "guidance", "not_applicable_default",
+]
 
 METADATA = {
     "schema_version": VERSION,
@@ -99,11 +117,11 @@ HEADER_COMMENT = f"""\
 #
 # *** GENERATED FILE — DO NOT EDIT BY HAND. ***
 #
-# This file is generated from the AIRBDS scoring spreadsheet by
-#     {SCRIPT_PATH}
-# Any manual edit will be lost the next time the file is regenerated. To change
-# this file's contents — or the way it is generated — edit that script (and/or
-# the source spreadsheet) and re-run it. Never edit this file directly.
+# This file is generated from the AIRBDS scoring spreadsheet by the metric
+# build script in scripts/. Any manual edit will be lost the next time the
+# file is regenerated. To change this file's contents — or the way it is
+# generated — edit that script (and/or the source spreadsheet) and re-run it.
+# Never edit this file directly.
 # =============================================================================
 #
 # Question definitions for a given metric version. For a version the scope,
@@ -329,6 +347,26 @@ def render_yaml(questions, grade_points, grading) -> str:
     return "\n".join(out) + "\n"
 
 
+def render_csv(questions, grade_points) -> str:
+    """Render the companion CSV (CRLF, minimal quoting) from the same data."""
+    buf = io.StringIO()
+    writer = csv.writer(buf, lineterminator="\r\n", quoting=csv.QUOTE_MINIMAL)
+    writer.writerow(CSV_COLUMNS)
+    for q in questions:
+        writer.writerow([
+            q["id"],
+            q["scope"],
+            q["theme"],
+            q["grade"],
+            grade_points[q["grade"]],
+            " / ".join(q["mapped_from"]),
+            q["question"],
+            q["guidance"],
+            "Yes" if q["scope"] in NA_DEFAULT_SCOPES else "",
+        ])
+    return buf.getvalue()
+
+
 # ── Validation ─────────────────────────────────────────────────────────────────
 
 def validate(questions, grade_points, grading) -> None:
@@ -353,8 +391,9 @@ def main() -> None:
     ap = argparse.ArgumentParser(description="Build the metric YAML from the scoring spreadsheet.")
     ap.add_argument("--workbook", type=Path, default=DEFAULT_WORKBOOK, help="path to the .xlsx template")
     ap.add_argument("--output", type=Path, default=DEFAULT_OUTPUT, help="path to write the metric YAML")
+    ap.add_argument("--output-csv", type=Path, default=DEFAULT_OUTPUT_CSV, help="path to write the metric CSV")
     ap.add_argument("--check", action="store_true",
-                    help="do not write; exit 1 if --output differs from what the spreadsheet would produce")
+                    help="do not write; exit 1 if either output differs from what the spreadsheet would produce")
     args = ap.parse_args()
 
     if not args.workbook.exists():
@@ -366,23 +405,33 @@ def main() -> None:
     grading = read_grading(wb["Lookups"])
     validate(questions, grade_points, grading)
 
-    generated = render_yaml(questions, grade_points, grading)
+    generated_yaml = render_yaml(questions, grade_points, grading)
+    generated_csv = render_csv(questions, grade_points)
 
-    # Confirm the output is itself valid YAML before we trust it.
-    yaml.safe_load(generated)
+    # Confirm the YAML output is itself valid before we trust it.
+    yaml.safe_load(generated_yaml)
+
+    # Compare/write as bytes so the CSV's CRLF line endings round-trip exactly
+    # (read_text would silently translate them and break the comparison).
+    targets = [(args.output, generated_yaml.encode("utf-8")),
+               (args.output_csv, generated_csv.encode("utf-8"))]
 
     if args.check:
-        current = args.output.read_text() if args.output.exists() else ""
-        if current == generated:
-            print(f"OK: {args.output} is in sync with {args.workbook.name} "
-                  f"({len(questions)} questions)")
+        drifted = [path for path, content in targets
+                   if (path.read_bytes() if path.exists() else b"") != content]
+        if not drifted:
+            print(f"OK: {args.output.name} and {args.output_csv.name} are in sync "
+                  f"with {args.workbook.name} ({len(questions)} questions)")
             sys.exit(0)
-        print(f"DRIFT: {args.output} differs from the spreadsheet. "
-              f"Run: python3 {SCRIPT_PATH}", file=sys.stderr)
+        for path in drifted:
+            print(f"DRIFT: {path} differs from the spreadsheet.", file=sys.stderr)
+        print(f"Run: python3 {SCRIPT_PATH}", file=sys.stderr)
         sys.exit(1)
 
-    args.output.write_text(generated)
-    print(f"Wrote {args.output} ({len(questions)} questions, "
+    for path, content in targets:
+        path.write_bytes(content)
+    print(f"Wrote {args.output} and {args.output_csv} "
+          f"({len(questions)} questions, "
           f"{sum(q['scope'] in NA_DEFAULT_SCOPES for q in questions)} ethics) "
           f"from {args.workbook.name}")
 
