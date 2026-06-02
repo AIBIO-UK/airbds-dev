@@ -1,0 +1,32 @@
+name: Metric Source Sync Check
+
+# Manual, on-demand check that the generated metric YAML/CSV match the source
+# spreadsheet (runs the build script's --check). Deliberately NOT triggered on
+# push/pull_request: once a spreadsheet change is regenerated into the YAML it
+# can break code that relies on the YAML (the review processor, the auto-airbds
+# frontend, the assessment skills) — nothing in the codebase consumes the CSV —
+# so re-syncing is a deliberate step taken when you're ready to handle that
+# downstream impact, not an automatic gate.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check-metric-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install openpyxl pyyaml
+
+      - name: Verify metric YAML/CSV are in sync with the source spreadsheet
+        run: python3 scripts/build_metric_yaml_and_csv_from_spreadsheet_v0.3.py --check
