@@ -80,7 +80,7 @@ The CSV files must exactly mirror their YAML counterparts in content. Use the ex
 
 **For `metric/airbds_metric_vX.Y.csv`:**
 The CSV has one header row and one row per question. Columns (in order):
-`question_id, scope, theme, weight, weight_points, question, guidance, not_applicable_default`
+`question_id, scope, theme, weight, weight_points, mapped_from, question, guidance, not_applicable_default`
 
 Read `metric/airbds_metric_v0.3.csv` to confirm the exact column names and order before writing.
 

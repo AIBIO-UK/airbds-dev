@@ -24,10 +24,8 @@ This project adheres to
 - Reworked the metric YAML structure: questions are a map keyed by question id,
   using `grade`/`question`/`guidance` fields, with top-level `grade_points` and
   `grading` (with `min_score`) driving scoring.
-
-### Removed
-- Per-question `mapped_from` provenance codes (to be re-sourced for the
-  reworded questions in a later revision).
+- Refreshed per-question `mapped_from` provenance codes to match the reworded
+  questions.
 
 ---
 
