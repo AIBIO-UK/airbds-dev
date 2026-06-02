@@ -1,6 +1,6 @@
 # Review — AIRBDS AI-Readiness Dataset Scoring Metric v0.3
 # Example: fully compliant YAML review (all 28 questions answered)
-# Expected outcome: renamed to E-MTAB-0001_TS_1_713_Gold.yaml, CSV companion generated
+# Expected outcome: renamed to E-MTAB-0001_TS_1_716_Gold.yaml, CSV companion generated
 
 schema_version: "0.3"
 
@@ -22,11 +22,11 @@ process_comments: "Review conducted against metric v0.3. Dataset contains no hum
 
 answers:
   ACM-1:  { answer: "Yes", comments: "Full dataset available via bulk download." }
-  ACM-2:  { answer: "Yes", comments: "Accessible via HTTPS." }
-  ACM-3:  { answer: "Yes", comments: "Supports authentication for controlled-access tier." }
-  ACM-4:  { answer: "Yes", comments: "CC-BY-4.0 license clearly stated." }
-  ACM-5:  { answer: "Yes", comments: "License explicitly permits AI/ML training use." }
-  ACM-6:  { answer: "Yes", comments: "Archive download available." }
+  ACM-2:  { answer: "Yes", comments: "Metadata colocated with the data on the ArrayExpress record." }
+  ACM-3:  { answer: "Yes", comments: "MD5 checksums provided for all files." }
+  ACM-4:  { answer: "Yes", comments: "CC-BY-4.0 licence clearly stated." }
+  ACM-5:  { answer: "Yes", comments: "CC-BY-4.0 is a standardised, machine-readable licence." }
+  ACM-6:  { answer: "Yes", comments: "ArrayExpress is a FAIR-compliant archive." }
   ACM-7:  { answer: "Yes", comments: "ArrayExpress is a domain repository for functional genomics." }
   ACM-8:  { answer: "Yes", comments: "Searchable by metadata fields and accession." }
   ACM-9:  { answer: "Yes", comments: "ArrayExpress accession E-MTAB-0001 is a globally unique persistent identifier." }

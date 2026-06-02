@@ -23,23 +23,28 @@ weights:
     rationale: >
       Optional questions capture desirable but non-essential characteristics.
 
+# A dataset earns a grade only when it meets BOTH the per-tier pass-rate
+# criteria AND the min_score (minimum total weighted score) for that grade.
 grades:
   - grade: "Caution"
     badge_color: "#dc3545"
     description: "May have serious issues. Fails one or more critical criteria."
     criteria:
       critical_pass_rate: "< 7/8"
+      min_score: 0
   - grade: "Bronze"
     badge_color: "#cd7f32"
     description: "Passes most Critical questions."
     criteria:
       critical_pass_rate: ">= 7/8"
+      min_score: 560
   - grade: "Silver"
     badge_color: "#c0c0c0"
     description: "Passes all Critical plus >= 50% of Important questions."
     criteria:
       critical_pass_rate: "1.0"
       important_pass_rate: ">= 0.5"
+      min_score: 670
   - grade: "Gold"
     badge_color: "#ffc107"
     description: "Passes all Critical and Important, plus >= 50% Optional."
@@ -47,6 +52,7 @@ grades:
       critical_pass_rate: "1.0"
       important_pass_rate: "1.0"
       optional_pass_rate: ">= 0.5"
+      min_score: 708
 
 ethics_note: >
   Ethics questions (ACM-24 to ACM-28) default to "Yes" for datasets containing

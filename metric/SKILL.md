@@ -57,8 +57,8 @@ Classify the change using the table below. The change type determines which file
 
 **How to determine the type from a diff:**
 - If only `guidance:` text changed under any question → PATCH
-- If any `question:`, `weight:`, `scope:`, `theme:`, or `id:` field changed, or a question was added/removed → MINOR
-- If any value under `scoring.weight_points` or `scoring.grades` changed → MAJOR
+- If any `question:`, `grade:`, `scope:`, `theme:` field, or a question id (the map key), changed, or a question was added/removed → MINOR
+- If any value under `grade_points` or `grading` changed → MAJOR
 
 ---
 
@@ -80,7 +80,7 @@ The CSV files must exactly mirror their YAML counterparts in content. Use the ex
 
 **For `metric/airbds_metric_vX.Y.csv`:**
 The CSV has one header row and one row per question. Columns (in order):
-`question_id, scope, theme, weight, weight_points, question, guidance, mapped_from, not_applicable_default`
+`question_id, scope, theme, weight, weight_points, question, guidance, not_applicable_default`
 
 Read `metric/airbds_metric_v0.3.csv` to confirm the exact column names and order before writing.
 

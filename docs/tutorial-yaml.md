@@ -148,8 +148,8 @@ Calculate pass rates per tier (proportion of questions answered Yes):
 
 ```
 Critical pass rate  = (number of Critical "Yes" answers) / 8
-Important pass rate = (number of Important "Yes" answers) / 11
-Optional pass rate  = (number of Optional "Yes" answers) / 9
+Important pass rate = (number of Important "Yes" answers) / 12
+Optional pass rate  = (number of Optional "Yes" answers) / 8
 ```
 
 See [`metric/airbds_metric_v0.3.yaml`](../metric/airbds_metric_v0.3.yaml) for which questions belong to each tier.

@@ -3,8 +3,8 @@ weight_tier,Critical,80,"Failing a Critical question indicates a fundamental pro
 weight_tier,Important,5,"Important questions represent best practices affecting reproducibility, interoperability, or usability."
 weight_tier,Optional,2,"Optional questions capture desirable but non-essential characteristics."
 
-section,grade,description,critical_pass_rate_min,important_pass_rate_min,optional_pass_rate_min,hex_color
-grade,Caution,"May have serious issues. Fails one or more Critical criteria.",0.0,—,—,#dc3545
-grade,Bronze,"Passes most Critical questions (at least 7 out of 8).",0.875,—,—,#cd7f32
-grade,Silver,"Passes all Critical questions plus at least 50% of Important questions.",1.0,0.5,—,#c0c0c0
-grade,Gold,"Passes all Critical and Important questions plus at least 50% of Optional questions.",1.0,1.0,0.5,#ffc107
+section,grade,description,critical_pass_rate_min,important_pass_rate_min,optional_pass_rate_min,min_score,hex_color
+grade,Caution,"May have serious issues. Fails one or more Critical criteria.",0.0,—,—,0,#dc3545
+grade,Bronze,"Passes most Critical questions (at least 7 out of 8).",0.875,—,—,560,#cd7f32
+grade,Silver,"Passes all Critical questions plus at least 50% of Important questions.",1.0,0.5,—,670,#c0c0c0
+grade,Gold,"Passes all Critical and Important questions plus at least 50% of Optional questions.",1.0,1.0,0.5,708,#ffc107

@@ -95,20 +95,48 @@ def load_metric(metric_path: str) -> dict:
     """Load question metadata from the canonical metric YAML.
 
     Returns {question_id: {weight, weight_points, scope, theme, question, guidance}}.
+
+    Questions are stored as a map keyed by question id. Each question's grade
+    lives in a `grade` field and the per-grade point values in a top-level
+    `grade_points` map. The processor's internal vocabulary is
+    "weight"/"weight_points", so the grade is surfaced as the weight and its
+    points looked up from grade_points.
     """
     with open(metric_path, encoding="utf-8") as f:
         data = yaml.safe_load(f)
+    grade_points = data.get("grade_points", {})
     meta = {}
-    for q in data.get("questions", []):
-        meta[q["id"]] = {
-            "weight": q["weight"],
-            "weight_points": q["weight_points"],
+    for qid, q in (data.get("questions") or {}).items():
+        grade = q["grade"]
+        meta[qid] = {
+            "weight": grade,
+            "weight_points": grade_points.get(grade, WEIGHT_POINTS.get(grade, 0)),
             "scope": q["scope"],
             "theme": q["theme"],
             "question": q["question"].strip(),
             "guidance": q["guidance"].strip(),
         }
     return meta
+
+
+def load_grading(metric_path: str) -> list:
+    """Load grade thresholds from the metric YAML, highest grade first.
+
+    Returns a list of {name, min_proportion_yes: {tier: float}, min_score: float}.
+    A dataset earns the highest grade whose per-tier "Yes" proportions and total
+    weighted score all meet the listed minima — mirroring the auto-airbds
+    frontend so the two grade identically.
+    """
+    with open(metric_path, encoding="utf-8") as f:
+        data = yaml.safe_load(f)
+    grading = []
+    for entry in data.get("grading", []):
+        grading.append({
+            "name": entry["name"],
+            "min_proportion_yes": dict(entry.get("min_proportion_yes", {})),
+            "min_score": entry.get("min_score", 0),
+        })
+    return grading
 
 
 # ── Filename helpers ───────────────────────────────────────────────────────────
@@ -363,39 +391,42 @@ def _parse_csv_bool(value: str) -> bool:
 
 # ── Scoring ───────────────────────────────────────────────────────────────────
 
-def score_review(answers: dict, question_meta: dict) -> tuple:
-    """Return (weighted_score: int, grade: str)."""
-    by_tier: dict = {"Critical": [], "Important": [], "Optional": []}
-    total = 0
+def score_review(answers: dict, question_meta: dict, grading: list) -> tuple:
+    """Return (weighted_score: int, grade: str).
 
-    for qid in ALL_QUESTION_IDS:
-        if qid not in answers or qid not in question_meta:
-            continue
-        weight = question_meta[qid]["weight"]
-        pts = WEIGHT_POINTS[weight]
-        is_yes = answers[qid].get("answer") == "Yes"
-        by_tier[weight].append(is_yes)
-        if is_yes:
-            total += pts
+    Grades identically to the auto-airbds frontend: the dataset earns the
+    highest grade for which the proportion of "Yes" answers in every grade tier
+    is at least the tier minimum AND the total weighted score is at least the
+    grade's min_score. Proportions use the metric's full per-tier question
+    counts as denominators, so a missing answer counts against the proportion.
+    """
+    total_by_tier: dict = {}
+    yes_by_tier: dict = {}
+    score = 0
 
-    n_crit = max(len(by_tier["Critical"]), 1)
-    n_imp = max(len(by_tier["Important"]), 1)
-    n_opt = max(len(by_tier["Optional"]), 1)
+    for qid, qm in question_meta.items():
+        tier = qm["weight"]
+        total_by_tier[tier] = total_by_tier.get(tier, 0) + 1
+        if answers.get(qid, {}).get("answer") == "Yes":
+            yes_by_tier[tier] = yes_by_tier.get(tier, 0) + 1
+            score += qm.get("weight_points", 0)
 
-    c = sum(by_tier["Critical"]) / n_crit
-    i = sum(by_tier["Important"]) / n_imp
-    o = sum(by_tier["Optional"]) / n_opt
+    def proportion(tier: str) -> float:
+        total = total_by_tier.get(tier, 0)
+        # A tier with no questions imposes no constraint.
+        return 1.0 if total == 0 else yes_by_tier.get(tier, 0) / total
 
-    if c == 1.0 and i == 1.0 and o >= 0.5:
-        grade = "Gold"
-    elif c == 1.0 and i >= 0.5:
-        grade = "Silver"
-    elif c >= 0.875:
-        grade = "Bronze"
-    else:
-        grade = "Caution"
+    grade = ""
+    for g in grading:
+        proportions_met = all(
+            proportion(tier) >= minimum
+            for tier, minimum in g["min_proportion_yes"].items()
+        )
+        if proportions_met and score >= g["min_score"]:
+            grade = g["name"]
+            break
 
-    return total, grade
+    return score, grade
 
 
 # ── File writing ──────────────────────────────────────────────────────────────
@@ -645,6 +676,7 @@ def main() -> None:
     args = parser.parse_args()
 
     question_meta = load_metric(args.metric)
+    grading = load_grading(args.metric)
 
     if not os.path.exists(args.files):
         write_outputs(False, False)
@@ -740,7 +772,7 @@ def main() -> None:
             continue
 
         # 4. Score
-        score, grade = score_review(data["answers"], question_meta)
+        score, grade = score_review(data["answers"], question_meta, grading)
         data["result"] = {"weighted_score": score, "grade": grade}
         result["score"] = score
         result["grade"] = grade

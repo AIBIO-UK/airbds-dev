@@ -9,6 +9,28 @@ This project adheres to
 
 ---
 
+## [Unreleased]
+
+### Changed
+- Reworded ACM-2, ACM-3, ACM-5, ACM-6, and ACM-7 to the canonical AIRBDS
+  question set (e.g. ACM-2 now covers metadata colocation, ACM-3 dataset
+  integrity, ACM-6 FAIR-compliant archives).
+- Regraded ACM-5 (Critical → Important) and ACM-7 (Optional → Important). The
+  metric now comprises 8 Critical, 12 Important, and 8 Optional questions
+  (maximum score 716, previously 713).
+- Grading now requires a minimum total weighted score (`min_score`) in addition
+  to the per-tier pass-rate thresholds, so `scripts/review_processor.py` and the
+  auto-airbds web frontend grade datasets identically.
+- Reworked the metric YAML structure: questions are a map keyed by question id,
+  using `grade`/`question`/`guidance` fields, with top-level `grade_points` and
+  `grading` (with `min_score`) driving scoring.
+
+### Removed
+- Per-question `mapped_from` provenance codes (to be re-sourced for the
+  reworded questions in a later revision).
+
+---
+
 ## [0.3] — Initial public release
 
 ### Added

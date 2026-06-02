@@ -112,12 +112,12 @@ Full reviewer instructions are in [`metric/scoring_schema.yaml`](metric/scoring_
 | ID | Theme | Weight | Question (short) |
 |---|---|---|---|
 | ACM-1 | Access | Important | Can the dataset be accessed in its entirety? |
-| ACM-2 | Access | Important | Is there a standardised communications protocol for accessing the dataset? |
-| ACM-3 | Access | Optional | Does the access protocol allow for authentication/authorisation where necessary? |
-| ACM-4 | License | **Critical** | Is the dataset provided with a clear data-use license? |
-| ACM-5 | License | **Critical** | Does the license permit use in AI/ML model training? |
-| ACM-6 | Download | Important | Is there a mechanism to download the entire dataset at once? |
-| ACM-7 | Resource | Optional | Is the hosting resource specifically designed for scientific data? |
+| ACM-2 | Metadata | Important | Is the metadata provided along with the data? |
+| ACM-3 | Integrity | Optional | Does the dataset include a mechanism for verifying its integrity? |
+| ACM-4 | Licence | **Critical** | Is the dataset released with a clear licence or terms of use? |
+| ACM-5 | Licence | Important | Is the licence standardised and machine-readable? |
+| ACM-6 | Resource | Important | Is the dataset deposited in a FAIR-compliant archive? |
+| ACM-7 | Resource | Important | Is the dataset deposited in a domain-appropriate infrastructure? |
 | ACM-8 | Resource | Optional | Is the dataset hosted in a searchable infrastructure? |
 | ACM-9 | UID | **Critical** | Does the dataset have a globally unique, persistent identifier? |
 | ACM-10 | Updates | Optional | If subject to updates, does it use a version control system? |
