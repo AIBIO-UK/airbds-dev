@@ -171,7 +171,9 @@ jobs:
             fi
           fi
 
-          MISMATCH_COUNT=$(grep -c . /tmp/alignment_mismatches.txt 2>/dev/null || echo 0)
+          # grep -c prints 0 and exits non-zero on an empty file; capture the
+          # count and fall back to 0 without appending a second line.
+          MISMATCH_COUNT=$(grep -c . /tmp/alignment_mismatches.txt 2>/dev/null) || MISMATCH_COUNT=0
           echo "mismatch_count=$MISMATCH_COUNT" >> "$GITHUB_OUTPUT"
           echo "Total mismatches: $MISMATCH_COUNT"
           if [ "$MISMATCH_COUNT" -gt "0" ]; then
