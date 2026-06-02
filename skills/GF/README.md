@@ -3,6 +3,8 @@
 This directory contains personal/experimental skill variants authored by Gavin Farrell (GF),
 maintained in parallel with the team's `testing/` skills for individual experimentation.
 
+This variant collects reviewer metadata (name, initials, ORCID, affiliation, review number) before the assessment, then writes the completed review to `reviews/<accession>_<INITIALS>_<n>.yaml` — ready for automated scoring by the `review-check` workflow.
+
 **These skills are not production-ready and have not been agreed with the team.**
 They exist for personal testing and as a proof-of-concept for improvements to discuss.
 
@@ -10,7 +12,6 @@ They exist for personal testing and as a proof-of-concept for improvements to di
 
 | Feature | `testing/` skill | `GF/` skill |
 |---------|-----------------|-------------|
-| Scoring reference | XLSX spreadsheet | YAML metric files (`metric/`) |
 | Output | Assessment table in chat only | Assessment table + YAML review file written to `reviews/` |
 | Reviewer metadata | Not collected | Collected at start (name, initials, ORCID, affiliation, n) |
 | Works in Claude Code | ✅ | ✅ |
@@ -29,3 +30,12 @@ The GF skills are not registered in the marketplace. To use in Claude Code, eith
 
 For now, the simplest approach is inline: open Claude Code in the repo directory and prompt:
 > "Please read skills/GF/GF-airbds-assessment-skill/SKILL.md and follow its instructions to assess [dataset URL]"
+
+## Installation (Claude Web) with Code execution + file creation
+
+Follow the same **Enable Code execution and file creation** step as in `skills/README.md`, then prompt:
+
+```
+Please read the SKILL.md I'm about to paste and follow its instructions…
+```
+

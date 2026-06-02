@@ -2,9 +2,12 @@
 
 This directory contains skills that can be imported into AI assistants to conduct AIRBDS assessments.
 
-Skills being tested are in `testing/`
+Skill versions being tested are in `testing/`
+Skill versions under development are in `development/`
 
 There are no production skills yet.
+
+For information on Gavin's skill under test please see `GF/README.md`
 
 We recommend you use the most capable model you have to perform the assessment.
 
