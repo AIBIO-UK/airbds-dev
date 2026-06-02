@@ -83,6 +83,7 @@ questions:
     scope: Infrastructure
     theme: Access
     grade: Important
+    mapped_from: ["ESIP-4.7"]
     question: "Can the dataset be accessed in its entirety?"
     guidance: "Every entry in the dataset should be accessible via direct download, API, or in a cloud container. This metric is not applicable to datasets behind access controls with an approval process, or in trusted research environments."
     answer: { type: boolean, options: ["Yes", "No"] }
@@ -90,6 +91,7 @@ questions:
     scope: Infrastructure
     theme: Metadata
     grade: Important
+    mapped_from: ["ODI-2.b"]
     question: "Is the metadata provided along with the data?"
     guidance: "All metadata should be colocated with the data. This means it should be visible on the same repository page, or packaged with the download. Journal articles are not considered metadata."
     answer: { type: boolean, options: ["Yes", "No"] }
@@ -97,6 +99,7 @@ questions:
     scope: Infrastructure
     theme: Integrity
     grade: Optional
+    mapped_from: ["MG-13"]
     question: "Does the dataset include a mechanism for verifying its integrity?"
     guidance: "For a direct download or cloud container, this would be a checksum or cryptographic hash. For an API using HTTPS/TLS, integrity checks are built into the protocol."
     answer: { type: boolean, options: ["Yes", "No"] }
@@ -104,6 +107,7 @@ questions:
     scope: Infrastructure
     theme: Licence
     grade: Critical
+    mapped_from: ["MG-52"]
     question: "Is the dataset released with a clear licence or terms of use?"
     guidance: "Infrastructures may offer no guarantees about the licensing of the data they host. See NIH Policies as an example. Datasets with an explicit licence are strongly preferred."
     answer: { type: boolean, options: ["Yes", "No"] }
@@ -111,6 +115,7 @@ questions:
     scope: Infrastructure
     theme: Licence
     grade: Important
+    mapped_from: ["ESIP-3.17"]
     question: "Is the licence standardised and machine-readable?"
     guidance: "e.g. Creative Commons, MIT."
     answer: { type: boolean, options: ["Yes", "No"] }
@@ -118,6 +123,7 @@ questions:
     scope: Infrastructure
     theme: Resource
     grade: Important
+    mapped_from: ["Bridge2AI-5.b"]
     question: "Is the dataset deposited in a FAIR-compliant archive?"
     guidance: "General purpose repositories may or may not be FAIR-compliant. For example, Zenodo is considered FAIR-compliant. HuggingFace and Kaggle are not."
     answer: { type: boolean, options: ["Yes", "No"] }
@@ -125,6 +131,7 @@ questions:
     scope: Infrastructure
     theme: Resource
     grade: Important
+    mapped_from: ["Bridge2AI-5.b"]
     question: "Is the dataset deposited in a domain-appropriate infrastructure?"
     guidance: "A domain-appropriate archive is preferred for findability, access to specific tooling, and consistent implementation of standards. The alternative is a general purpose archive, e.g. Zenodo, Data Dryad."
     answer: { type: boolean, options: ["Yes", "No"] }
@@ -132,6 +139,7 @@ questions:
     scope: Infrastructure
     theme: Resource
     grade: Optional
+    mapped_from: ["FAIR-F.4"]
     question: "Is the dataset hosted in a searchable infrastructure?"
     guidance: "Infrastructures vary in the search functionality they offer, but it should be possible to search for a dataset based on metadata properties as well as looking it up directly via an ID or accession."
     answer: { type: boolean, options: ["Yes", "No"] }
@@ -139,6 +147,7 @@ questions:
     scope: Infrastructure
     theme: UID
     grade: Critical
+    mapped_from: ["MG-140"]
     question: "Does the dataset have a globally unique, persistent identifier?"
     guidance: "A URL does not count as a persistent identifier. An accession assigned by a repository is acceptable, as long as the combination of repository+accession uniquely identifies the dataset. While FAIR-compliant archives provide UIDs, not all archives do (e.g. Kaggle)."
     answer: { type: boolean, options: ["Yes", "No"] }
@@ -146,6 +155,7 @@ questions:
     scope: Infrastructure
     theme: Updates
     grade: Optional
+    mapped_from: ["ODI-3.c"]
     question: "If the dataset is subject to updates, does it use a version control system?"
     guidance: "If the dataset will not be updated, mark this question \"Yes\"."
     answer: { type: boolean, options: ["Yes", "No"] }
@@ -153,6 +163,7 @@ questions:
     scope: Metadata
     theme: Bias
     grade: Important
+    mapped_from: ["MG-94", "MG-98"]
     question: "Is consideration of bias documented in the metadata?"
     guidance: "An accompanying research article does not form part of the metadata."
     answer: { type: boolean, options: ["Yes", "No"] }
@@ -160,6 +171,7 @@ questions:
     scope: Metadata
     theme: Metadata
     grade: Critical
+    mapped_from: ["MG-66"]
     question: "Does the dataset use a machine-readable, domain-appropriate metadata standard?"
     guidance: "Metadata should include a domain-appropriate set of information about the dataset, following a standard. For example, Minimum Information Standards (e.g. MIAME, MIAPE). Variable names should be self-explanatory."
     answer: { type: boolean, options: ["Yes", "No"] }
@@ -167,6 +179,7 @@ questions:
     scope: Metadata
     theme: Metadata
     grade: Critical
+    mapped_from: ["FAIR-F.3"]
     question: "Does the metadata include the identifier of the dataset?"
     guidance: "The metadata should be clearly linked to the dataset with a unqiue identifier. If the dataset has no unique identifier, mark this question \"No\". A URL does not qualify as a unique identifier."
     answer: { type: boolean, options: ["Yes", "No"] }
@@ -174,6 +187,7 @@ questions:
     scope: Metadata
     theme: Metadata
     grade: Optional
+    mapped_from: ["MG-77"]
     question: "Does the metadata specify intended access controls?"
     guidance: "e.g. “public”, “controlled access only”, etc. If the data is publically available with no limitations on use, this should be specified."
     answer: { type: boolean, options: ["Yes", "No"] }
@@ -181,6 +195,7 @@ questions:
     scope: Metadata
     theme: Metadata
     grade: Optional
+    mapped_from: ["ODI-2.c.i"]
     question: "Does the metadata document the modalities used?"
     guidance: "e.g. RNA sequence, molecular structure, spectrum, image ."
     answer: { type: boolean, options: ["Yes", "No"] }
@@ -188,6 +203,7 @@ questions:
     scope: Metadata
     theme: Preprocessing
     grade: Important
+    mapped_from: ["MG-33"]
     question: "Are transformation and preprocessing steps documented well enough to reproduce them?"
     guidance: "Either with software in a repository, or with a detailed description."
     answer: { type: boolean, options: ["Yes", "No"] }
@@ -195,6 +211,7 @@ questions:
     scope: Metadata
     theme: Provenance
     grade: Critical
+    mapped_from: ["MG-37", "ODI-2.c.vi"]
     question: "Is the provenance of the dataset clearly documented?"
     guidance: "This should include who generated or collected it, how it's been processed, whether it has been published before, whether it contains data from other sources, whether and how it was measured or simulated. If any of these things is missing, mark the question \"No\"."
     answer: { type: boolean, options: ["Yes", "No"] }
@@ -202,6 +219,7 @@ questions:
     scope: Content
     theme: Quality
     grade: Important
+    mapped_from: ["AIDRIN-1.c"]
     question: "Is the dataset free of duplicate records?"
     guidance: "Repeated records or files is a common mistake that damages the quality of a dataset."
     answer: { type: boolean, options: ["Yes", "No"] }
@@ -209,6 +227,7 @@ questions:
     scope: Content
     theme: Quality
     grade: Important
+    mapped_from: ["AIDRIN-1.a"]
     question: "Does the dataset include all expected records and content?"
     guidance: "The expected content is defined by the metadata. If the dataset has no metadata, mark this question \"No\"."
     answer: { type: boolean, options: ["Yes", "No"] }
@@ -216,6 +235,7 @@ questions:
     scope: Content
     theme: Format
     grade: Critical
+    mapped_from: ["ESIP-2.12", "MG-91"]
     question: "Are units, data types and parameter names consistent between entries?"
     guidance: "Data types and vocabularies should be used consistently, even if a dataset combines data from multiple sources."
     answer: { type: boolean, options: ["Yes", "No"] }
@@ -223,6 +243,7 @@ questions:
     scope: Content
     theme: Standards
     grade: Important
+    mapped_from: ["MG-20"]
     question: "Does the dataset follow domain standards with respect to units, data types, parameter names?"
     guidance: "This could be indicated by a schema or domain-specific minimum information standard."
     answer: { type: boolean, options: ["Yes", "No"] }
@@ -230,6 +251,7 @@ questions:
     scope: Content
     theme: Format
     grade: Optional
+    mapped_from: ["MG-164"]
     question: "Does the data use an appropriate file format?"
     guidance: "Particularly with respect to efficiency and suitability. The appropriate format is specific to the modality, domain, and intended use."
     answer: { type: boolean, options: ["Yes", "No"] }
@@ -237,6 +259,7 @@ questions:
     scope: Content
     theme: Format
     grade: Optional
+    mapped_from: ["ESIP-4.3"]
     question: "Is the data available in at least one open, non-proprietary format?"
     guidance: "It should be possible to read a dataset and write it to a different format without the use of proprietary software."
     answer: { type: boolean, options: ["Yes", "No"] }
@@ -244,6 +267,7 @@ questions:
     scope: Ethics
     theme: Ethics
     grade: Critical
+    mapped_from: ["MG-10"]
     question: "If the dataset contains data from animal or human subjects, does the dataset include an ethical assessment that covers acquisition?"
     guidance: "This includes consent, sampling methods, regulatory compliance, and funding sources. The acquisition should be described using an appropriate framework, like the Belmont, Menlo, or CARE principles, sufficient for its proper evaluation in context of intended use. If the dataset contains no human or animal data, mark the question \"Yes\"."
     answer: { type: boolean, options: ["Yes", "No"] }
@@ -252,6 +276,7 @@ questions:
     scope: Ethics
     theme: Privacy
     grade: Critical
+    mapped_from: ["MG-6"]
     question: "If the dataset contains data from human subjects, does the dataset preserve the privacy of subjects?"
     guidance: "The risk of reidentification when the data is used to train AI should also be considered. If the dataset contains no human data, mark the question \"Yes\"."
     answer: { type: boolean, options: ["Yes", "No"] }
@@ -260,6 +285,7 @@ questions:
     scope: Ethics
     theme: Ethics
     grade: Important
+    mapped_from: ["Bridge2AI-4.b"]
     question: "If the dataset contains data from human subjects, does the dataset include an ethical assessment that covers data management?"
     guidance: "Management includes processing, storage, access and use. The management plan should indicate privacy-protection processing, if any, sufficient to evaluate ethical status for intended use, e.g. \"anonymized\" vs. \"limited data set\" vs. \"non-PHI dataset\". If the dataset contains no human data, mark the question \"Yes\"."
     answer: { type: boolean, options: ["Yes", "No"] }
@@ -268,6 +294,7 @@ questions:
     scope: Ethics
     theme: Security
     grade: Important
+    mapped_from: ["MG-1"]
     question: "If the dataset contains data from human subjects, does the dataset have the necessary authentication and access controls?"
     guidance: "The appropriate level of access security depends on the dataset. If the dataset contains no human data, mark the question \"Yes\"."
     answer: { type: boolean, options: ["Yes", "No"] }
@@ -276,6 +303,7 @@ questions:
     scope: Ethics
     theme: Metadata
     grade: Optional
+    mapped_from: ["ODI-2.e.iii"]
     question: "If the dataset contains data from human subjects, does the metadata document data protection declarations?"
     guidance: "The metadata should specify what consent was given by participants and the legal basis for collection and processing. If the dataset contains no human data, mark the question \"Yes\"."
     answer: { type: boolean, options: ["Yes", "No"] }
