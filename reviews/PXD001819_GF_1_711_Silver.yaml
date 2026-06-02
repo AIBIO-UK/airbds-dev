@@ -112,5 +112,5 @@ answers:
     comments: Consent type and legal basis documented in CPTAC data use agreement.
     not_applicable: false
 result:
-  weighted_score: 783
+  weighted_score: 711
   grade: Silver

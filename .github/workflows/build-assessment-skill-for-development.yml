@@ -1,14 +1,14 @@
-name: Build Assessment Skill for Test
+name: Build Assessment Skill for Development
 
-# Trigger the workflow when changes are pushed to the main branch
+# Trigger the workflow when changes are pushed to the development skill
 on:
   push:
     branches:
       - main
-      - skills-testing
+      - skills-development
     paths:
-      - 'skills/testing/airbds-assessment-skill/SKILL.md'
-      - 'skills/testing/airbds-assessment-skill/templates/*'
+      - 'skills/development/airbds-assessment-skill/SKILL.md'
+      - 'skills/development/airbds-assessment-skill/templates/*'
   workflow_dispatch:
 
 jobs:
@@ -26,13 +26,13 @@ jobs:
           # Zip from inside the skill directory so its structure (including
           # templates/) is preserved with the skill dir as the zip root. No -y,
           # so the symlinked metric template is dereferenced into a real file.
-          ( cd skills/testing/airbds-assessment-skill && zip -r - . ) > airbds-assessment-skill.zip
-        
-      - name: Update Test Release
+          ( cd skills/development/airbds-assessment-skill && zip -r - . ) > airbds-assessment-skill-dev.zip
+
+      - name: Update Development Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: assessment-skill-testing
-          name: "AIRBDS assessment testing skill zip"
+          tag_name: assessment-skill-development
+          name: "AIRBDS assessment development skill zip"
           draft: false
           prerelease: true
-          files: airbds-assessment-skill.zip
+          files: airbds-assessment-skill-dev.zip

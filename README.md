@@ -4,6 +4,7 @@
 [![Version](https://img.shields.io/badge/metric%20version-v0.3-blue)](CHANGELOG.md)
 [![AIBIO-UK](https://img.shields.io/badge/AIBIO--UK-AIRBDS%20Working%20Group-green)](https://aibio.ac.uk/about/working-groups/airbds/)
 [![Review Check](https://github.com/AIBIO-UK/airbds-metric/actions/workflows/review-check.yml/badge.svg)](https://github.com/AIBIO-UK/airbds-metric/actions/workflows/review-check.yml)
+[![Metric Alignment Check](https://github.com/AIBIO-UK/airbds-metric/actions/workflows/metric-alignment-check.yml/badge.svg)](https://github.com/AIBIO-UK/airbds-metric/actions/workflows/metric-alignment-check.yml)
 
 A versioned, machine-readable scoring metric for evaluating the **AI-readiness
 of bioscience datasets**. Developed by the
@@ -209,7 +210,7 @@ We recommend using the latest Gemini Pro model.
    - *Free / Pro / Max:* [Settings → Capabilities](https://claude.ai/settings/capabilities) → toggle on.
    - *Team:* enabled by default.
    - *Enterprise:* an Owner must enable **Code execution and file creation** and **Skills** in [Organisation settings → Skills](https://claude.ai/admin-settings/skills).
-2. [**Download the skill ZIP →**](https://github.com/AIBIO-UK/airbds-metric/releases/download/testing/airbds-assessment-skill.zip)
+2. [**Download the skill ZIP →**](https://github.com/AIBIO-UK/airbds-metric/releases/download/assessment-skill-testing/airbds-assessment-skill.zip)
 3. Go to [Customize → Skills](https://claude.ai/customize/skills), click **+**, then **Create skill → Upload a skill**, and upload the ZIP.
 
 The skill activates automatically when you ask about an AIRBDS assessment. Try:

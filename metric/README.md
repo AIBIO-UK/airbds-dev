@@ -14,7 +14,7 @@ Changes to this folder have a disproportionate downstream impact. Multiple files
 |----------|--------|---------|-------------|
 | `airbds_metric_v0.3.yaml` | YAML | **Canonical** 28-question metric: question text, grades, guidance, scopes | `airbds_metric_v0.3.csv` |
 | `airbds_metric_v0.3.csv` | CSV | Identical content to the YAML metric; used by spreadsheet workflow | `airbds_metric_v0.3.yaml` |
-| `scoring_schema.yaml` | YAML | Grade thresholds (Caution/Bronze/Silver/Gold), weight-point definitions, versioning policy | `scoring_schema.csv` |
+| `scoring_schema.yaml` | YAML | Grade thresholds (Caution/Bronze/Silver/Gold pass-rates and `min_score`), weight-point definitions, versioning policy | `scoring_schema.csv` |
 | `scoring_schema.csv` | CSV | Identical content to scoring_schema.yaml | `scoring_schema.yaml` |
 | `review_template.yaml` | YAML | Blank review template (28 answer slots + reviewer metadata); no version in filename — always tracks current metric | `review_template.csv` |
 | `review_template.csv` | CSV | Identical content to review_template.yaml | `review_template.yaml` |

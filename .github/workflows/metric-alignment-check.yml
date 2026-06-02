@@ -171,7 +171,9 @@ jobs:
             fi
           fi
 
-          MISMATCH_COUNT=$(grep -c . /tmp/alignment_mismatches.txt 2>/dev/null || echo 0)
+          # grep -c prints 0 and exits non-zero on an empty file; capture the
+          # count and fall back to 0 without appending a second line.
+          MISMATCH_COUNT=$(grep -c . /tmp/alignment_mismatches.txt 2>/dev/null) || MISMATCH_COUNT=0
           echo "mismatch_count=$MISMATCH_COUNT" >> "$GITHUB_OUTPUT"
           echo "Total mismatches: $MISMATCH_COUNT"
           if [ "$MISMATCH_COUNT" -gt "0" ]; then
@@ -229,50 +231,52 @@ jobs:
               console.log(`Updated existing issue #${existing.number}`);
             } else {
               // Create a new issue
-              const issueBody = `## Metric File Alignment Check Failed
-
-**Event:** ${dedupKey}
-**Commit:** [\`${sha7}\`](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/commit/${context.sha})
-**Workflow run:** [View run](${runUrl})
-
-The following metric files are out of sync — a partial update was detected:
-
-\`\`\`
-${mismatches}
-\`\`\`
-
----
-
-### What this means
-
-Files in \`metric/\` must always be updated in coupled pairs (YAML + CSV). When a new metric version is released, \`CHANGELOG.md\` and \`README.md\` must also be updated in the same commit range. See [**metric/README.md**](https://github.com/${context.repo.owner}/${context.repo.repo}/blob/main/metric/README.md) for the full Coupled File Groups manifest.
-
-### How to fix
-
-**Option 1 — Use the agent skill (Claude Code users):**
-Open Claude Code in this repository and run:
-> "Use the metric/SKILL.md skill to propagate the metric change to all coupled files."
-
-The skill will automatically identify what changed, regenerate companion files, and update downstream references.
-
-**Option 2 — Fix manually:**
-Update the missing files listed above, then push to the same branch/PR.
-
-Refer to the **[Coupled File Groups manifest](https://github.com/${context.repo.owner}/${context.repo.repo}/blob/main/metric/README.md#coupled-file-groups-manifest)** for the complete list of files that must change together.
-
----
-
-### Versioning reminder
-
-| Change type | Files to update |
-|-------------|-----------------|
-| **PATCH** (guidance only) | Groups A, B, C — YAML/CSV pairs only |
-| **MINOR** (question change) | Groups A, B, C, D — all pairs + downstream files |
-| **MAJOR** (weight/threshold) | Groups A, B, C, D — all pairs + downstream files |
-
----
-
-_This issue was created automatically by the [metric-alignment-check workflow](${runUrl}). It will be closed automatically when the misalignment is resolved._`;
+              const issueBody = [
+                '## Metric File Alignment Check Failed',
+                '',
+                `**Event:** ${dedupKey}`,
+                `**Commit:** [\`${sha7}\`](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/commit/${context.sha})`,
+                `**Workflow run:** [View run](${runUrl})`,
+                '',
+                'The following metric files are out of sync — a partial update was detected:',
+                '',
+                '```',
+                mismatches,
+                '```',
+                '',
+                '---',
+                '',
+                '### What this means',
+                '',
+                `Files in \`metric/\` must always be updated in coupled pairs (YAML + CSV). When a new metric version is released, \`CHANGELOG.md\` and \`README.md\` must also be updated in the same commit range. See [**metric/README.md**](https://github.com/${context.repo.owner}/${context.repo.repo}/blob/main/metric/README.md) for the full Coupled File Groups manifest.`,
+                '',
+                '### How to fix',
+                '',
+                '**Option 1 — Use the agent skill (Claude Code users):**',
+                'Open Claude Code in this repository and run:',
+                '> "Use the metric/SKILL.md skill to propagate the metric change to all coupled files."',
+                '',
+                'The skill will automatically identify what changed, regenerate companion files, and update downstream references.',
+                '',
+                '**Option 2 — Fix manually:**',
+                'Update the missing files listed above, then push to the same branch/PR.',
+                '',
+                `Refer to the **[Coupled File Groups manifest](https://github.com/${context.repo.owner}/${context.repo.repo}/blob/main/metric/README.md#coupled-file-groups-manifest)** for the complete list of files that must change together.`,
+                '',
+                '---',
+                '',
+                '### Versioning reminder',
+                '',
+                '| Change type | Files to update |',
+                '|-------------|-----------------|',
+                '| **PATCH** (guidance only) | Groups A, B, C — YAML/CSV pairs only |',
+                '| **MINOR** (question change) | Groups A, B, C, D — all pairs + downstream files |',
+                '| **MAJOR** (weight/threshold) | Groups A, B, C, D — all pairs + downstream files |',
+                '',
+                '---',
+                '',
+                `_This issue was created automatically by the [metric-alignment-check workflow](${runUrl}). It will be closed automatically when the misalignment is resolved._`,
+              ].join('\n');
 
               const created = await github.rest.issues.create({
                 owner: context.repo.owner,
@@ -301,22 +305,24 @@ _This issue was created automatically by the [metric-alignment-check workflow]($
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body: `## ⚠️ Metric Alignment Check — Files Out of Sync
-
-The following metric files are **out of sync** in this PR:
-
-\`\`\`
-${mismatches}
-\`\`\`
-
-Files in \`metric/\` must be updated in coupled pairs (YAML + CSV). When a new metric version is added, \`CHANGELOG.md\` and \`README.md\` must also be updated in the same commit range.
-
-**To fix:**
-1. Update the missing files listed above and push to this branch.
-2. See [\`metric/README.md\`](../blob/main/metric/README.md#coupled-file-groups-manifest) for the full Coupled File Groups manifest.
-3. Claude Code users: use the [\`metric/SKILL.md\`](../blob/main/metric/SKILL.md) skill to propagate changes automatically.
-
-This check must pass before the PR can be merged. See [workflow run](${runUrl}) for details.`
+              body: [
+                '## ⚠️ Metric Alignment Check — Files Out of Sync',
+                '',
+                'The following metric files are **out of sync** in this PR:',
+                '',
+                '```',
+                mismatches,
+                '```',
+                '',
+                'Files in `metric/` must be updated in coupled pairs (YAML + CSV). When a new metric version is added, `CHANGELOG.md` and `README.md` must also be updated in the same commit range.',
+                '',
+                '**To fix:**',
+                '1. Update the missing files listed above and push to this branch.',
+                '2. See [`metric/README.md`](../blob/main/metric/README.md#coupled-file-groups-manifest) for the full Coupled File Groups manifest.',
+                '3. Claude Code users: use the [`metric/SKILL.md`](../blob/main/metric/SKILL.md) skill to propagate changes automatically.',
+                '',
+                `This check must pass before the PR can be merged. See [workflow run](${runUrl}) for details.`,
+              ].join('\n')
             });
 
       # -----------------------------------------------------------------------
