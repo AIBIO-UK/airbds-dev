@@ -1,7 +1,7 @@
 ---
 name: airbds-assessment-skill
 description: Use this skill whenever a user wants to assess, score, or evaluate a life science dataset against the AIRBDS (AI-Ready Biological Data Sets) criteria. Triggers include any mention of "AIRBDS", "AI-ready dataset", "dataset scoring", or requests to grade a biological/biomedical dataset's AI-readiness. Activate when the user provides a dataset URL and asks for an assessment, audit, or readiness check. Do NOT use for general data quality reviews unrelated to AIRBDS or for non-life-science datasets.
-version: 0.1.3
+version: 0.2.0
 metadata:
   hermes:
     tags: [science]
@@ -27,6 +27,7 @@ Your only goal is to evaluate datasets based on the AIRBDS (AI-Ready Biological 
 2. **Assessment Process**
 
 - Analyze the provided dataset against the questions defined under `questions` in the AIRBDS metric file. Each question's `guidance` explains how it should be answered.
+- While reviewing the landing page, determine the dataset's name/title from the page itself (no need to ask the user). Keep it — it is required if the assessment is later uploaded.
 - For each question, determine if the answer is 'Yes' or 'No' regarding its AI-readiness. You must answer all the questions and only the questions defined in the metric file. Be thorough in your assessment, looking through other pages on the website if necessary, particularly if the answer appears to be "No".
 - For every question, provide an answer, the score for that answer, and the justification. The justification shouldn't be more than two sentences. The score for a question is its full points when the answer is "Yes" and 0 when the answer is "No". A question's full points are given by `grade_points` keyed by that question's `grade` (Critical = 80, Important = 5, Optional = 2).
 
@@ -38,6 +39,24 @@ Your only goal is to evaluate datasets based on the AIRBDS (AI-Ready Biological 
   - the **final score** — the sum of the per-question scores;
   - the **overall grade** (Gold / Silver / Bronze / Caution) — determined from the `grading` thresholds in the metric file. A dataset earns the highest grade for which the proportion of "Yes" answers in every tier (Critical / Important / Optional) is at least that grade's `min_proportion_yes` for the tier AND the final score is at least its `min_score`. Tier proportions use the metric's full per-tier question counts as denominators;
   - a short summary justification.
+
+4. **Optional: save the assessment as a YAML file**
+
+- After presenting the report, offer to save the assessment as a YAML file the user can download and keep. Only proceed if the user wants it; otherwise stop here.
+- If the user agrees, build a YAML document in the shape of `templates/review_template_v0.3.yaml` (bundled with this skill), filled in from the assessment you just produced:
+  - `schema_version`: `"0.3"`.
+  - `reviewer.name`: your own model identifier (e.g. `claude-opus-4-8`) — the model that performed the assessment. Leave `reviewer.initials`, `reviewer.orcid`, and `reviewer.affiliation` blank. Tell the user they can edit these to record their own name/ORCID before submitting it anywhere that expects a named reviewer.
+  - `reviewer.review_date`: the current date and time in ISO 8601, including a timezone (e.g. `2026-06-03T14:32:05Z`).
+  - `dataset.name`: the dataset's name/title you determined during the assessment.
+  - `dataset.url`: the URL the user provided.
+  - `dataset.comments`: the short summary justification from the report.
+  - `answers.<id>`: for **every** question ACM-1 … ACM-28, set `answer` to exactly `"Yes"` or `"No"` and `comments` to that question's justification. Include all questions.
+  - You may fill in the `result` block (`weighted_score`, `grade`) for the user's reference.
+- Make the file available to the user: create a downloadable file if your environment supports it (named after the dataset and date, e.g. `airbds-assessment-<dataset-slug>-<date>.yaml`); otherwise output the complete YAML in a single code block they can copy and save. Do **not** upload or send the file anywhere yourself.
+- Briefly let the user know what they can do with it:
+  - keep it for their own records;
+  - contribute it to the public AIRBDS results site at https://auto-airbds.pages.dev if they wish;
+  - or submit it to the AIRBDS metric project by its manual submission method.
 
 ## Overall Tone:
 
@@ -57,3 +76,8 @@ skill. Its structure:
   Important 5, Optional 2). A "No" always scores 0.
 - `grading`: the overall-grade thresholds (Gold / Silver / Bronze / Caution),
   each with a per-tier `min_proportion_yes` and a `min_score`.
+
+The review-template shape is at `templates/review_template_v0.3.yaml`, also
+bundled with this skill. It is the blank assessment template used for the
+optional saved YAML file (see step 4): a top-level `schema_version`, a
+`reviewer` block, a `dataset` block, and an `answers` map keyed by question id.
