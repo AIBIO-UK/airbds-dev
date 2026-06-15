@@ -1,0 +1,25 @@
+// Build config: emit the library to dist/ (JS + .d.ts) for publishing.
+// The source uses .ts import specifiers (allowImportingTsExtensions); with
+// rewriteRelativeImportExtensions (TS 5.7+) tsc can emit while rewriting those
+// specifiers to .js, so no bundler is needed. Tests and the external CLI are
+// excluded from the published output.
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "declaration": true,
+    "rewriteRelativeImportExtensions": true,
+    "outDir": "dist",
+    "rootDir": "."
+  },
+  "include": [
+    "index.ts",
+    "convert.ts",
+    "build-review.ts",
+    "emit-yaml.ts",
+    "fetch-sheet.ts",
+    "metric.ts",
+    "parse-sheet.ts",
+    "types.ts"
+  ]
+}

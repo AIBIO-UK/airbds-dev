@@ -7,3 +7,6 @@ src/google-sheet-converter/node_modules/
 src/google-sheet-converter/bun.lock
 src/google-sheet-converter/bun.lockb
 
+# Build output of the converter package (rebuilt on prepublishOnly)
+src/google-sheet-converter/dist/
+
