@@ -1,0 +1,22 @@
+{
+  "name": "@airbds/converter-tools",
+  "version": "0.3.0",
+  "private": true,
+  "type": "module",
+  "description": "AIRBDS TypeScript tooling: convert an assessment Google Sheet to a review YAML, plus the shared converter library.",
+  "engines": {
+    "node": ">=22.6.0"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "node --test *.test.ts"
+  },
+  "dependencies": {
+    "csv-parse": "^5.5.6",
+    "yaml": "^2.5.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.4",
+    "typescript": "^5.6.2"
+  }
+}

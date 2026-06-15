@@ -1,0 +1,19 @@
+Instructions,,AIRBDS Dataset Metric v0.3
+,1,Review Datasets scoring template README for information on how this sheet was compiled and how scores are calculated
+,2,Pick a dataset
+,3,Make a copy of this template in the same folder Testing
+,4,"In the filename, replace <initials> with your initials and <#> a number to identify your review. You can also delete TEMPLATE"
+,5,Fill out the information below
+,6,Score the dataset by answering the questions on the next sheet
+,7,Repeat steps 2-6!
+,,
+Review informaton,,
+,Reviewer name:,Justin Clark-Casey
+,Dataset name:,Flagship Dataset of Type 2 Diabetes from the AI-READI Project
+,Dataset link:,https://fairhub.io/datasets/3
+,Resource name:,AI-READI
+,Accession numer:,https://doi.org/10.60775/fairhub.3
+,Dataset comments:,
+,Process comments:,Assessing a dataset explicitly labelled as AI-ready (it's in the name!) to see how it scores against our metric
+,Score,539
+,Grade,In progress

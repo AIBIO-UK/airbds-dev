@@ -8,9 +8,9 @@
 # *** GENERATED FILE — DO NOT EDIT BY HAND. ***
 #
 # This file is generated from the AIRBDS scoring spreadsheet by the metric
-# build script in scripts/. Any manual edit will be lost the next time the
-# file is regenerated. To change this file's contents — or the way it is
-# generated — edit that script (and/or the source spreadsheet) and re-run it.
+# build script (see metric/README.md). Any manual edit will be lost the next
+# time the file is regenerated. To change this file's contents — or the way it
+# is generated — edit that script (and/or the source spreadsheet) and re-run it.
 # Never edit this file directly.
 # =============================================================================
 #

@@ -66,9 +66,14 @@ airbds-metric/
 │   ├── testing/                  # Skill versions under test — Gemini, Claude Web, Claude Code
 │   ├── development/              # Skill versions under active development
 │   └── GF/                       # GF (Gavin) personal variant — YAML-based, writes review files
-├── scripts/                      # Tooling for the metric and reviews
-│   ├── review_processor.py       # Validates, scores & converts review files (CI + local)
-│   └── build_metric_yaml_and_csv_from_spreadsheet_v0.3.py   # Regenerates the metric YAML+CSV from the source spreadsheet
+├── src/                          # TypeScript tooling + scripts (own npm package; see src/README.md)
+│   ├── google-sheet-converter/   # Reusable TS library: assessment Google Sheet → review YAML
+│   ├── scripts/                  # Tooling for the metric and reviews
+│   │   ├── review_processor.py   # Validates, scores & converts review files (CI + local)
+│   │   ├── build_metric_yaml_and_csv_from_spreadsheet_v0.3.py   # Regenerates the metric YAML+CSV from the source spreadsheet
+│   │   └── convert_review_google_sheet_to_yaml_v0.3.mts   # Converts an assessment Google Sheet to a review YAML
+│   ├── docs/DESIGN.md            # Why the tooling is built this way
+│   └── README.md                 # Install & usage for the TS tooling
 ├── docs/
 │   ├── tutorial-csv.md           # Beginner tutorial — Excel / Google Sheets
 │   └── tutorial-yaml.md          # Intermediate tutorial — text editor / CLI
@@ -232,7 +237,7 @@ so it remains fast even as the `reviews/` directory grows.
 pip install pyyaml
 
 echo "reviews/your_file.yaml" > /tmp/files.txt
-python3 scripts/review_processor.py \
+python3 src/scripts/review_processor.py \
     --files /tmp/files.txt \
     --metric metric/airbds_metric_v0.3.yaml
 ```
