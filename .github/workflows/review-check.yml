@@ -59,7 +59,7 @@ jobs:
         if: steps.changed.outputs.changed_count != '0'
         id: process
         run: |
-          python3 scripts/review_processor.py \
+          python3 src/scripts/review_processor.py \
             --files /tmp/changed_reviews.txt \
             --metric metric/airbds_metric_v0.3.yaml
         continue-on-error: true
@@ -101,7 +101,7 @@ jobs:
           echo "To apply the scored filenames locally, run:" >> "$GITHUB_STEP_SUMMARY"
           echo '```bash' >> "$GITHUB_STEP_SUMMARY"
           echo "pip install pyyaml" >> "$GITHUB_STEP_SUMMARY"
-          echo "python3 scripts/review_processor.py --files <your-review-file> --metric metric/airbds_metric_v0.3.yaml" >> "$GITHUB_STEP_SUMMARY"
+          echo "python3 src/scripts/review_processor.py --files <your-review-file> --metric metric/airbds_metric_v0.3.yaml" >> "$GITHUB_STEP_SUMMARY"
           echo '```' >> "$GITHUB_STEP_SUMMARY"
 
       - name: Fail if validation errors

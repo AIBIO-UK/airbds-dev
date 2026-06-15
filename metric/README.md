@@ -32,19 +32,19 @@ Changes to this folder have a disproportionate downstream impact. Multiple files
 `airbds_metric_v0.3.yaml` and `airbds_metric_v0.3.csv` are **generated, not hand-edited.** Both are produced from a single source — the scoring spreadsheet (`AIRBDS Core Metric scoring v0.3 - _initials_-_#_ TEMPLATE.xlsx` in `metric/source/`) — by one script:
 
 ```
-scripts/build_metric_yaml_and_csv_from_spreadsheet_v0.3.py
+src/scripts/build_metric_yaml_and_csv_from_spreadsheet_v0.3.py
 ```
 
 Because that one script writes **both** formats from the same question data, the Group A pair can never drift apart.
 
 - **To change metric content** (questions, themes, grades, mapped-from references): edit the `Scoring` and `Lookups` sheets of the spreadsheet, then regenerate:
   ```
-  python3 scripts/build_metric_yaml_and_csv_from_spreadsheet_v0.3.py
+  python3 src/scripts/build_metric_yaml_and_csv_from_spreadsheet_v0.3.py
   ```
 - **Document-level metadata not held in the spreadsheet** (licence, repository, contact, the prose description, scope descriptions) lives in a `CONFIG` block at the top of the script — edit it there.
 - **To verify** the committed files are in sync with the spreadsheet (suitable for CI):
   ```
-  python3 scripts/build_metric_yaml_and_csv_from_spreadsheet_v0.3.py --check
+  python3 src/scripts/build_metric_yaml_and_csv_from_spreadsheet_v0.3.py --check
   ```
   This exits non-zero if either file is out of date.
 
@@ -56,7 +56,7 @@ Because that one script writes **both** formats from the same question data, the
 
 ### The YAML ↔ CSV pairs must always be identical in content
 
-YAML and CSV files are **not** derived from each other at read time — both are independent files that are read directly. The automated review processor (`scripts/review_processor.py`) loads whichever format was changed; the human spreadsheet workflow reads the CSV. If the YAML is updated but the CSV is not, a researcher using the spreadsheet workflow scores against a different version of the metric than one using the YAML workflow. This is **silent**, produces no error, and **invalidates inter-rater reliability**.
+YAML and CSV files are **not** derived from each other at read time — both are independent files that are read directly. The automated review processor (`src/scripts/review_processor.py`) loads whichever format was changed; the human spreadsheet workflow reads the CSV. If the YAML is updated but the CSV is not, a researcher using the spreadsheet workflow scores against a different version of the metric than one using the YAML workflow. This is **silent**, produces no error, and **invalidates inter-rater reliability**.
 
 ### The downstream impact chain
 
@@ -64,7 +64,7 @@ For any **MINOR** change (question additions, deletions, or rewordings) or **MAJ
 
 | File | What breaks if not updated |
 |------|---------------------------|
-| `scripts/review_processor.py` | `SCHEMA_VERSION` constant (line 31) still references old version; reviews may be validated against the wrong schema |
+| `src/scripts/review_processor.py` | `SCHEMA_VERSION` constant (line 31) still references old version; reviews may be validated against the wrong schema |
 | `.github/workflows/review-check.yml` | `--metric metric/airbds_metric_v0.3.yaml` path (2 occurrences) still points to old metric; new reviews auto-scored with old questions |
 | `.github/workflows/review-test.yml` | `--metric` path (5 occurrences) still points to old metric; test suite silently runs against old schema |
 | `README.md` | Version badge, question table, download links, and processor command examples all reference the old version |
@@ -110,7 +110,7 @@ Use this as a checklist when implementing any metric change.
 - `metric/airbds_metric_vX.Y.yaml`
 - `metric/airbds_metric_vX.Y.csv`
 
-> For v0.3, both are generated together by `scripts/build_metric_yaml_and_csv_from_spreadsheet_v0.3.py` — edit the spreadsheet and regenerate rather than hand-editing either file. See [How the v0.3 metric files are generated](#how-the-v03-metric-files-are-generated).
+> For v0.3, both are generated together by `src/scripts/build_metric_yaml_and_csv_from_spreadsheet_v0.3.py` — edit the spreadsheet and regenerate rather than hand-editing either file. See [How the v0.3 metric files are generated](#how-the-v03-metric-files-are-generated).
 
 ### Group B — Scoring schema pair *(always change together)*
 - `metric/scoring_schema.yaml`
@@ -124,7 +124,7 @@ Use this as a checklist when implementing any metric change.
 - `README.md` — version badge, question table, download links, processor command examples
 - `CHANGELOG.md` — add a new entry at the top referencing the originating Issue
 - `CITATION.cff` — update `version:` and `date-released:` fields
-- `scripts/review_processor.py` — update `SCHEMA_VERSION` constant and `--metric` path references
+- `src/scripts/review_processor.py` — update `SCHEMA_VERSION` constant and `--metric` path references
 - `.github/workflows/review-check.yml` — update `--metric metric/airbds_metric_vX.Y.yaml` (2 occurrences)
 - `.github/workflows/review-test.yml` — update `--metric` path (5 occurrences)
 - `skills/GF/GF-airbds-assessment-skill/SKILL.md` — update embedded templates, question table, file paths, skill version

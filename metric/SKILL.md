@@ -134,14 +134,14 @@ Update `schema_version: "0.3"` → `"NEW"`.
 
 Then regenerate `metric/review_template.csv`.
 
-#### H. Update `scripts/review_processor.py`
+#### H. Update `src/scripts/review_processor.py`
 
 Three locations to update:
 1. **Line 31:** `SCHEMA_VERSION = "0.3"` → `SCHEMA_VERSION = "NEW"`
 2. In the script's docstring or module comment: update the `--metric metric/airbds_metric_v0.3.yaml` example path
 3. The `help=` string in the argparse `--metric` argument definition (search for `"Path to airbds_metric_v0.3.yaml"`)
 
-Use `grep -n "0\.3" scripts/review_processor.py` to find all occurrences before editing.
+Use `grep -n "0\.3" src/scripts/review_processor.py` to find all occurrences before editing.
 
 #### I. Update `.github/workflows/review-check.yml`
 
@@ -250,7 +250,7 @@ When the metric version changes:
 
 ## Step 4 — The source spreadsheet
 
-`metric/source/AIRBDS Core Metric scoring v0.3 - _initials_-_#_ TEMPLATE.xlsx` is the hand-edited source of truth for the metric content. The metric YAML and CSV are generated **from** it by `scripts/build_metric_yaml_and_csv_from_spreadsheet_v0.3.py` (see "How the v0.3 metric files are generated" in `metric/README.md`); the spreadsheet itself is not programmatically regenerated.
+`metric/source/AIRBDS Core Metric scoring v0.3 - _initials_-_#_ TEMPLATE.xlsx` is the hand-edited source of truth for the metric content. The metric YAML and CSV are generated **from** it by `src/scripts/build_metric_yaml_and_csv_from_spreadsheet_v0.3.py` (see "How the v0.3 metric files are generated" in `metric/README.md`); the spreadsheet itself is not programmatically regenerated.
 
 If a new metric version is released:
 1. Edit the spreadsheet in `metric/source/` (the `Scoring` and `Lookups` sheets), or copy it to a new versioned filename.
@@ -276,7 +276,7 @@ After completing all applicable steps, produce a structured summary for the cont
 - metric/scoring_schema.csv — regenerated
 - metric/review_template.yaml — schema_version updated to NEW
 - metric/review_template.csv — regenerated
-- scripts/review_processor.py — SCHEMA_VERSION and --metric path updated
+- src/scripts/review_processor.py — SCHEMA_VERSION and --metric path updated
 - .github/workflows/review-check.yml — --metric path updated (2 occurrences)
 - .github/workflows/review-test.yml — --metric path updated (5 occurrences)
 - README.md — version badge, file listing, download links updated
@@ -308,7 +308,7 @@ Open a pull request referencing the originating GitHub Issue (#N):
 | `metric/scoring_schema.csv` | ✅* | ✅ | ✅ |
 | `metric/review_template.yaml` | ✅* | ✅ | ✅ |
 | `metric/review_template.csv` | ✅* | ✅ | ✅ |
-| `scripts/review_processor.py` | — | ✅ | ✅ |
+| `src/scripts/review_processor.py` | — | ✅ | ✅ |
 | `.github/workflows/review-check.yml` | — | ✅ | ✅ |
 | `.github/workflows/review-test.yml` | — | ✅ | ✅ |
 | `README.md` | — | ✅ | ✅ |

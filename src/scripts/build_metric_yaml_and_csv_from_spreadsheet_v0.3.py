@@ -7,13 +7,13 @@ regenerates BOTH from the same source so they can never drift apart.
 
 Usage:
     # Regenerate metric/airbds_metric_v0.3.{yaml,csv} from the source workbook
-    python3 scripts/build_metric_yaml_and_csv_from_spreadsheet_v0.3.py
+    python3 src/scripts/build_metric_yaml_and_csv_from_spreadsheet_v0.3.py
 
     # Verify both committed files are in sync with the spreadsheet (CI-friendly)
-    python3 scripts/build_metric_yaml_and_csv_from_spreadsheet_v0.3.py --check
+    python3 src/scripts/build_metric_yaml_and_csv_from_spreadsheet_v0.3.py --check
 
     # Custom paths
-    python3 scripts/build_metric_yaml_and_csv_from_spreadsheet_v0.3.py \
+    python3 src/scripts/build_metric_yaml_and_csv_from_spreadsheet_v0.3.py \
         --workbook "metric/source/AIRBDS Core Metric scoring v0.3 - _initials_-_#_ TEMPLATE.xlsx" \
         --output metric/airbds_metric_v0.3.yaml \
         --output-csv metric/airbds_metric_v0.3.csv
@@ -53,11 +53,12 @@ from pathlib import Path
 import openpyxl
 import yaml
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
+# Repo root is three levels up: <root>/src/scripts/<this file>.
+REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 
-# This script's own path, derived dynamically so the generated banner and the
-# drift message stay correct even if the file is renamed.
-SCRIPT_PATH = f"scripts/{Path(__file__).name}"
+# This script's own path (for the drift-message hint), derived dynamically so it
+# stays correct even if the file is renamed.
+SCRIPT_PATH = f"src/scripts/{Path(__file__).name}"
 
 # ── Editorial config (NOT in the spreadsheet — edit here) ────────────────────
 
@@ -118,9 +119,9 @@ HEADER_COMMENT = f"""\
 # *** GENERATED FILE — DO NOT EDIT BY HAND. ***
 #
 # This file is generated from the AIRBDS scoring spreadsheet by the metric
-# build script in scripts/. Any manual edit will be lost the next time the
-# file is regenerated. To change this file's contents — or the way it is
-# generated — edit that script (and/or the source spreadsheet) and re-run it.
+# build script (see metric/README.md). Any manual edit will be lost the next
+# time the file is regenerated. To change this file's contents — or the way it
+# is generated — edit that script (and/or the source spreadsheet) and re-run it.
 # Never edit this file directly.
 # =============================================================================
 #
