@@ -35,7 +35,7 @@ You are an expert in the AIRBDS metric repository structure. This skill guides y
 Before doing anything else, read the following files so you have complete context:
 
 1. `metric/airbds_metric_v*.yaml` — identify the **current metric version** from the `version:` field
-2. `metric/scoring_schema.yaml` — current grade thresholds and weight definitions
+2. `metric/scoring_schema_v0.3.yaml` — current grade thresholds and weight definitions
 3. `reviews/review_template.yaml` — current blank review template schema
 4. `metric/README.md` — the Coupled File Groups manifest (your checklist)
 5. `CHANGELOG.md` — understand the existing entry format before adding a new one
@@ -84,8 +84,8 @@ The CSV has one header row and one row per question. Columns (in order):
 
 Read `metric/airbds_metric_v0.3.csv` to confirm the exact column names and order before writing.
 
-**For `metric/scoring_schema.csv`:**
-Read the existing `metric/scoring_schema.csv` to confirm the structure (it mirrors the YAML sections for `answers`, `weights`, and `grades`).
+**For `metric/scoring_schema_v0.3.csv`:**
+Read the existing `metric/scoring_schema_v0.3.csv` to confirm the structure (it mirrors the YAML sections for `answers`, `weights`, and `grades`).
 
 **For `reviews/review_template.csv`:**
 The CSV template has two sections:
@@ -120,13 +120,13 @@ Create:
 
 **Do NOT delete** `metric/airbds_metric_v0.3.yaml` or `metric/airbds_metric_v0.3.csv`. Old versions are retained for archival so that existing reviews (which carry `schema_version: "0.3"`) can still be validated.
 
-#### F. Update `metric/scoring_schema.yaml`
+#### F. Create new scoring_schema version files (keep old versions)
 
-Update the following fields:
-- `schema_version: "0.3"` → `"NEW"`
-- Under `versioning:`, update `current_version: "0.3"` → `"NEW"`
+`scoring_schema` is versioned like the metric. Create:
+- `metric/scoring_schema_vNEW.yaml` — copy from `metric/scoring_schema_v0.3.yaml`, apply your changes, then update `schema_version: "0.3"` → `"NEW"` and, under `versioning:`, `current_version: "0.3"` → `"NEW"`
+- `metric/scoring_schema_vNEW.csv` — regenerate from the new YAML content
 
-Then regenerate `metric/scoring_schema.csv`.
+**Do NOT delete** `metric/scoring_schema_v0.3.yaml` or `metric/scoring_schema_v0.3.csv`. Old versions are retained for archival, like the metric files.
 
 #### G. Update `reviews/review_template.yaml`
 
@@ -272,8 +272,8 @@ After completing all applicable steps, produce a structured summary for the cont
 ### Files modified:
 - metric/airbds_metric_vNEW.yaml — [description of change]
 - metric/airbds_metric_vNEW.csv — regenerated from YAML
-- metric/scoring_schema.yaml — schema_version updated to NEW
-- metric/scoring_schema.csv — regenerated
+- metric/scoring_schema_vNEW.yaml — created, schema_version NEW
+- metric/scoring_schema_vNEW.csv — regenerated
 - reviews/review_template.yaml — schema_version updated to NEW
 - reviews/review_template.csv — regenerated
 - reviews/src/scripts/review_processor.py — SCHEMA_VERSION and --metric path updated
@@ -304,8 +304,8 @@ Open a pull request referencing the originating GitHub Issue (#N):
 |------|-------|-------|-------|
 | `metric/airbds_metric_vX.Y.yaml` (in-place or new) | ✅ | ✅ | ✅ |
 | `metric/airbds_metric_vX.Y.csv` | ✅ | ✅ | ✅ |
-| `metric/scoring_schema.yaml` | ✅* | ✅ | ✅ |
-| `metric/scoring_schema.csv` | ✅* | ✅ | ✅ |
+| `metric/scoring_schema_vX.Y.yaml` | ✅* | ✅ | ✅ |
+| `metric/scoring_schema_vX.Y.csv` | ✅* | ✅ | ✅ |
 | `reviews/review_template.yaml` | ✅* | ✅ | ✅ |
 | `reviews/review_template.csv` | ✅* | ✅ | ✅ |
 | `reviews/src/scripts/review_processor.py` | — | ✅ | ✅ |
@@ -320,4 +320,4 @@ Open a pull request referencing the originating GitHub Issue (#N):
 | `docs/tutorial-csv.md` | — | ✅ | ✅ |
 | `metric/README.md` (this folder) | — | ✅ | ✅ |
 
-> *For `scoring_schema` and `review_template`: only update if the PATCH affects those specific files (e.g. a guidance-only change to `scoring_schema.yaml`). If only the metric question YAML was patched, these files may not need to change.
+> *For `scoring_schema` and `review_template`: only update if the PATCH affects those specific files (e.g. a guidance-only change to `scoring_schema_v0.3.yaml`). If only the metric question YAML was patched, these files may not need to change.
