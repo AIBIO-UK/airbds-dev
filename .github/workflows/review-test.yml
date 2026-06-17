@@ -26,9 +26,7 @@ jobs:
         run: |
           cp reviews/examples/E-MTAB-0001_TS_1.yaml /tmp/test_yaml.yaml
           echo "/tmp/test_yaml.yaml" > /tmp/files.txt
-          python3 reviews/src/scripts/review_processor.py \
-            --files /tmp/files.txt \
-            --metric metric/airbds_metric_v0.3.yaml
+          python3 reviews/src/scripts/review_processor.py --files /tmp/files.txt
           echo "Exit code: $? (expected: 0)"
           ls /tmp/test_yaml*.yaml /tmp/test_yaml*.csv 2>/dev/null && echo "Companion files generated."
 
@@ -45,9 +43,7 @@ jobs:
         run: |
           cp reviews/examples/E-MTAB-0002_TS_1.csv /tmp/test_csv.csv
           echo "/tmp/test_csv.csv" > /tmp/files.txt
-          python3 reviews/src/scripts/review_processor.py \
-            --files /tmp/files.txt \
-            --metric metric/airbds_metric_v0.3.yaml
+          python3 reviews/src/scripts/review_processor.py --files /tmp/files.txt
           echo "Exit code: $? (expected: 0)"
 
   test-bad-filename:
@@ -63,9 +59,7 @@ jobs:
         run: |
           cp reviews/examples/bad-filename_noinit.yaml /tmp/bad-filename_noinit.yaml
           echo "/tmp/bad-filename_noinit.yaml" > /tmp/files.txt
-          python3 reviews/src/scripts/review_processor.py \
-            --files /tmp/files.txt \
-            --metric metric/airbds_metric_v0.3.yaml && \
+          python3 reviews/src/scripts/review_processor.py --files /tmp/files.txt && \
             { echo "ERROR: expected exit code 1, got 0"; exit 1; } || \
             echo "Correctly failed with exit code 1."
 
@@ -82,9 +76,7 @@ jobs:
         run: |
           cp reviews/examples/E-MTAB-0003_TS_1.yaml /tmp/E-MTAB-0003_TS_1.yaml
           echo "/tmp/E-MTAB-0003_TS_1.yaml" > /tmp/files.txt
-          python3 reviews/src/scripts/review_processor.py \
-            --files /tmp/files.txt \
-            --metric metric/airbds_metric_v0.3.yaml && \
+          python3 reviews/src/scripts/review_processor.py --files /tmp/files.txt && \
             { echo "ERROR: expected exit code 1, got 0"; exit 1; } || \
             echo "Correctly failed with exit code 1."
 
@@ -101,8 +93,6 @@ jobs:
         run: |
           cp reviews/examples/E-MTAB-0004_TS_1.csv /tmp/E-MTAB-0004_TS_1.csv
           echo "/tmp/E-MTAB-0004_TS_1.csv" > /tmp/files.txt
-          python3 reviews/src/scripts/review_processor.py \
-            --files /tmp/files.txt \
-            --metric metric/airbds_metric_v0.3.yaml && \
+          python3 reviews/src/scripts/review_processor.py --files /tmp/files.txt && \
             { echo "ERROR: expected exit code 1, got 0"; exit 1; } || \
             echo "Correctly failed with exit code 1."

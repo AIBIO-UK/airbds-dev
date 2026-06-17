@@ -2,11 +2,15 @@
 """AIRBDS Review Processor — validates, converts, and scores review files.
 
 Usage:
-    python3 reviews/src/scripts/review_processor.py \
-        --files /tmp/changed_files.txt \
-        --metric metric/airbds_metric_v0.3.yaml
+    python3 reviews/src/scripts/review_processor.py --files /tmp/changed_files.txt
 
-Each line in --files should be a path to a .yaml or .csv review file.
+Each line in --files should be a path to a .yaml or .csv review file. The metric
+version is selected per review from its `schema_version` field: a review with
+`schema_version: "0.4"` is scored against metric/airbds_metric_v0.4.yaml. All
+version-specific facts (question ids, the ethics set, whether questions carry a
+`theme`) are derived from that metric, so the processor handles any version with
+no code change. Override the metric directory with --metric-dir.
+
 The script validates, scores, writes the result block, generates the companion
 format, and renames each file to include the score and grade as a postfix.
 
@@ -21,16 +25,18 @@ import io
 import os
 import re
 import sys
-from datetime import date, datetime
+from datetime import datetime
 from pathlib import Path
 
 import yaml
 
 # ── Constants ──────────────────────────────────────────────────────────────────
 
-SCHEMA_VERSION = "0.3"
-ETHICS_QUESTIONS = {"ACM-24", "ACM-25", "ACM-26", "ACM-27", "ACM-28"}
-ALL_QUESTION_IDS = [f"ACM-{i}" for i in range(1, 29)]
+# Repo root is four levels up: <root>/reviews/src/scripts/<this file>.
+REPO_ROOT = Path(__file__).resolve().parents[3]
+DEFAULT_METRIC_DIR = REPO_ROOT / "metric"
+
+# Fallback grade points, used only if a metric omits grade_points for a grade.
 WEIGHT_POINTS = {"Critical": 80, "Important": 5, "Optional": 2}
 
 # YAML 1.1 strings that are misread as booleans — must be quoted on output
@@ -45,8 +51,6 @@ YAML11_BOOL_STRINGS = {
 _NUMERIC_RE = re.compile(r"^[-+]?(\d+\.?\d*|\.\d+)([eE][-+]?\d+)?$")
 
 # Filename regex: <token>_<INITIALS>_<N>[_<score>_<grade>].<ext>
-# Group 1 = base stem (everything before optional score postfix)
-# Group 2 = grade (if scored), Group 3 = extension
 SCORED_SUFFIX_RE = re.compile(
     r"^(.+_[A-Z]{1,6}_\d+)(?:_\d+_(Caution|Bronze|Silver|Gold))?\.(yaml|csv)$"
 )
@@ -56,7 +60,7 @@ FILENAME_RE = re.compile(
 )
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
-# Strict match for a *fully scored* filename: requires both score AND grade components.
+# Strict match for a *fully scored* filename: requires both score AND grade.
 # Groups: (1) base stem, (2) score as string, (3) grade, (4) extension
 FULL_SCORED_FILENAME_RE = re.compile(
     r"^(.+_[A-Z]{1,6}_\d+)_(\d+)_(Caution|Bronze|Silver|Gold)\.(yaml|csv)$"
@@ -91,52 +95,86 @@ ReviewDumper.add_representer(str, _bool_safe_str)
 
 # ── Metric loading ─────────────────────────────────────────────────────────────
 
-def load_metric(metric_path: str) -> dict:
-    """Load question metadata from the canonical metric YAML.
+def load_metric_profile(metric_path: str) -> dict:
+    """Load everything the processor needs from a canonical metric YAML.
 
-    Returns {question_id: {weight, weight_points, scope, theme, question, guidance}}.
+    Returns a profile dict:
+      schema_version : str          — the metric's version
+      question_ids   : list[str]    — question ids in metric order
+      ethics_ids     : set[str]     — questions requiring a not_applicable flag
+      has_theme      : bool         — whether questions carry a `theme`
+      question_meta  : {qid: {...}} — weight/weight_points/scope/theme/question/guidance
+      grading        : list[{...}]  — grade thresholds, highest grade first
 
-    Questions are stored as a map keyed by question id. Each question's grade
-    lives in a `grade` field and the per-grade point values in a top-level
-    `grade_points` map. The processor's internal vocabulary is
-    "weight"/"weight_points", so the grade is surfaced as the weight and its
-    points looked up from grade_points.
+    Version-specific facts (ids, ethics, theme, version) are all derived here, so
+    the processor scores any metric version without code changes. Each question's
+    grade is surfaced as its "weight" and the points looked up from grade_points.
     """
     with open(metric_path, encoding="utf-8") as f:
         data = yaml.safe_load(f)
+
+    schema_version = str(data.get("schema_version", "")).strip()
     grade_points = data.get("grade_points", {})
-    meta = {}
+
+    question_meta: dict = {}
+    question_ids: list = []
+    ethics_ids: set = set()
+    has_theme = False
+
     for qid, q in (data.get("questions") or {}).items():
         grade = q["grade"]
-        meta[qid] = {
+        theme = q.get("theme")
+        if theme is not None:
+            has_theme = True
+        question_ids.append(qid)
+        question_meta[qid] = {
             "weight": grade,
             "weight_points": grade_points.get(grade, WEIGHT_POINTS.get(grade, 0)),
-            "scope": q["scope"],
-            "theme": q["theme"],
-            "question": q["question"].strip(),
-            "guidance": q["guidance"].strip(),
+            "scope": q.get("scope", ""),
+            "theme": theme,
+            "question": (q.get("question") or "").strip(),
+            "guidance": (q.get("guidance") or "").strip(),
         }
-    return meta
+        # A question needs a not_applicable flag in reviews iff the metric gives
+        # it a not_applicable_default (the Ethics questions, in v0.3 and v0.4).
+        if q.get("not_applicable_default") is not None:
+            ethics_ids.add(qid)
 
-
-def load_grading(metric_path: str) -> list:
-    """Load grade thresholds from the metric YAML, highest grade first.
-
-    Returns a list of {name, min_proportion_yes: {tier: float}, min_score: float}.
-    A dataset earns the highest grade whose per-tier "Yes" proportions and total
-    weighted score all meet the listed minima — mirroring the auto-airbds
-    frontend so the two grade identically.
-    """
-    with open(metric_path, encoding="utf-8") as f:
-        data = yaml.safe_load(f)
     grading = []
     for entry in data.get("grading", []):
         grading.append({
             "name": entry["name"],
             "min_proportion_yes": dict(entry.get("min_proportion_yes", {})),
-            "min_score": entry.get("min_score", 0),
+            "min_score": entry.get("min_score", 0),  # may be fractional (v0.4)
         })
-    return grading
+
+    return {
+        "schema_version": schema_version,
+        "question_ids": question_ids,
+        "ethics_ids": ethics_ids,
+        "has_theme": has_theme,
+        "question_meta": question_meta,
+        "grading": grading,
+    }
+
+
+def resolve_profile(version: str, metric_dir: str, cache: dict) -> tuple:
+    """Return (profile, error). Loads metric/airbds_metric_v<version>.yaml once."""
+    if version in cache:
+        return cache[version], None
+    path = Path(metric_dir) / f"airbds_metric_v{version}.yaml"
+    if not path.exists():
+        return None, (
+            f"No metric found for `schema_version` `{version}` — expected "
+            f"`{path}`. Supported versions are the airbds_metric_v*.yaml files "
+            f"in `{metric_dir}`."
+        )
+    try:
+        profile = load_metric_profile(str(path))
+    except (yaml.YAMLError, KeyError, OSError) as exc:
+        return None, f"Failed to load metric for schema_version `{version}`: {exc}"
+    cache[version] = profile
+    return profile, None
 
 
 # ── Filename helpers ───────────────────────────────────────────────────────────
@@ -199,17 +237,20 @@ def parse_yaml(path: str) -> tuple:
         return None, [f"Cannot read file: {exc}"]
 
 
-def validate_content(data: dict, filename_initials: str | None, question_meta: dict) -> list:
+def validate_content(data: dict, filename_initials: str | None, profile: dict) -> list:
     """Validate parsed review data (works for both YAML and normalised CSV)."""
     errors = []
+    schema_version = profile["schema_version"]
+    question_ids = profile["question_ids"]
+    ethics_ids = profile["ethics_ids"]
 
     # schema_version
     sv = data.get("schema_version")
     if sv is None:
         errors.append("`schema_version` field is missing")
-    elif str(sv) != SCHEMA_VERSION:
+    elif str(sv) != schema_version:
         errors.append(
-            f"`schema_version` must be `\"{SCHEMA_VERSION}\"` (string, not float) — got `{sv!r}`"
+            f"`schema_version` must be `\"{schema_version}\"` (string, not float) — got `{sv!r}`"
         )
 
     # reviewer block
@@ -258,11 +299,11 @@ def validate_content(data: dict, filename_initials: str | None, question_meta: d
         errors.append("`answers` block is missing or malformed")
         return errors
 
-    missing_ids = [qid for qid in ALL_QUESTION_IDS if qid not in answers]
+    missing_ids = [qid for qid in question_ids if qid not in answers]
     if missing_ids:
         errors.append(f"Missing question block(s): {', '.join(missing_ids)}")
 
-    for qid in ALL_QUESTION_IDS:
+    for qid in question_ids:
         if qid not in answers:
             continue
         ans_block = answers[qid]
@@ -282,7 +323,7 @@ def validate_content(data: dict, filename_initials: str | None, question_meta: d
                 f"(case-sensitive, quoted string)"
             )
 
-        if qid in ETHICS_QUESTIONS:
+        if qid in ethics_ids:
             na = ans_block.get("not_applicable")
             if not isinstance(na, bool):
                 errors.append(
@@ -431,10 +472,11 @@ def score_review(answers: dict, question_meta: dict, grading: list) -> tuple:
 
 # ── File writing ──────────────────────────────────────────────────────────────
 
-def write_yaml(path: str, data: dict) -> None:
+def write_yaml(path: str, data: dict, profile: dict) -> None:
     """Write review data as YAML, ensuring answer strings are quoted."""
+    schema_version = profile["schema_version"]
     out: dict = {
-        "schema_version": data.get("schema_version", SCHEMA_VERSION),
+        "schema_version": data.get("schema_version", schema_version),
         "reviewer": data.get("reviewer", {}),
         "dataset": data.get("dataset", {}),
         "process_comments": data.get("process_comments", ""),
@@ -442,26 +484,32 @@ def write_yaml(path: str, data: dict) -> None:
         "result": data.get("result", {"weighted_score": None, "grade": ""}),
     }
 
-    for qid in ALL_QUESTION_IDS:
+    for qid in profile["question_ids"]:
         ans = (data.get("answers") or {}).get(qid, {})
         entry: dict = {
             "answer": ans.get("answer", ""),
             "comments": ans.get("comments", ""),
         }
-        if qid in ETHICS_QUESTIONS:
+        if qid in profile["ethics_ids"]:
             entry["not_applicable"] = bool(ans.get("not_applicable", False))
         out["answers"][qid] = entry
 
     os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
-        f.write(f"# Review — AIRBDS AI-Readiness Dataset Scoring Metric v{SCHEMA_VERSION}\n")
+        f.write(f"# Review — AIRBDS AI-Readiness Dataset Scoring Metric v{schema_version}\n")
         f.write("# Auto-processed by AIRBDS Review Processor\n\n")
         yaml.dump(out, f, Dumper=ReviewDumper, default_flow_style=False,
                   allow_unicode=True, sort_keys=False)
 
 
-def write_csv(path: str, data: dict, question_meta: dict) -> None:
-    """Write review data as CSV matching review_template.csv layout."""
+def write_csv(path: str, data: dict, profile: dict) -> None:
+    """Write review data as CSV matching the review_template.csv layout.
+
+    The `theme` column is included only when the metric carries themes (v0.3);
+    v0.4 has no themes, so the column is omitted.
+    """
+    question_meta = profile["question_meta"]
+    has_theme = profile["has_theme"]
     reviewer = data.get("reviewer") or {}
     dataset = data.get("dataset") or {}
     result = data.get("result") or {}
@@ -469,7 +517,7 @@ def write_csv(path: str, data: dict, question_meta: dict) -> None:
 
     rows = [
         ["field", "value"],
-        ["schema_version", data.get("schema_version", SCHEMA_VERSION)],
+        ["schema_version", data.get("schema_version", profile["schema_version"])],
         ["reviewer_name", reviewer.get("name", "")],
         ["reviewer_initials", reviewer.get("initials", "")],
         ["reviewer_orcid", reviewer.get("orcid", "")],
@@ -483,25 +531,30 @@ def write_csv(path: str, data: dict, question_meta: dict) -> None:
         ["weighted_score", result.get("weighted_score", "")],
         ["grade", result.get("grade", "")],
         [],  # blank separator row
-        ["question_id", "scope", "theme", "weight", "question", "guidance",
-         "answer", "not_applicable", "comments"],
     ]
 
-    for qid in ALL_QUESTION_IDS:
+    header = ["question_id", "scope"]
+    if has_theme:
+        header.append("theme")
+    header += ["weight", "question", "guidance", "answer", "not_applicable", "comments"]
+    rows.append(header)
+
+    for qid in profile["question_ids"]:
         qm = question_meta.get(qid, {})
         ans = answers.get(qid, {})
         na_val = bool(ans.get("not_applicable", False))
-        rows.append([
-            qid,
-            qm.get("scope", ""),
-            qm.get("theme", ""),
+        row = [qid, qm.get("scope", "")]
+        if has_theme:
+            row.append(qm.get("theme") or "")
+        row += [
             qm.get("weight", ""),
             qm.get("question", ""),
             qm.get("guidance", ""),
             ans.get("answer", ""),
             "TRUE" if na_val else "FALSE",
             ans.get("comments", ""),
-        ])
+        ]
+        rows.append(row)
 
     os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
     with open(path, "w", newline="", encoding="utf-8") as f:
@@ -553,7 +606,6 @@ def group_by_stem(file_list: list) -> dict:
 
 
 # ── Compliance check ──────────────────────────────────────────────────────────
-
 
 def is_already_compliant(path: str) -> tuple:
     """Return (compliant, score, grade) if the file is already fully scored.
@@ -671,12 +723,11 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Validate, convert, and score AIRBDS review files.")
     parser.add_argument("--files", required=True,
                         help="Path to a text file listing review paths (one per line)")
-    parser.add_argument("--metric", required=True,
-                        help="Path to airbds_metric_v0.3.yaml")
+    parser.add_argument("--metric-dir", default=str(DEFAULT_METRIC_DIR),
+                        help="Directory of airbds_metric_v<version>.yaml files "
+                             "(default: the repo's metric/). The version is selected "
+                             "per review from its schema_version.")
     args = parser.parse_args()
-
-    question_meta = load_metric(args.metric)
-    grading = load_grading(args.metric)
 
     if not os.path.exists(args.files):
         write_outputs(False, False)
@@ -694,6 +745,7 @@ def main() -> None:
         sys.exit(0)
 
     groups = group_by_stem(file_list)
+    profile_cache: dict = {}
     results = []
     has_changes = False
     has_errors = False
@@ -708,9 +760,6 @@ def main() -> None:
             primary_fmt = "csv"
 
         # 0. Compliance shortcut — skip files that are already fully scored.
-        # A file is compliant if its filename has the score+grade suffix AND
-        # the internal result.weighted_score matches the filename score.
-        # Skipped files do not set has_changes, so no auto-commit occurs.
         compliant, c_score, c_grade = is_already_compliant(primary_path)
         if compliant:
             print(f"[skip] already compliant: {os.path.basename(primary_path)}", flush=True)
@@ -735,14 +784,17 @@ def main() -> None:
             "notes": [],
         }
 
+        def fail(messages: list) -> None:
+            result["errors"].extend(messages)
+            for e in messages:
+                emit_annotation(primary_path, e)
+            results.append(result)
+
         # 1. Filename validation
         fn_errors = validate_filename(primary_path)
         if fn_errors:
-            result["errors"].extend(fn_errors)
-            results.append(result)
+            fail(fn_errors)
             has_errors = True
-            for e in fn_errors:
-                emit_annotation(primary_path, e)
             continue
 
         filename_initials = extract_initials_from_filename(primary_path)
@@ -754,36 +806,44 @@ def main() -> None:
             data, parse_errors = parse_csv(primary_path)
 
         if parse_errors:
-            result["errors"].extend(parse_errors)
-            results.append(result)
+            fail(parse_errors)
             has_errors = True
-            for e in parse_errors:
-                emit_annotation(primary_path, e)
             continue
 
-        # 3. Content validation
-        content_errors = validate_content(data, filename_initials, question_meta)
+        # 3. Select the metric version from the review's schema_version
+        version = str(data.get("schema_version") or "").strip()
+        if not version:
+            fail(["`schema_version` is missing or empty — it selects which metric "
+                  "version scores this review (e.g. `schema_version: \"0.3\"`)"])
+            has_errors = True
+            continue
+
+        profile, profile_error = resolve_profile(version, args.metric_dir, profile_cache)
+        if profile_error:
+            fail([profile_error])
+            has_errors = True
+            continue
+
+        # 4. Content validation
+        content_errors = validate_content(data, filename_initials, profile)
         if content_errors:
-            result["errors"].extend(content_errors)
-            results.append(result)
+            fail(content_errors)
             has_errors = True
-            for e in content_errors:
-                emit_annotation(primary_path, e)
             continue
 
-        # 4. Score
-        score, grade = score_review(data["answers"], question_meta, grading)
+        # 5. Score
+        score, grade = score_review(data["answers"], profile["question_meta"], profile["grading"])
         data["result"] = {"weighted_score": score, "grade": grade}
         result["score"] = score
         result["grade"] = grade
         result["status"] = "pass"
 
-        # 5. Write primary file at scored path
+        # 5b. Write primary file at scored path
         scored_primary = compute_scored_path(primary_path, score, grade)
         if primary_fmt == "yaml":
-            write_yaml(scored_primary, data)
+            write_yaml(scored_primary, data, profile)
         else:
-            write_csv(scored_primary, data, question_meta)
+            write_csv(scored_primary, data, profile)
 
         if os.path.abspath(primary_path) != os.path.abspath(scored_primary):
             os.remove(primary_path)
@@ -799,9 +859,9 @@ def main() -> None:
         )
 
         if companion_ext == "csv":
-            write_csv(companion_path, data, question_meta)
+            write_csv(companion_path, data, profile)
         else:
-            write_yaml(companion_path, data)
+            write_yaml(companion_path, data, profile)
 
         companion_existed = companion_ext in formats
         result["notes"].append(

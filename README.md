@@ -242,9 +242,7 @@ so it remains fast even as the `reviews/testing/` directory grows.
 pip install pyyaml
 
 echo "reviews/testing/your_file.yaml" > /tmp/files.txt
-python3 reviews/src/scripts/review_processor.py \
-    --files /tmp/files.txt \
-    --metric metric/airbds_metric_v0.3.yaml
+python3 reviews/src/scripts/review_processor.py --files /tmp/files.txt
 ```
 
 Example test files demonstrating compliant and non-compliant inputs are in

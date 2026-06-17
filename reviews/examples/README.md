@@ -17,16 +17,12 @@ pip install pyyaml
 
 # Test a compliant YAML (should rename file and generate CSV companion)
 echo "reviews/examples/E-MTAB-0001_TS_1.yaml" > /tmp/test.txt
-python3 reviews/src/scripts/review_processor.py \
-    --files /tmp/test.txt \
-    --metric metric/airbds_metric_v0.3.yaml
+python3 reviews/src/scripts/review_processor.py --files /tmp/test.txt
 echo "Exit code: $?"
 
 # Test non-compliant content (should exit 1 with errors)
 echo "reviews/examples/E-MTAB-0003_TS_1.yaml" > /tmp/test.txt
-python3 reviews/src/scripts/review_processor.py \
-    --files /tmp/test.txt \
-    --metric metric/airbds_metric_v0.3.yaml
+python3 reviews/src/scripts/review_processor.py --files /tmp/test.txt
 echo "Exit code: $?"
 ```
 
