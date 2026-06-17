@@ -3,7 +3,7 @@
 This directory contains personal/experimental skill variants authored by Gavin Farrell (GF),
 maintained in parallel with the team's `testing/` skills for individual experimentation.
 
-This variant collects reviewer metadata (name, initials, ORCID, affiliation, review number) before the assessment, then writes the completed review to `reviews/<accession>_<INITIALS>_<n>.yaml` — ready for automated scoring by the `review-check` workflow.
+This variant collects reviewer metadata (name, initials, ORCID, affiliation, review number) before the assessment, then writes the completed review to `reviews/testing/<accession>_<INITIALS>_<n>.yaml` — ready for automated scoring by the `review-check` workflow.
 
 **These skills are not production-ready and have not been agreed with the team.**
 They exist for personal testing and as a proof-of-concept for improvements to discuss.
@@ -12,14 +12,14 @@ They exist for personal testing and as a proof-of-concept for improvements to di
 
 | Feature | `testing/` skill | `GF/` skill |
 |---------|-----------------|-------------|
-| Output | Assessment table in chat only | Assessment table + YAML review file written to `reviews/` |
+| Output | Assessment table in chat only | Assessment table + YAML review file written to `reviews/testing/` |
 | Reviewer metadata | Not collected | Collected at start (name, initials, ORCID, affiliation, n) |
 | Works in Claude Code | ✅ | ✅ |
 | Works in Claude Web | ✅ | ✅ (requires Code execution + file creation) |
 
 ## Skills
 
-- [`GF-airbds-assessment-skill/`](GF-airbds-assessment-skill/) — YAML-based assessment that writes directly to `reviews/`
+- [`GF-airbds-assessment-skill/`](GF-airbds-assessment-skill/) — YAML-based assessment that writes directly to `reviews/testing/`
 
 ## Installation (Claude Code)
 

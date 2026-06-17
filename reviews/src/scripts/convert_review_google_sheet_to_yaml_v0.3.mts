@@ -1,17 +1,17 @@
 #!/usr/bin/env node
 /**
  * Convert an AIRBDS assessment Google Sheet (or its exported CSV tabs) into a
- * review YAML conforming to metric/review_template.yaml.
+ * review YAML conforming to reviews/review_template.yaml.
  *
  *   # From a public Google Sheet (shared "anyone with the link"):
- *   node src/scripts/convert_review_google_sheet_to_yaml_v0.3.mts <url-or-id> review.yaml
+ *   node reviews/src/scripts/convert_review_google_sheet_to_yaml_v0.3.mts <url-or-id> review.yaml
  *
  *   # Offline / private sheet — supply the two exported CSV tabs:
- *   node src/scripts/convert_review_google_sheet_to_yaml_v0.3.mts \
+ *   node reviews/src/scripts/convert_review_google_sheet_to_yaml_v0.3.mts \
  *       --review-csv review-info.csv --questions-csv questions.csv review.yaml
  *
  * Scoring is intentionally NOT done here: `result` is left blank and
- * src/scripts/review_processor.py / CI compute the score and grade.
+ * reviews/src/scripts/review_processor.py / CI compute the score and grade.
  *
  * This is a thin adapter over the pure ../google-sheet-converter library.
  */
@@ -22,7 +22,7 @@ import { convert, fetchSheet, parseMetric } from "../google-sheet-converter/inde
 // metric/airbds_metric_v0.3.yaml is the single source of truth, referenced from
 // the repo root — never copied into the converter.
 const DEFAULT_METRIC = fileURLToPath(
-  new URL("../../metric/airbds_metric_v0.3.yaml", import.meta.url),
+  new URL("../../../metric/airbds_metric_v0.3.yaml", import.meta.url),
 );
 
 interface Args {

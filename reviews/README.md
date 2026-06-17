@@ -1,10 +1,13 @@
-# Completed Dataset Reviews
+# Reviews
 
-This directory contains completed dataset review files in YAML and CSV format.
+This directory holds the blank review template, the completed reviews (under
+[`testing/`](testing/) for now — nothing is in production yet), reference
+[`examples/`](examples/), and the tooling that produces and scores them
+([`src/`](src/)).
 
-Each file follows the schema defined in
-[`../metric/review_template.yaml`](../metric/review_template.yaml) (YAML) or
-[`../metric/review_template.csv`](../metric/review_template.csv) (CSV).
+Completed review files are YAML and CSV. Each follows the schema defined in
+[`review_template.yaml`](review_template.yaml) (YAML) or
+[`review_template.csv`](review_template.csv) (CSV).
 
 **Naming convention:** `<dataset_accession>_<reviewer_initials>_<n>.<yaml|csv>`
 

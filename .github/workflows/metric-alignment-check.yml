@@ -1,6 +1,7 @@
 name: Metric Alignment Check
 
-# Runs whenever any file under metric/ changes.
+# Runs whenever any file under metric/ — or the review_template pair under
+# reviews/ — changes.
 # Verifies that YAML/CSV pairs are updated together and that new metric
 # versions are accompanied by CHANGELOG.md and README.md updates.
 # On misalignment: creates a GitHub Issue and (for PRs) posts a PR comment.
@@ -10,9 +11,13 @@ on:
   push:
     paths:
       - 'metric/**'
+      - 'reviews/review_template.csv'
+      - 'reviews/review_template.yaml'
   pull_request:
     paths:
       - 'metric/**'
+      - 'reviews/review_template.csv'
+      - 'reviews/review_template.yaml'
 
 permissions:
   contents: read
@@ -47,7 +52,8 @@ jobs:
           echo "Comparing against base: $BASE"
 
       # -----------------------------------------------------------------------
-      # Collect changed files under metric/ (Added, Copied, Modified, Renamed).
+      # Collect changed files under metric/ plus the review_template pair
+      # (Added, Copied, Modified, Renamed).
       # Exclude metric/README.md and metric/SKILL.md — documentation files
       # that have no YAML/CSV counterpart and are not subject to pair-checking.
       - name: Collect changed metric files
@@ -55,7 +61,7 @@ jobs:
         run: |
           BASE="${{ steps.base.outputs.base_sha }}"
 
-          git diff --name-only --diff-filter=ACMR "$BASE" HEAD -- 'metric/**' \
+          git diff --name-only --diff-filter=ACMR "$BASE" HEAD -- 'metric/**' 'reviews/review_template.yaml' 'reviews/review_template.csv' \
             | grep -E '\.(yaml|csv)$' \
             > /tmp/changed_metric_files.txt || true
 
@@ -129,8 +135,9 @@ jobs:
                       f'  → expected also changed: {y}'
                   )
 
-          # -- Group C: review_template pair --
-          for y, c in [('metric/review_template.yaml', 'metric/review_template.csv')]:
+          # -- Group C: review_template pair (lives under reviews/, but stays
+          #    version-locked to the metric, so it is checked here) --
+          for y, c in [('reviews/review_template.yaml', 'reviews/review_template.csv')]:
               if y in yaml_files and c not in csv_files:
                   mismatches.append(
                       f'YAML changed without companion CSV: {y}\n'

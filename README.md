@@ -54,26 +54,31 @@ airbds-metric/
 │   ├── airbds_metric_v0.3.csv    # Canonical metric — all 28 questions (CSV)
 │   ├── scoring_schema.yaml       # Grade thresholds, weight definitions (YAML)
 │   ├── scoring_schema.csv        # Grade thresholds, weight definitions (CSV)
-│   ├── review_template.yaml      # Blank review template (YAML)
-│   ├── review_template.csv       # Blank review template (CSV / spreadsheet)
 │   ├── README.md                 # Contributor guide — file coupling rules & update workflow
 │   ├── SKILL.md                  # AI agent skill — propagates metric changes across the repo
-│   └── source/                   # Source spreadsheet that generates the metric YAML/CSV
-│       └── AIRBDS Core Metric scoring v0.3 - _initials_-_#_ TEMPLATE.xlsx
-├── reviews/                      # Completed dataset review files
+│   ├── source/                   # Source spreadsheet that generates the metric YAML/CSV
+│   │   └── AIRBDS Core Metric scoring v0.3 - _initials_-_#_ TEMPLATE.xlsx
+│   └── src/                      # Metric-build tooling
+│       ├── scripts/
+│       │   └── build_metric_yaml_and_csv_from_spreadsheet_v0.3.py   # Regenerates the metric YAML+CSV from the source spreadsheet
+│       └── README.md             # Install & usage for the metric-build tooling
+├── reviews/                      # Reviews + the tooling that produces and scores them
+│   ├── review_template.yaml      # Blank review template (YAML) — tracks the current metric
+│   ├── review_template.csv       # Blank review template (CSV / spreadsheet)
+│   ├── testing/                  # Completed dataset reviews (all reviews live here for now)
+│   ├── examples/                 # Compliant & non-compliant samples used by CI tests
+│   ├── src/                      # Review tooling
+│   │   ├── google-sheet-converter/   # Reusable TS library: assessment Google Sheet → review YAML
+│   │   ├── scripts/
+│   │   │   ├── review_processor.py   # Validates, scores & converts review files (CI + local)
+│   │   │   └── convert_review_google_sheet_to_yaml_v0.3.mts   # Converts an assessment Google Sheet to a review YAML
+│   │   └── docs/DESIGN.md        # Why the review tooling is built this way
+│   └── README.md                 # Review submission & processing guide
 ├── skills/                       # AI agent skills for performing assessments and installation instructions
 │   ├── README.md                 # Skills setup & known issues
 │   ├── testing/                  # Skill versions under test — Gemini, Claude Web, Claude Code
 │   ├── development/              # Skill versions under active development
 │   └── GF/                       # GF (Gavin) personal variant — YAML-based, writes review files
-├── src/                          # TypeScript tooling + scripts (own npm package; see src/README.md)
-│   ├── google-sheet-converter/   # Reusable TS library: assessment Google Sheet → review YAML
-│   ├── scripts/                  # Tooling for the metric and reviews
-│   │   ├── review_processor.py   # Validates, scores & converts review files (CI + local)
-│   │   ├── build_metric_yaml_and_csv_from_spreadsheet_v0.3.py   # Regenerates the metric YAML+CSV from the source spreadsheet
-│   │   └── convert_review_google_sheet_to_yaml_v0.3.mts   # Converts an assessment Google Sheet to a review YAML
-│   ├── docs/DESIGN.md            # Why the tooling is built this way
-│   └── README.md                 # Install & usage for the TS tooling
 ├── docs/
 │   ├── tutorial-csv.md           # Beginner tutorial — Excel / Google Sheets
 │   └── tutorial-yaml.md          # Intermediate tutorial — text editor / CLI
@@ -95,8 +100,8 @@ The metric is available in two formats. Both cover the same 28 questions and pro
 
 | Format | Best for | Template | Tutorial |
 |---|---|---|---|
-| **CSV** | Beginners · Excel or Google Sheets · no coding required | [review_template.csv](metric/review_template.csv) | [Beginner CSV Tutorial](https://aibio-uk.github.io/airbds-metric-tutorial/chapters/chapter_02_csv/) |
-| **YAML** | Intermediate · text editor / command line | [review_template.yaml](metric/review_template.yaml) | [Intermediate YAML Tutorial](https://aibio-uk.github.io/airbds-metric-tutorial/chapters/chapter_03_yaml/) |
+| **CSV** | Beginners · Excel or Google Sheets · no coding required | [review_template.csv](reviews/review_template.csv) | [Beginner CSV Tutorial](https://aibio-uk.github.io/airbds-metric-tutorial/chapters/chapter_02_csv/) |
+| **YAML** | Intermediate · text editor / command line | [review_template.yaml](reviews/review_template.yaml) | [Intermediate YAML Tutorial](https://aibio-uk.github.io/airbds-metric-tutorial/chapters/chapter_03_yaml/) |
 
 ---
 
@@ -106,7 +111,7 @@ For the spreadsheet workflow, see the [Beginner CSV Tutorial](docs/tutorial-csv.
 
 1. **Copy the template:**
    ```bash
-   cp metric/review_template.yaml reviews/<accession>_<initials>_1.yaml
+   cp reviews/review_template.yaml reviews/testing/<accession>_<initials>_1.yaml
    ```
 2. **Answer all 28 questions** (`"Yes"` or `"No"`) in your copy.
 3. **Submit a PR** — see [CONTRIBUTING.md](CONTRIBUTING.md).
@@ -207,7 +212,7 @@ opening a PR. All contributors must abide by our [Code of Conduct](CODE_OF_CONDU
 
 ## Automated Review Processing
 
-When a pull request or push adds or modifies a file under `reviews/`, a
+When a pull request or push adds or modifies a file under `reviews/testing/`, a
 GitHub Actions workflow ([`.github/workflows/review-check.yml`](.github/workflows/review-check.yml))
 runs automatically to:
 
@@ -229,15 +234,15 @@ automatically.
 as `null` / `""` and the workflow fills it in.
 
 The workflow only processes files that changed in the current push (incremental),
-so it remains fast even as the `reviews/` directory grows.
+so it remains fast even as the `reviews/testing/` directory grows.
 
 ### Running the processor locally
 
 ```bash
 pip install pyyaml
 
-echo "reviews/your_file.yaml" > /tmp/files.txt
-python3 src/scripts/review_processor.py \
+echo "reviews/testing/your_file.yaml" > /tmp/files.txt
+python3 reviews/src/scripts/review_processor.py \
     --files /tmp/files.txt \
     --metric metric/airbds_metric_v0.3.yaml
 ```

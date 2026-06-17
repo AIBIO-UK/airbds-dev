@@ -1,5 +1,5 @@
 // Public surface of the AIRBDS review converter library.
-// The CLI (src/scripts/convert_review_google_sheet_to_yaml_v0.3.mts) and,
+// The CLI (reviews/src/scripts/convert_review_google_sheet_to_yaml_v0.3.mts) and,
 // later, the website's server-side code both import from here.
 
 export * from "./types.ts";

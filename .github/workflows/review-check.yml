@@ -3,10 +3,10 @@ name: Review Check & Score
 on:
   push:
     paths:
-      - 'reviews/**'
+      - 'reviews/testing/**'
   pull_request:
     paths:
-      - 'reviews/**'
+      - 'reviews/testing/**'
 
 permissions:
   contents: write
@@ -45,9 +45,8 @@ jobs:
 
           echo "Comparing against base: $BASE"
 
-          git diff --name-only --diff-filter=AM "$BASE" HEAD -- 'reviews/**' \
+          git diff --name-only --diff-filter=AM "$BASE" HEAD -- 'reviews/testing/**' \
             | grep -E '\.(yaml|csv)$' \
-            | grep -v '^reviews/examples/' \
             > /tmp/changed_reviews.txt || true
 
           COUNT=$(wc -l < /tmp/changed_reviews.txt | tr -d ' ')
@@ -59,7 +58,7 @@ jobs:
         if: steps.changed.outputs.changed_count != '0'
         id: process
         run: |
-          python3 src/scripts/review_processor.py \
+          python3 reviews/src/scripts/review_processor.py \
             --files /tmp/changed_reviews.txt \
             --metric metric/airbds_metric_v0.3.yaml
         continue-on-error: true
@@ -74,7 +73,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add reviews/
+          git add reviews/testing/
           if git diff --cached --quiet; then
             echo "No file changes to commit."
           else
@@ -101,7 +100,7 @@ jobs:
           echo "To apply the scored filenames locally, run:" >> "$GITHUB_STEP_SUMMARY"
           echo '```bash' >> "$GITHUB_STEP_SUMMARY"
           echo "pip install pyyaml" >> "$GITHUB_STEP_SUMMARY"
-          echo "python3 src/scripts/review_processor.py --files <your-review-file> --metric metric/airbds_metric_v0.3.yaml" >> "$GITHUB_STEP_SUMMARY"
+          echo "python3 reviews/src/scripts/review_processor.py --files <your-review-file> --metric metric/airbds_metric_v0.3.yaml" >> "$GITHUB_STEP_SUMMARY"
           echo '```' >> "$GITHUB_STEP_SUMMARY"
 
       - name: Fail if validation errors

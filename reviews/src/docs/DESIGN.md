@@ -1,7 +1,8 @@
 # Tooling design
 
-Why the tooling under `src/` is built the way it is. Scope: the Google-Sheet →
-review-YAML converter and how it relates to the existing Python scripts.
+Why the review tooling under `reviews/src/` is built the way it is. Scope: the
+Google-Sheet → review-YAML converter and how it relates to the existing Python
+scripts.
 
 ## TypeScript, not Python (for the converter)
 

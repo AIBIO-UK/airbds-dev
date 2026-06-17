@@ -1,7 +1,7 @@
-# `src/` — AIRBDS tooling
+# `reviews/src/` — review tooling
 
-A self-contained workspace for the project's tooling, kept out of the repository
-root. The design rationale lives in [`docs/DESIGN.md`](docs/DESIGN.md).
+The tooling that turns assessments into review files and validates/scores them.
+The design rationale lives in [`docs/DESIGN.md`](docs/DESIGN.md).
 
 ## TypeScript
 
@@ -9,7 +9,7 @@ root. The design rationale lives in [`docs/DESIGN.md`](docs/DESIGN.md).
 dependencies, and `tsconfig.json` live there; see
 [`google-sheet-converter/README.md`](google-sheet-converter/README.md) to work on it) that turns an AIRBDS
 assessment spreadsheet into a review YAML conforming to
-[`metric/review_template.yaml`](../metric/review_template.yaml). It is the shared
+[`review_template.yaml`](../review_template.yaml). It is the shared
 core — the CLI uses it today, and a website will use it server-side to parse
 incoming spreadsheet links. The CLI is
 `scripts/convert_review_google_sheet_to_yaml_v0.3.mts`.
@@ -21,10 +21,10 @@ incoming spreadsheet links. The CLI is
 curl -fsSL https://bun.sh/install | bash
 
 # 2. Install dependencies (one-time — they live in the converter package)
-cd src/google-sheet-converter
+cd reviews/src/google-sheet-converter
 bun install
 
-# 3. Convert a sheet → review YAML (run the CLI from src/scripts)
+# 3. Convert a sheet → review YAML (run the CLI from reviews/src/scripts)
 cd ../scripts
 bun ./convert_review_google_sheet_to_yaml_v0.3.mts <google-sheets-url-or-id> review.yaml
 ```
@@ -50,13 +50,11 @@ Notes:
   those are left blank for you to fill in (warnings flag them). Warnings also list
   any unanswered questions — the file is a draft until every question is `Yes`/`No`.
 - After converting, name the file per
-  [`CONTRIBUTING.md`](../CONTRIBUTING.md) (`<accession>_<INITIALS>_<n>.yaml`) and
+  [`CONTRIBUTING.md`](../../CONTRIBUTING.md) (`<accession>_<INITIALS>_<n>.yaml`) and
   submit it; CI scores it on the way in.
 
 ## Python
 
 - `scripts/review_processor.py` — validates, scores, and converts review files (CI + local).
-- `scripts/build_metric_yaml_and_csv_from_spreadsheet_v0.3.py` — regenerates the
-  metric YAML/CSV from the source spreadsheet.
 
-These need Python 3 with `pyyaml` (and `openpyxl` for the build script).
+Needs Python 3 with `pyyaml`.

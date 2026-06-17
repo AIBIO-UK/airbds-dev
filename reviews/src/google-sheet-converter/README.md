@@ -2,10 +2,10 @@
 
 The reusable AIRBDS review-converter library — turns an assessment spreadsheet
 into a review YAML conforming to
-[`metric/review_template.yaml`](../../metric/review_template.yaml). It is the
+[`review_template.yaml`](../../review_template.yaml). It is the
 shared core used by the CLI
 (`../scripts/convert_review_google_sheet_to_yaml_v0.3.mts`) and by the
-[`auto-airbds`](../../../../auto-airbds) website's server-side import route, which
+[`auto-airbds`](../../../../../auto-airbds) website's server-side import route, which
 depends on it as the published npm package **`@airbds/converter-tools`**.
 
 This is its own npm package — `package.json`, dependencies, and `tsconfig.json`
@@ -21,7 +21,7 @@ usage).
 
 ## Develop
 
-Run from this directory (`src/google-sheet-converter`):
+Run from this directory (`reviews/src/google-sheet-converter`):
 
 ```bash
 bun install       # one-time

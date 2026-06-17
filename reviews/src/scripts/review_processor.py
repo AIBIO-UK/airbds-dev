@@ -2,7 +2,7 @@
 """AIRBDS Review Processor — validates, converts, and scores review files.
 
 Usage:
-    python3 src/scripts/review_processor.py \
+    python3 reviews/src/scripts/review_processor.py \
         --files /tmp/changed_files.txt \
         --metric metric/airbds_metric_v0.3.yaml
 

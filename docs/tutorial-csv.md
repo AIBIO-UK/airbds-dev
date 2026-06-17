@@ -18,7 +18,7 @@ You will open a CSV template, fill in your answers to 28 Yes/No questions about 
 
 Download the blank review template directly from the repository:
 
-**[metric/review_template.csv](../metric/review_template.csv)**
+**[reviews/review_template.csv](../reviews/review_template.csv)**
 
 To download: click the link above, then on GitHub click the **Download raw file** button (the down-arrow icon near the top-right of the file view).
 
@@ -170,12 +170,12 @@ If there is no accession number, use a short descriptive name for the dataset.
 
 ## Step 9 — Share your review
 
-Completed reviews are collected in the [`reviews/`](../reviews/) folder of this repository.
+Completed reviews are collected in the [`reviews/testing/`](../reviews/testing/) folder of this repository.
 
 See [CONTRIBUTING.md](../CONTRIBUTING.md) for full submission instructions. The short version:
 
 1. Fork the repository on GitHub.
-2. Add your CSV to the `reviews/` folder.
+2. Add your CSV to the `reviews/testing/` folder.
 3. Open a pull request against `main`.
 
 If you are not familiar with GitHub pull requests, you can also email your completed CSV to the working group — contact details are at [aibio.ac.uk/about/working-groups/airbds/](https://aibio.ac.uk/about/working-groups/airbds/).

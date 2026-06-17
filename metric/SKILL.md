@@ -36,7 +36,7 @@ Before doing anything else, read the following files so you have complete contex
 
 1. `metric/airbds_metric_v*.yaml` — identify the **current metric version** from the `version:` field
 2. `metric/scoring_schema.yaml` — current grade thresholds and weight definitions
-3. `metric/review_template.yaml` — current blank review template schema
+3. `reviews/review_template.yaml` — current blank review template schema
 4. `metric/README.md` — the Coupled File Groups manifest (your checklist)
 5. `CHANGELOG.md` — understand the existing entry format before adding a new one
 6. The file(s) that were actually changed — determine from `git status`, `git diff`, or the GitHub Actions output that triggered this skill
@@ -87,12 +87,12 @@ Read `metric/airbds_metric_v0.3.csv` to confirm the exact column names and order
 **For `metric/scoring_schema.csv`:**
 Read the existing `metric/scoring_schema.csv` to confirm the structure (it mirrors the YAML sections for `answers`, `weights`, and `grades`).
 
-**For `metric/review_template.csv`:**
+**For `reviews/review_template.csv`:**
 The CSV template has two sections:
 - Section A: metadata rows (`field, value` format; one row per reviewer/dataset field)
 - Section B: question rows (`question_id, answer, comments, not_applicable` format; one blank row per question)
 
-Read `metric/review_template.csv` to confirm the exact structure before writing.
+Read `reviews/review_template.csv` to confirm the exact structure before writing.
 
 #### C. Write the regenerated CSV file(s) to disk
 
@@ -128,26 +128,26 @@ Update the following fields:
 
 Then regenerate `metric/scoring_schema.csv`.
 
-#### G. Update `metric/review_template.yaml`
+#### G. Update `reviews/review_template.yaml`
 
 Update `schema_version: "0.3"` → `"NEW"`.
 
-Then regenerate `metric/review_template.csv`.
+Then regenerate `reviews/review_template.csv`.
 
-#### H. Update `src/scripts/review_processor.py`
+#### H. Update `reviews/src/scripts/review_processor.py`
 
 Three locations to update:
 1. **Line 31:** `SCHEMA_VERSION = "0.3"` → `SCHEMA_VERSION = "NEW"`
 2. In the script's docstring or module comment: update the `--metric metric/airbds_metric_v0.3.yaml` example path
 3. The `help=` string in the argparse `--metric` argument definition (search for `"Path to airbds_metric_v0.3.yaml"`)
 
-Use `grep -n "0\.3" src/scripts/review_processor.py` to find all occurrences before editing.
+Use `grep -n "0\.3" reviews/src/scripts/review_processor.py` to find all occurrences before editing.
 
 #### I. Update `.github/workflows/review-check.yml`
 
 Search for `airbds_metric_v0.3.yaml` in this file. There are 2 occurrences:
-- Line 64: `--metric metric/airbds_metric_v0.3.yaml` in the `Process review files` step
-- Line 104: in the Fork PR notice step summary
+- Line 63: `--metric metric/airbds_metric_v0.3.yaml` in the `Process review files` step
+- Line 103: in the Fork PR notice step summary
 
 Update both to `--metric metric/airbds_metric_vNEW.yaml`.
 
@@ -250,7 +250,7 @@ When the metric version changes:
 
 ## Step 4 — The source spreadsheet
 
-`metric/source/AIRBDS Core Metric scoring v0.3 - _initials_-_#_ TEMPLATE.xlsx` is the hand-edited source of truth for the metric content. The metric YAML and CSV are generated **from** it by `src/scripts/build_metric_yaml_and_csv_from_spreadsheet_v0.3.py` (see "How the v0.3 metric files are generated" in `metric/README.md`); the spreadsheet itself is not programmatically regenerated.
+`metric/source/AIRBDS Core Metric scoring v0.3 - _initials_-_#_ TEMPLATE.xlsx` is the hand-edited source of truth for the metric content. The metric YAML and CSV are generated **from** it by `metric/src/scripts/build_metric_yaml_and_csv_from_spreadsheet_v0.3.py` (see "How the v0.3 metric files are generated" in `metric/README.md`); the spreadsheet itself is not programmatically regenerated.
 
 If a new metric version is released:
 1. Edit the spreadsheet in `metric/source/` (the `Scoring` and `Lookups` sheets), or copy it to a new versioned filename.
@@ -274,9 +274,9 @@ After completing all applicable steps, produce a structured summary for the cont
 - metric/airbds_metric_vNEW.csv — regenerated from YAML
 - metric/scoring_schema.yaml — schema_version updated to NEW
 - metric/scoring_schema.csv — regenerated
-- metric/review_template.yaml — schema_version updated to NEW
-- metric/review_template.csv — regenerated
-- src/scripts/review_processor.py — SCHEMA_VERSION and --metric path updated
+- reviews/review_template.yaml — schema_version updated to NEW
+- reviews/review_template.csv — regenerated
+- reviews/src/scripts/review_processor.py — SCHEMA_VERSION and --metric path updated
 - .github/workflows/review-check.yml — --metric path updated (2 occurrences)
 - .github/workflows/review-test.yml — --metric path updated (5 occurrences)
 - README.md — version badge, file listing, download links updated
@@ -306,9 +306,9 @@ Open a pull request referencing the originating GitHub Issue (#N):
 | `metric/airbds_metric_vX.Y.csv` | ✅ | ✅ | ✅ |
 | `metric/scoring_schema.yaml` | ✅* | ✅ | ✅ |
 | `metric/scoring_schema.csv` | ✅* | ✅ | ✅ |
-| `metric/review_template.yaml` | ✅* | ✅ | ✅ |
-| `metric/review_template.csv` | ✅* | ✅ | ✅ |
-| `src/scripts/review_processor.py` | — | ✅ | ✅ |
+| `reviews/review_template.yaml` | ✅* | ✅ | ✅ |
+| `reviews/review_template.csv` | ✅* | ✅ | ✅ |
+| `reviews/src/scripts/review_processor.py` | — | ✅ | ✅ |
 | `.github/workflows/review-check.yml` | — | ✅ | ✅ |
 | `.github/workflows/review-test.yml` | — | ✅ | ✅ |
 | `README.md` | — | ✅ | ✅ |

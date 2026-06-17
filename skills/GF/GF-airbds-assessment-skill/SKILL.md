@@ -14,7 +14,7 @@ metadata:
     tags: [science]
     category: science
   author: GF
-  note: Personal variant — YAML-based scoring, writes review file to reviews/. Not yet agreed with team.
+  note: Personal variant — YAML-based scoring, writes review file to reviews/testing/. Not yet agreed with team.
 ---
 
 # AIRBDS Assessment Skill (GF personal variant)
@@ -23,7 +23,7 @@ You are an expert in scoring life science datasets against the AIRBDS AI-Ready c
 
 This is the **GF personal variant** of the AIRBDS assessment skill. It uses the canonical
 YAML metric files instead of the XLSX spreadsheet, and writes a structured YAML review file
-to the `reviews/` folder of the project upon completion.
+to the `reviews/testing/` folder of the project upon completion.
 
 ---
 
@@ -33,7 +33,7 @@ The canonical metric and scoring rules are defined in:
 
 - `metric/airbds_metric_v0.3.yaml` — 28 questions with weights and guidance
 - `metric/scoring_schema.yaml` — grade thresholds and weight points
-- `metric/review_template.yaml` — output YAML schema to follow exactly
+- `reviews/review_template.yaml` — output YAML schema to follow exactly
 
 **Read these files before beginning the assessment if you have file access (Claude Code).**
 If running in Claude Web without file access, use the embedded question list below.
@@ -145,12 +145,12 @@ descriptive slug (letters, digits, hyphens and dots only).
 
 **b. Compute the output filename:**
 ```
-reviews/<accession>_<INITIALS>_<n>.yaml
+reviews/testing/<accession>_<INITIALS>_<n>.yaml
 ```
 - Do NOT include the score or grade in the filename — the automation adds these.
-- Example: `reviews/zenodo.18973687_GF_1.yaml`
+- Example: `reviews/testing/zenodo.18973687_GF_1.yaml`
 
-**c. Produce a YAML review file** conforming to the schema in `metric/review_template.yaml`.
+**c. Produce a YAML review file** conforming to the schema in `reviews/review_template.yaml`.
 The `result` block MUST be populated with the computed `weighted_score` (integer) and `grade`.
 
 Use this exact schema:
@@ -211,14 +211,14 @@ result:
 **d. Write the file** using the appropriate method for your environment:
 
 - **Claude Code (preferred):** Use the `Write` tool to write the file at the absolute path
-  `<project_root>/reviews/<accession>_<INITIALS>_<n>.yaml`. If unsure of the project root,
+  `<project_root>/reviews/testing/<accession>_<INITIALS>_<n>.yaml`. If unsure of the project root,
   check the current working directory first.
 - **Claude Web** with "Code execution and file creation" enabled: Use the code execution
   environment to write the file.
 - **Fallback:** Display the complete YAML in a fenced code block so the user can save it manually.
 
 **e. After writing, tell the user:**
-> "Your review has been saved as `reviews/<filename>.yaml`.
+> "Your review has been saved as `reviews/testing/<filename>.yaml`.
 > The automation will validate, score, and rename it when pushed to the repository.
 > To submit: open a pull request at https://github.com/AIBIO-UK/airbds-metric
 > or commit the file directly if you have write access."
@@ -239,5 +239,5 @@ result:
 |------|---------|
 | `metric/airbds_metric_v0.3.yaml` | Canonical 28-question metric with weights and guidance |
 | `metric/scoring_schema.yaml` | Grade thresholds and weight point definitions |
-| `metric/review_template.yaml` | Blank YAML output schema |
-| `reviews/` | Output directory for completed assessments |
+| `reviews/review_template.yaml` | Blank YAML output schema |
+| `reviews/testing/` | Output directory for completed assessments |

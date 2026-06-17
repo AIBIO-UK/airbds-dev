@@ -38,11 +38,11 @@ The primary contribution type is a completed dataset review scored using the
 AIRBDS metric.
 
 1. **Copy the template:** Start from
-   [`metric/review_template.yaml`](metric/review_template.yaml) (YAML) or
-   [`metric/review_template.csv`](metric/review_template.csv) (CSV spreadsheet).
+   [`reviews/review_template.yaml`](reviews/review_template.yaml) (YAML) or
+   [`reviews/review_template.csv`](reviews/review_template.csv) (CSV spreadsheet).
 2. **Name your file:** Use the convention
-   `reviews/<dataset_accession>_<reviewer_initials>_<n>.yaml`  
-   e.g. `reviews/E-MTAB-1234_CH_1.yaml`  
+   `reviews/testing/<dataset_accession>_<reviewer_initials>_<n>.yaml`  
+   e.g. `reviews/testing/E-MTAB-1234_CH_1.yaml`  
    Initials must be **uppercase letters only** (A-Z, 2–6 characters).
 3. **Fill in all fields:** Answer all 28 questions (`"Yes"` or `"No"`, case-sensitive, quoted). For Ethics
    questions (ACM-24 to ACM-28), if the dataset contains no human or animal
@@ -114,7 +114,7 @@ If you find an error, broken link, or inconsistency anywhere in the repository:
    ```
 4. **Commit your changes** using the [convention below](#commit-message-convention):
    ```bash
-   git add reviews/E-MTAB-1234_CH_1.yaml
+   git add reviews/testing/E-MTAB-1234_CH_1.yaml
    git commit -m "review: add review for E-MTAB-1234 (CH)"
    ```
 5. **Push to your fork:**
@@ -130,7 +130,7 @@ If you find an error, broken link, or inconsistency anywhere in the repository:
 
 ## What to Contribute
 
-- ✅ Completed dataset reviews (`reviews/*.yaml`)
+- ✅ Completed dataset reviews (`reviews/testing/*.yaml`)
 - ✅ Corrections to existing reviews (factual errors, updated dataset versions)
 - ✅ Proposed question additions, removals, or rewordings — via Issue first
 - ✅ Guidance clarifications (PATCH-level) — directly as a PR
@@ -156,10 +156,11 @@ If you find an error, broken link, or inconsistency anywhere in the repository:
 airbds-metric/
 ├── metric/
 │   ├── airbds_metric_v0.3.yaml   # Canonical metric definition (questions, weights)
-│   ├── scoring_schema.yaml       # Grade thresholds and scoring rules
-│   └── review_template.yaml      # Blank template for new reviews
-├── reviews/                      # Completed dataset reviews (one file per review)
-│   └── <accession>_<initials>_<n>.yaml
+│   └── scoring_schema.yaml       # Grade thresholds and scoring rules
+├── reviews/                      # Reviews + review tooling
+│   ├── review_template.yaml      # Blank template for new reviews
+│   └── testing/                  # Completed dataset reviews (one file per review)
+│       └── <accession>_<initials>_<n>.yaml
 ├── CITATION.cff
 ├── CODE_OF_CONDUCT.md
 ├── CONTRIBUTING.md

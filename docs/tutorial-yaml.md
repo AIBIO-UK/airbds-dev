@@ -37,10 +37,10 @@ Or, if you plan to submit your review, fork the repository on GitHub first, then
 
 ## Step 2 — Copy the template
 
-Create a new file in the `reviews/` folder using the naming convention `<accession>_<initials>_<n>.yaml`:
+Create a new file in the `reviews/testing/` folder using the naming convention `<accession>_<initials>_<n>.yaml`:
 
 ```bash
-cp metric/review_template.yaml reviews/E-MTAB-1234_CH_1.yaml
+cp reviews/review_template.yaml reviews/testing/E-MTAB-1234_CH_1.yaml
 ```
 
 Replace `E-MTAB-1234` with the dataset's accession number and `CH` with your initials. If there is no accession number, use a short descriptive slug.
@@ -125,7 +125,7 @@ If the dataset **does contain** human or animal subjects, answer normally and le
 Before calculating the score, check that your file is valid YAML:
 
 ```bash
-python3 -c "import yaml; yaml.safe_load(open('reviews/E-MTAB-1234_CH_1.yaml')); print('YAML is valid')"
+python3 -c "import yaml; yaml.safe_load(open('reviews/testing/E-MTAB-1234_CH_1.yaml')); print('YAML is valid')"
 ```
 
 If you see `YAML is valid`, proceed. If you see an error, it will show you the line number to fix (common mistakes: missing quotes around `Yes`/`No`, inconsistent indentation).
@@ -183,7 +183,7 @@ Full grade thresholds and rationale are in [`metric/scoring_schema.yaml`](../met
 
 ```bash
 git checkout -b review/add-E-MTAB-1234
-git add reviews/E-MTAB-1234_CH_1.yaml
+git add reviews/testing/E-MTAB-1234_CH_1.yaml
 git commit -m "review: add review for E-MTAB-1234 (CH)"
 ```
 

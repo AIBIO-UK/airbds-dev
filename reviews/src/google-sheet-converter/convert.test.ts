@@ -10,7 +10,7 @@ const here = (p: string) => fileURLToPath(new URL(p, import.meta.url));
 
 // Reference the single source of truth, the same metric the CLI uses.
 const metric = parseMetric(
-  await readFile(here("../../metric/airbds_metric_v0.3.yaml"), "utf8"),
+  await readFile(here("../../../metric/airbds_metric_v0.3.yaml"), "utf8"),
 );
 const reviewCsv = await readFile(here("./fixtures/review-info.csv"), "utf8");
 const questionsCsv = await readFile(here("./fixtures/questions.csv"), "utf8");

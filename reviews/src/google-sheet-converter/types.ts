@@ -1,6 +1,6 @@
 // Shared types for the AIRBDS review converter.
 // The converter turns an AIRBDS assessment spreadsheet into a review document
-// conforming to metric/review_template.yaml.
+// conforming to reviews/review_template.yaml.
 
 /** A single answered question in a review. */
 export interface ReviewAnswer {
