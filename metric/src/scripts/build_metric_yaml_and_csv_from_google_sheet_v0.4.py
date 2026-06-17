@@ -436,9 +436,11 @@ def main() -> None:
 
     for path, content in targets:
         path.write_bytes(content)
-    print(f"Wrote {args.output} and {args.output_csv} "
-          f"({len(questions)} questions, "
-          f"{sum(q['scope'] in NA_DEFAULT_SCOPES for q in questions)} ethics) from {source}")
+    print(f"Wrote: {args.output}\n"
+          f"Wrote: {args.output_csv}\n"
+          f"{len(questions)} questions, "
+          f"{sum(q['scope'] in NA_DEFAULT_SCOPES for q in questions)} ethics\n"
+          f"Source: {source}")
 
 
 if __name__ == "__main__":
