@@ -47,47 +47,14 @@ Questions are grouped into **four scopes** and **three weight tiers**:
 
 ## Repository Structure
 
+Top level only — `metric/`, `reviews/`, and `skills/` each carry their own `README.md` with the details. (Kept one level deep on purpose, so it doesn't drift out of date.)
+
 ```
 airbds-metric/
-├── metric/
-│   ├── airbds_metric_v0.3.yaml   # Canonical metric — all 28 questions (YAML)
-│   ├── airbds_metric_v0.3.csv    # Canonical metric — all 28 questions (CSV)
-│   ├── README.md                 # Contributor guide — file coupling rules & update workflow
-│   ├── SKILL.md                  # AI agent skill — propagates metric changes across the repo
-│   ├── upstream/                 # The spreadsheet/sheet each metric version is generated from
-│   │   └── AIRBDS Core Metric scoring v0.3 - _initials_-_#_ TEMPLATE.xlsx
-│   └── src/                      # Metric-build tooling
-│       ├── scripts/
-│       │   └── build_metric_yaml_and_csv_from_spreadsheet_v0.3.py   # Regenerates the metric YAML+CSV from the source spreadsheet
-│       └── README.md             # Install & usage for the metric-build tooling
-├── reviews/                      # Reviews + the tooling that produces and scores them
-│   ├── review_template.yaml      # Blank review template (YAML) — tracks the current metric
-│   ├── review_template.csv       # Blank review template (CSV / spreadsheet)
-│   ├── testing/                  # Completed dataset reviews (all reviews live here for now)
-│   ├── examples/                 # Compliant & non-compliant samples used by CI tests
-│   ├── GUIDANCE.md               # Reviewer guidance — how scores & grades work
-│   ├── docs/                     # Review tutorials + the submission-paths diagram
-│   │   ├── tutorial-csv.md       # Beginner tutorial — Excel / Google Sheets
-│   │   ├── tutorial-yaml.md      # Intermediate tutorial — text editor / CLI
-│   │   └── diagrams/             # Mermaid diagram sources
-│   ├── src/                      # Review tooling
-│   │   ├── google-sheet-converter/   # Reusable TS library: assessment Google Sheet → review YAML
-│   │   ├── scripts/
-│   │   │   ├── review_processor.py   # Validates, scores & converts review files (CI + local)
-│   │   │   └── convert_review_google_sheet_to_yaml_v0.3.mts   # Converts an assessment Google Sheet to a review YAML
-│   │   └── docs/DESIGN.md        # Why the review tooling is built this way
-│   └── README.md                 # Review submission & processing guide
-├── skills/                       # AI agent skills for performing assessments and installation instructions
-│   ├── README.md                 # Skills setup & known issues
-│   ├── testing/                  # Skill versions under test — Gemini, Claude Web, Claude Code
-│   ├── development/              # Skill versions under active development
-│   └── GF/                       # GF (Gavin) personal variant — YAML-based, writes review files
-├── CHANGELOG.md
-├── CITATION.cff
-├── CODE_OF_CONDUCT.md
-├── CONTRIBUTING.md
-├── LICENSE.md
-└── README.md
+├── metric/    # The versioned scoring metric (YAML/CSV), its build tooling, and upstream source
+├── reviews/   # Dataset reviews, the blank template, review/scoring tooling, tutorials & guidance
+├── skills/    # AI-agent skills for performing assessments and contributing them to a website
+└── scripts/   # Repo-wide helper scripts (e.g. D2 diagram rendering)
 ```
 
 ---
