@@ -18,11 +18,11 @@ You will open a CSV template, fill in your answers to 28 Yes/No questions about 
 
 Download the blank review template directly from the repository:
 
-**[reviews/review_template.csv](../reviews/review_template.csv)**
+**[reviews/review_template.csv](../review_template.csv)**
 
 To download: click the link above, then on GitHub click the **Download raw file** button (the down-arrow icon near the top-right of the file view).
 
-> The canonical question reference — with full guidance text, weights, and source mappings — is in [metric/airbds_metric_v0.3.csv](../metric/airbds_metric_v0.3.csv).
+> The canonical question reference — with full guidance text, weights, and source mappings — is in [metric/airbds_metric_v0.3.csv](../../metric/airbds_metric_v0.3.csv).
 
 ---
 
@@ -148,7 +148,7 @@ Look up your critical, important, and optional pass rates in this table:
 | Silver | ⚪ | = 1.0 (all) | ≥ 0.5 | any |
 | Gold | 🟡 | = 1.0 (all) | = 1.0 (all) | ≥ 0.5 |
 
-What the grades mean is explained in [reviews/GUIDANCE.md](../reviews/GUIDANCE.md); the thresholds are in the metric (`airbds_metric_v0.3.csv` / `.yaml`).
+What the grades mean is explained in [reviews/GUIDANCE.md](../GUIDANCE.md); the thresholds are in the metric (`airbds_metric_v0.3.csv` / `.yaml`).
 
 ---
 
@@ -170,9 +170,9 @@ If there is no accession number, use a short descriptive name for the dataset.
 
 ## Step 9 — Share your review
 
-Completed reviews are collected in the [`reviews/testing/`](../reviews/testing/) folder of this repository.
+Completed reviews are collected in the [`reviews/testing/`](../testing/) folder of this repository.
 
-See [CONTRIBUTING.md](../CONTRIBUTING.md) for full submission instructions. The short version:
+See [CONTRIBUTING.md](../../CONTRIBUTING.md) for full submission instructions. The short version:
 
 1. Fork the repository on GitHub.
 2. Add your CSV to the `reviews/testing/` folder.

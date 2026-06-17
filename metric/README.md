@@ -69,8 +69,8 @@ For any **MINOR** change (question additions, deletions, or rewordings) or **MAJ
 | `CITATION.cff` | `version` and `date-released` fields are stale; published citations will reference the wrong version |
 | `skills/GF/GF-airbds-assessment-skill/SKILL.md` | Embedded question table, YAML templates, `schema_version` value, and file paths all reference old version |
 | `skills/testing/airbds-assessment-skill/SKILL.md` | Template filename reference (update only if the XLSX is also regenerated) |
-| `docs/tutorial-yaml.md` | File path references to `v0.3` in instructions become broken |
-| `docs/tutorial-csv.md` | Same as above for spreadsheet tutorial |
+| `reviews/docs/tutorial-yaml.md` | File path references to `v0.3` in instructions become broken |
+| `reviews/docs/tutorial-csv.md` | Same as above for spreadsheet tutorial |
 
 **PATCH** changes (guidance text only — no change to question meaning, weight, or ID) are lighter: update only the YAML/CSV pairs. Downstream files are not required unless they quote guidance text verbatim.
 
@@ -120,8 +120,8 @@ Use this as a checklist when implementing any metric change.
 - The review processor and its workflows (`review-check.yml`, `review-test.yml`) need **no update** — the processor auto-selects `metric/airbds_metric_v<schema_version>.yaml` per review.
 - `skills/GF/GF-airbds-assessment-skill/SKILL.md` — update embedded templates, question table, file paths, skill version
 - `skills/testing/airbds-assessment-skill/SKILL.md` — update template filename **only if the XLSX is also regenerated**
-- `docs/tutorial-yaml.md` — update all `vX.Y` path references
-- `docs/tutorial-csv.md` — update all `vX.Y` path references
+- `reviews/docs/tutorial-yaml.md` — update all `vX.Y` path references
+- `reviews/docs/tutorial-csv.md` — update all `vX.Y` path references
 
 > `metric/README.md` and `metric/skills/SKILL.md` are documentation files. They do not have YAML/CSV counterparts and are excluded from the automated pair-checking. Update their version references when implementing MINOR or MAJOR changes.
 

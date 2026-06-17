@@ -196,13 +196,13 @@ If a new metric version creates a new file (`metric/airbds_metric_vNEW.yaml`):
 - Update the `templates/airbds_metric_v0.3.yaml` path references in each SKILL.md body to `vNEW`.
 - Bump each skill's `version:` if its behaviour or bundled metric changed.
 
-#### O. Update `docs/tutorial-yaml.md`
+#### O. Update `reviews/docs/tutorial-yaml.md`
 
-Run `grep -n "v0\.3" docs/tutorial-yaml.md` to find all occurrences. Update all file path references from `airbds_metric_v0.3` to `airbds_metric_vNEW`.
+Run `grep -n "v0\.3" reviews/docs/tutorial-yaml.md` to find all occurrences. Update all file path references from `airbds_metric_v0.3` to `airbds_metric_vNEW`.
 
-#### P. Update `docs/tutorial-csv.md`
+#### P. Update `reviews/docs/tutorial-csv.md`
 
-Same as above: `grep -n "v0\.3" docs/tutorial-csv.md`, update all path references.
+Same as above: `grep -n "v0\.3" reviews/docs/tutorial-csv.md`, update all path references.
 
 #### Q. Verify `.claude-plugin/marketplace.json`
 
@@ -260,8 +260,8 @@ After completing all applicable steps, produce a structured summary for the cont
 - CHANGELOG.md — new entry added for vNEW
 - CITATION.cff — version and date-released updated
 - skills/GF/GF-airbds-assessment-skill/SKILL.md — embedded templates, paths, skill version updated
-- docs/tutorial-yaml.md — path references updated
-- docs/tutorial-csv.md — path references updated
+- reviews/docs/tutorial-yaml.md — path references updated
+- reviews/docs/tutorial-csv.md — path references updated
 - metric/README.md — version references updated
 
 ### Files NOT updated and why:
@@ -291,8 +291,8 @@ Open a pull request referencing the originating GitHub Issue (#N):
 | `CITATION.cff` | — | ✅ | ✅ |
 | `skills/GF/GF-airbds-assessment-skill/SKILL.md` | — | ✅ | ✅ |
 | `skills/testing/airbds-assessment-skill/SKILL.md` | — | if XLSX regenerated | if XLSX regenerated |
-| `docs/tutorial-yaml.md` | — | ✅ | ✅ |
-| `docs/tutorial-csv.md` | — | ✅ | ✅ |
+| `reviews/docs/tutorial-yaml.md` | — | ✅ | ✅ |
+| `reviews/docs/tutorial-csv.md` | — | ✅ | ✅ |
 | `metric/README.md` (this folder) | — | ✅ | ✅ |
 
 > *For `review_template`: only update if the PATCH affects it (e.g. a guidance-only change that the template references). If only the metric question YAML was patched in place, it may not need to change.

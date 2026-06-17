@@ -65,6 +65,11 @@ airbds-metric/
 │   ├── review_template.csv       # Blank review template (CSV / spreadsheet)
 │   ├── testing/                  # Completed dataset reviews (all reviews live here for now)
 │   ├── examples/                 # Compliant & non-compliant samples used by CI tests
+│   ├── GUIDANCE.md               # Reviewer guidance — how scores & grades work
+│   ├── docs/                     # Review tutorials + the submission-paths diagram
+│   │   ├── tutorial-csv.md       # Beginner tutorial — Excel / Google Sheets
+│   │   ├── tutorial-yaml.md      # Intermediate tutorial — text editor / CLI
+│   │   └── diagrams/             # Mermaid diagram sources
 │   ├── src/                      # Review tooling
 │   │   ├── google-sheet-converter/   # Reusable TS library: assessment Google Sheet → review YAML
 │   │   ├── scripts/
@@ -77,9 +82,6 @@ airbds-metric/
 │   ├── testing/                  # Skill versions under test — Gemini, Claude Web, Claude Code
 │   ├── development/              # Skill versions under active development
 │   └── GF/                       # GF (Gavin) personal variant — YAML-based, writes review files
-├── docs/
-│   ├── tutorial-csv.md           # Beginner tutorial — Excel / Google Sheets
-│   └── tutorial-yaml.md          # Intermediate tutorial — text editor / CLI
 ├── CHANGELOG.md
 ├── CITATION.cff
 ├── CODE_OF_CONDUCT.md
@@ -105,7 +107,7 @@ The metric is available in two formats. Both cover the same 28 questions and pro
 
 ## Quick Start (YAML)
 
-For the spreadsheet workflow, see the [Beginner CSV Tutorial](docs/tutorial-csv.md).
+For the spreadsheet workflow, see the [Beginner CSV Tutorial](reviews/docs/tutorial-csv.md).
 
 1. **Copy the template:**
    ```bash

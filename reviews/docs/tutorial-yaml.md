@@ -94,7 +94,7 @@ Rules:
 - `comments` is optional — leave as `""` if you have nothing to add.
 - Do not delete any question block, even if you answer `"No"`.
 
-The question text and guidance for each ID are in [`metric/airbds_metric_v0.3.yaml`](../metric/airbds_metric_v0.3.yaml).
+The question text and guidance for each ID are in [`metric/airbds_metric_v0.3.yaml`](../../metric/airbds_metric_v0.3.yaml).
 
 ---
 
@@ -152,7 +152,7 @@ Important pass rate = (number of Important "Yes" answers) / 12
 Optional pass rate  = (number of Optional "Yes" answers) / 8
 ```
 
-See [`metric/airbds_metric_v0.3.yaml`](../metric/airbds_metric_v0.3.yaml) for which questions belong to each tier.
+See [`metric/airbds_metric_v0.3.yaml`](../../metric/airbds_metric_v0.3.yaml) for which questions belong to each tier.
 
 ---
 
@@ -173,7 +173,7 @@ result:
   grade: "Silver"
 ```
 
-The grade thresholds are in the metric YAML's `grading` block; the rationale behind them is in [`reviews/GUIDANCE.md`](../reviews/GUIDANCE.md).
+The grade thresholds are in the metric YAML's `grading` block; the rationale behind them is in [`reviews/GUIDANCE.md`](../GUIDANCE.md).
 
 ---
 
@@ -195,7 +195,7 @@ git push -u origin review/add-E-MTAB-1234
 
 3. Open a pull request on GitHub against the `main` branch of [AIBIO-UK/airbds-metric](https://github.com/AIBIO-UK/airbds-metric).
 
-For full contribution guidelines, including naming conventions and inter-rater reliability recommendations, see [CONTRIBUTING.md](../CONTRIBUTING.md).
+For full contribution guidelines, including naming conventions and inter-rater reliability recommendations, see [CONTRIBUTING.md](../../CONTRIBUTING.md).
 
 ---
 
