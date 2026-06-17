@@ -10,3 +10,7 @@ reviews/src/google-sheet-converter/bun.lockb
 # Build output of the converter package (rebuilt on prepublishOnly)
 reviews/src/google-sheet-converter/dist/
 
+# Python bytecode cache (metric build tooling)
+__pycache__/
+*.pyc
+

@@ -1,0 +1,105 @@
+name: Metric Upstream Drift Check
+
+# Polls the public AIRBDS Google Sheet (the v0.4 source of truth) on a schedule
+# and opens/updates a single GitHub issue when it has drifted from the committed
+# metric/airbds_metric_v0.4.{yaml,csv}. It re-runs the generator's --check against
+# the live sheet — read-only; it never writes the repo. The run stays green; the
+# issue is the signal. Manually runnable via "Run workflow".
+#
+# NOTE: only meaningful once metric/airbds_metric_v0.4.{yaml,csv} are committed —
+# until then there is no baseline and every run reports drift.
+on:
+  schedule:
+    - cron: '17 6 * * 1'   # 06:17 UTC every Monday
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check-upstream-drift:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - run: pip install pyyaml
+
+      - name: Compare the live sheet against the committed v0.4 metric
+        id: drift
+        run: |
+          set +e
+          OUT=$(python3 metric/src/scripts/build_metric_yaml_and_csv_from_google_sheet_v0.4.py --check 2>&1)
+          CODE=$?
+          echo "$OUT"
+          echo "exit_code=$CODE" >> "$GITHUB_OUTPUT"
+          {
+            echo 'report<<DRIFT_EOF'
+            echo "$OUT"
+            echo 'DRIFT_EOF'
+          } >> "$GITHUB_OUTPUT"
+          exit 0   # keep the run green; the issue below is the alert
+
+      - name: Open or update the drift issue
+        if: steps.drift.outputs.exit_code != '0'
+        uses: actions/github-script@v7
+        env:
+          REPORT: ${{ steps.drift.outputs.report }}
+        with:
+          script: |
+            const label = 'metric-upstream-drift';
+            const title = 'Upstream metric sheet has drifted from the committed metric';
+            const body = [
+              'The scheduled drift check found that the canonical Google Sheet no longer',
+              'matches the committed `metric/airbds_metric_v0.4.{yaml,csv}`.',
+              '',
+              'When you are ready to take the change, regenerate and review the diff:',
+              '',
+              '```bash',
+              'python3 metric/src/scripts/build_metric_yaml_and_csv_from_google_sheet_v0.4.py',
+              'git diff metric/airbds_metric_v0.4.yaml metric/airbds_metric_v0.4.csv',
+              '```',
+              '',
+              '<details><summary>check output</summary>',
+              '',
+              '```',
+              (process.env.REPORT || '').trim(),
+              '```',
+              '',
+              '</details>',
+            ].join('\n');
+
+            const { owner, repo } = context.repo;
+            const stamp = `Detected on run [${context.runId}](${context.serverUrl}/${owner}/${repo}/actions/runs/${context.runId}).`;
+            const open = await github.rest.issues.listForRepo({ owner, repo, state: 'open', labels: label });
+
+            if (open.data.length) {
+              await github.rest.issues.createComment({
+                owner, repo, issue_number: open.data[0].number,
+                body: `Still drifting. ${stamp}`,
+              });
+            } else {
+              await github.rest.issues.create({
+                owner, repo, title, labels: [label], body: `${body}\n\n${stamp}`,
+              });
+            }
+
+      - name: Close the drift issue when back in sync
+        if: steps.drift.outputs.exit_code == '0'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const label = 'metric-upstream-drift';
+            const { owner, repo } = context.repo;
+            const open = await github.rest.issues.listForRepo({ owner, repo, state: 'open', labels: label });
+            for (const issue of open.data) {
+              await github.rest.issues.createComment({
+                owner, repo, issue_number: issue.number,
+                body: 'The sheet is back in sync with the committed metric — closing.',
+              });
+              await github.rest.issues.update({ owner, repo, issue_number: issue.number, state: 'closed' });
+            }
