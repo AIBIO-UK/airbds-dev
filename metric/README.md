@@ -2,7 +2,7 @@
 
 > **Before editing any file in this folder, read this document.**
 
-The `metric/` folder is the **single source of truth** for the AIRBDS scoring metric. It contains the versioned question set and the scoring schema — each in two machine-readable formats. The blank review template and completed dataset reviews live in `reviews/`, not here — but the template stays version-locked to the metric (see Group C below).
+The `metric/` folder is the **single source of truth** for the AIRBDS scoring metric — the versioned question set plus the `grade_points`/`grading` scoring rules, in two machine-readable formats. The blank review template and completed dataset reviews live in `reviews/`, not here — but the template stays version-locked to the metric (see Group B below).
 
 Changes to this folder have a disproportionate downstream impact. Multiple files across the repository — scripts, GitHub Actions workflows, skills, tutorials, and documentation — all reference the exact metric version and file paths. A partial update (e.g. editing the YAML without regenerating the CSV, or bumping the version without updating the workflow paths) creates silent failures that corrupt inter-rater reliability or break the CI/CD pipeline.
 
@@ -12,16 +12,14 @@ Changes to this folder have a disproportionate downstream impact. Multiple files
 
 | Filename | Format | Purpose | Paired With |
 |----------|--------|---------|-------------|
-| `airbds_metric_v0.3.yaml` | YAML | **Canonical** 28-question metric: question text, grades, guidance, scopes | `airbds_metric_v0.3.csv` |
+| `airbds_metric_v0.3.yaml` | YAML | **Canonical** 28-question metric: question text, grades, guidance, scopes, and the `grade_points`/`grading` scoring rules | `airbds_metric_v0.3.csv` |
 | `airbds_metric_v0.3.csv` | CSV | Identical content to the YAML metric; used by spreadsheet workflow | `airbds_metric_v0.3.yaml` |
-| `scoring_schema_v0.3.yaml` | YAML | Grade thresholds (Caution/Bronze/Silver/Gold pass-rates and `min_score`), weight-point definitions, versioning policy | `scoring_schema_v0.3.csv` |
-| `scoring_schema_v0.3.csv` | CSV | Identical content to scoring_schema_v0.3.yaml | `scoring_schema_v0.3.yaml` |
 | `README.md` | Markdown | This file — contributor guide for the metric folder | — |
 | `skills/SKILL.md` | Markdown | AI agent skill for propagating metric changes across the repo | — |
 
-> **Note on versioning:** `scoring_schema` is versioned in its filename like the metric (e.g. `scoring_schema_v0.3.yaml`) — a metric version bump creates a new `scoring_schema_vNEW` pair and the old one is retained. `review_template` (now under `reviews/`) is **not** versioned in its filename — it always tracks the current metric — but it carries a `schema_version` field that must match the current metric version, so it is updated on every bump too.
+> **Note on versioning:** `review_template` (under `reviews/`) is **not** versioned in its filename — it always tracks the current metric — but it carries a `schema_version` field that must match the current metric version, so it is updated on every bump.
 
-> **Note on new metric versions:** A version bump creates new files (e.g. `airbds_metric_v0.4.yaml` + `.csv`, and `scoring_schema_v0.4.yaml` + `.csv`). Old versions are **retained** for archival — reviews carry `schema_version` to record which version they were scored against.
+> **Note on new metric versions:** A version bump creates new files (e.g. `airbds_metric_v0.4.yaml` + `.csv`). Old versions are **retained** for archival — reviews carry `schema_version` to record which version they were scored against.
 
 ---
 
@@ -111,15 +109,11 @@ Use this as a checklist when implementing any metric change.
 
 > For v0.3, both are generated together by `metric/src/scripts/build_metric_yaml_and_csv_from_spreadsheet_v0.3.py` — edit the spreadsheet and regenerate rather than hand-editing either file. See [How the v0.3 metric files are generated](#how-the-v03-metric-files-are-generated).
 
-### Group B — Scoring schema pair *(always change together; versioned like the metric)*
-- `metric/scoring_schema_vX.Y.yaml`
-- `metric/scoring_schema_vX.Y.csv`
-
-### Group C — Review template pair *(always change together)*
+### Group B — Review template pair *(always change together)*
 - `reviews/review_template.yaml`
 - `reviews/review_template.csv`
 
-### Group D — Downstream version-carrying files *(MINOR or MAJOR changes only)*
+### Group C — Downstream version-carrying files *(MINOR or MAJOR changes only)*
 - `README.md` — version badge, question table, download links, processor command examples
 - `CHANGELOG.md` — add a new entry at the top referencing the originating Issue
 - `CITATION.cff` — update `version:` and `date-released:` fields
@@ -137,7 +131,7 @@ Use this as a checklist when implementing any metric change.
 
 Every push or pull request that touches a file under `metric/` — or the `review_template` pair under `reviews/` — triggers the `.github/workflows/metric-alignment-check.yml` workflow. It performs the following checks automatically:
 
-**1. YAML ↔ CSV pair check.** For every versioned metric YAML changed, it verifies the matching CSV was also changed in the same commit range, and vice versa. The same check applies to `scoring_schema` and `review_template` pairs.
+**1. YAML ↔ CSV pair check.** For every versioned metric YAML changed, it verifies the matching CSV was also changed in the same commit range, and vice versa. The same check applies to the `review_template` pair.
 
 **2. New-version downstream check.** If a new versioned metric YAML is detected as _Added_ (e.g. `airbds_metric_v0.4.yaml` appears for the first time), the workflow also checks whether `CHANGELOG.md` and `README.md` were updated in the same commit range.
 
@@ -157,11 +151,11 @@ Every push or pull request that touches a file under `metric/` — or the `revie
 
 | Change type | Description | Version bump | Files to update |
 |-------------|-------------|-------------|-----------------|
-| **PATCH** | Guidance text clarification only — no change to question meaning, weights, or IDs | `0.3` → `0.3.1` | Groups A, B, C |
-| **MINOR** | Question added, removed, or reworded | `0.3` → `0.4` | Groups A, B, C, D |
-| **MAJOR** | Weight point value or grade threshold changed | `0.3` → `1.0` | Groups A, B, C, D |
+| **PATCH** | Guidance text clarification only — no change to question meaning, weights, or IDs | `0.3` → `0.3.1` | Groups A, B |
+| **MINOR** | Question added, removed, or reworded | `0.3` → `0.4` | Groups A, B, C |
+| **MAJOR** | Weight point value or grade threshold changed | `0.3` → `1.0` | Groups A, B, C |
 
-The canonical versioning policy is defined in `metric/scoring_schema_v0.3.yaml` under `versioning:` and in [CONTRIBUTING.md](../CONTRIBUTING.md).
+The canonical versioning policy is defined in [CONTRIBUTING.md](../CONTRIBUTING.md).
 
 ---
 

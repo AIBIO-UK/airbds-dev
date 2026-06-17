@@ -2,7 +2,7 @@
 # Fill in all fields. For each question, set answer to "Yes" or "No".
 # This YAML lists answer slots by question id; see airbds_metric_v0.3.yaml (or
 # review_template.csv) for the full question text and guidance.
-# See scoring_schema_v0.3.yaml for grade calculation details.
+# See reviews/GUIDANCE.md and the metric YAML's grading block for grading details.
 # Submit completed file as a PR to https://github.com/AIBIO-UK/airbds-metric
 
 schema_version: "0.3"

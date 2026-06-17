@@ -155,8 +155,7 @@ If you find an error, broken link, or inconsistency anywhere in the repository:
 ```
 airbds-metric/
 ├── metric/
-│   ├── airbds_metric_v0.3.yaml   # Canonical metric definition (questions, weights)
-│   └── scoring_schema_v0.3.yaml  # Grade thresholds and scoring rules
+│   └── airbds_metric_v0.3.yaml   # Canonical metric (questions, weights, grading rules)
 ├── reviews/                      # Reviews + review tooling
 │   ├── review_template.yaml      # Blank template for new reviews
 │   └── testing/                  # Completed dataset reviews (one file per review)

@@ -34,12 +34,11 @@ You are an expert in the AIRBDS metric repository structure. This skill guides y
 
 Before doing anything else, read the following files so you have complete context:
 
-1. `metric/airbds_metric_v*.yaml` — identify the **current metric version** from the `version:` field
-2. `metric/scoring_schema_v0.3.yaml` — current grade thresholds and weight definitions
-3. `reviews/review_template.yaml` — current blank review template schema
-4. `metric/README.md` — the Coupled File Groups manifest (your checklist)
-5. `CHANGELOG.md` — understand the existing entry format before adding a new one
-6. The file(s) that were actually changed — determine from `git status`, `git diff`, or the GitHub Actions output that triggered this skill
+1. `metric/airbds_metric_v*.yaml` — identify the **current metric version** from the `version:` field, and the `grade_points`/`grading` scoring rules
+2. `reviews/review_template.yaml` — current blank review template schema
+3. `metric/README.md` — the Coupled File Groups manifest (your checklist)
+4. `CHANGELOG.md` — understand the existing entry format before adding a new one
+5. The file(s) that were actually changed — determine from `git status`, `git diff`, or the GitHub Actions output that triggered this skill
 
 If running in response to a failed alignment check, read the GitHub Issue or PR comment body — it lists the exact files that are missing from the update.
 
@@ -51,9 +50,9 @@ Classify the change using the table below. The change type determines which file
 
 | Change type | Definition | Version bump example | Files to update |
 |-------------|-----------|---------------------|-----------------|
-| **PATCH** | Guidance text clarification only — no change to question meaning, weight tier, or question ID | `0.3` → `0.3.1` | Groups A, B, C only |
-| **MINOR** | Question added, removed, or reworded; or `schema_version` field changes | `0.3` → `0.4` | Groups A, B, C, and D |
-| **MAJOR** | Weight point value (Critical/Important/Optional) or grade threshold (Caution/Bronze/Silver/Gold) changed | `0.3` → `1.0` | Groups A, B, C, and D |
+| **PATCH** | Guidance text clarification only — no change to question meaning, weight tier, or question ID | `0.3` → `0.3.1` | Groups A, B only |
+| **MINOR** | Question added, removed, or reworded; or `schema_version` field changes | `0.3` → `0.4` | Groups A, B, and C |
+| **MAJOR** | Weight point value (Critical/Important/Optional) or grade threshold (Caution/Bronze/Silver/Gold) changed | `0.3` → `1.0` | Groups A, B, and C |
 
 **How to determine the type from a diff:**
 - If only `guidance:` text changed under any question → PATCH
@@ -83,9 +82,6 @@ The CSV has one header row and one row per question. Columns (in order):
 `question_id, scope, theme, weight, weight_points, mapped_from, question, guidance, not_applicable_default`
 
 Read `metric/airbds_metric_v0.3.csv` to confirm the exact column names and order before writing.
-
-**For `metric/scoring_schema_v0.3.csv`:**
-Read the existing `metric/scoring_schema_v0.3.csv` to confirm the structure (it mirrors the YAML sections for `answers`, `weights`, and `grades`).
 
 **For `reviews/review_template.csv`:**
 The CSV template has two sections:
@@ -120,21 +116,13 @@ Create:
 
 **Do NOT delete** `metric/airbds_metric_v0.3.yaml` or `metric/airbds_metric_v0.3.csv`. Old versions are retained for archival so that existing reviews (which carry `schema_version: "0.3"`) can still be validated.
 
-#### F. Create new scoring_schema version files (keep old versions)
-
-`scoring_schema` is versioned like the metric. Create:
-- `metric/scoring_schema_vNEW.yaml` — copy from `metric/scoring_schema_v0.3.yaml`, apply your changes, then update `schema_version: "0.3"` → `"NEW"` and, under `versioning:`, `current_version: "0.3"` → `"NEW"`
-- `metric/scoring_schema_vNEW.csv` — regenerate from the new YAML content
-
-**Do NOT delete** `metric/scoring_schema_v0.3.yaml` or `metric/scoring_schema_v0.3.csv`. Old versions are retained for archival, like the metric files.
-
-#### G. Update `reviews/review_template.yaml`
+#### F. Update `reviews/review_template.yaml`
 
 Update `schema_version: "0.3"` → `"NEW"`.
 
 Then regenerate `reviews/review_template.csv`.
 
-#### H. Review processor & review workflows — no change needed
+#### G. Review processor & review workflows — no change needed
 
 `reviews/src/scripts/review_processor.py` is **metric-driven**: it scores each
 review against `metric/airbds_metric_v<schema_version>.yaml`, selected from the
@@ -142,15 +130,15 @@ review's own `schema_version`. Once the new metric file exists (Step E), vNEW
 reviews are scored automatically — there is no `SCHEMA_VERSION` constant or
 `--metric` path to update.
 
-#### I. `.github/workflows/review-check.yml` — no change needed
+#### H. `.github/workflows/review-check.yml` — no change needed
 
 It no longer passes `--metric`; the processor auto-selects the version.
 
-#### J. `.github/workflows/review-test.yml` — no change needed
+#### I. `.github/workflows/review-test.yml` — no change needed
 
 Same — no metric path is hardcoded.
 
-#### K. Update `README.md`
+#### J. Update `README.md`
 
 Search for `v0.3` and `0.3` throughout the file. Key locations:
 - Version badge URL (e.g. `img.shields.io/badge/metric%20version-v0.3-blue`)
@@ -160,7 +148,7 @@ Search for `v0.3` and `0.3` throughout the file. Key locations:
 
 Use `grep -n "v0\.3\|0\.3" README.md` to locate all occurrences before editing.
 
-#### L. Update `CHANGELOG.md`
+#### K. Update `CHANGELOG.md`
 
 Add a new entry **at the top**, above the existing `## [0.3]` entry. Format:
 
@@ -179,13 +167,13 @@ Add a new entry **at the top**, above the existing `## [0.3]` entry. Format:
 
 Use today's date in `YYYY-MM-DD` format. Follow the existing entry style in `CHANGELOG.md` exactly.
 
-#### M. Update `CITATION.cff`
+#### L. Update `CITATION.cff`
 
 Update two fields:
 - `version: "0.3"` → `"NEW"`
 - `date-released: "YYYY"` → current year
 
-#### N. Update `skills/GF/GF-airbds-assessment-skill/SKILL.md`
+#### M. Update `skills/GF/GF-airbds-assessment-skill/SKILL.md`
 
 This file contains multiple version-specific references. Update the following:
 
@@ -199,7 +187,7 @@ This file contains multiple version-specific references. Update the following:
 
 Use `grep -n "v0\.3\|0\.3\|0\.1\.0-GF" skills/GF/GF-airbds-assessment-skill/SKILL.md` to locate all occurrences before editing.
 
-#### O. Update the testing and development assessment skills
+#### N. Update the testing and development assessment skills
 
 `skills/testing/airbds-assessment-skill/` and `skills/development/airbds-assessment-skill/` bundle the canonical metric as `templates/airbds_metric_v0.3.yaml` — a symlink to `metric/airbds_metric_v0.3.yaml`. For an in-place PATCH the symlink already tracks the canonical file, so nothing changes.
 
@@ -208,19 +196,19 @@ If a new metric version creates a new file (`metric/airbds_metric_vNEW.yaml`):
 - Update the `templates/airbds_metric_v0.3.yaml` path references in each SKILL.md body to `vNEW`.
 - Bump each skill's `version:` if its behaviour or bundled metric changed.
 
-#### P. Update `docs/tutorial-yaml.md`
+#### O. Update `docs/tutorial-yaml.md`
 
 Run `grep -n "v0\.3" docs/tutorial-yaml.md` to find all occurrences. Update all file path references from `airbds_metric_v0.3` to `airbds_metric_vNEW`.
 
-#### Q. Update `docs/tutorial-csv.md`
+#### P. Update `docs/tutorial-csv.md`
 
 Same as above: `grep -n "v0\.3" docs/tutorial-csv.md`, update all path references.
 
-#### R. Verify `.claude-plugin/marketplace.json`
+#### Q. Verify `.claude-plugin/marketplace.json`
 
 Read this file and confirm the skills path `./skills/testing/airbds-assessment-skill` is still valid. This file does not carry the metric version directly — no update is typically needed. If the path has changed for any reason, update it.
 
-#### S. Update `metric/README.md` (this file)
+#### R. Update `metric/README.md` (this file)
 
 Search for any `v0.3` version references in `metric/README.md` (the contributor guide). Update any stale version numbers to `vNEW`.
 
@@ -266,8 +254,6 @@ After completing all applicable steps, produce a structured summary for the cont
 ### Files modified:
 - metric/airbds_metric_vNEW.yaml — [description of change]
 - metric/airbds_metric_vNEW.csv — regenerated from YAML
-- metric/scoring_schema_vNEW.yaml — created, schema_version NEW
-- metric/scoring_schema_vNEW.csv — regenerated
 - reviews/review_template.yaml — schema_version updated to NEW
 - reviews/review_template.csv — regenerated
 - README.md — version badge, file listing, download links updated
@@ -295,8 +281,6 @@ Open a pull request referencing the originating GitHub Issue (#N):
 |------|-------|-------|-------|
 | `metric/airbds_metric_vX.Y.yaml` (in-place or new) | ✅ | ✅ | ✅ |
 | `metric/airbds_metric_vX.Y.csv` | ✅ | ✅ | ✅ |
-| `metric/scoring_schema_vX.Y.yaml` | ✅* | ✅ | ✅ |
-| `metric/scoring_schema_vX.Y.csv` | ✅* | ✅ | ✅ |
 | `reviews/review_template.yaml` | ✅* | ✅ | ✅ |
 | `reviews/review_template.csv` | ✅* | ✅ | ✅ |
 | `reviews/src/scripts/review_processor.py` (metric-driven) | — | — | — |
@@ -311,4 +295,4 @@ Open a pull request referencing the originating GitHub Issue (#N):
 | `docs/tutorial-csv.md` | — | ✅ | ✅ |
 | `metric/README.md` (this folder) | — | ✅ | ✅ |
 
-> *For `scoring_schema` and `review_template`: only update if the PATCH affects those specific files (e.g. a guidance-only change to `scoring_schema_v0.3.yaml`). If only the metric question YAML was patched, these files may not need to change.
+> *For `review_template`: only update if the PATCH affects it (e.g. a guidance-only change that the template references). If only the metric question YAML was patched in place, it may not need to change.

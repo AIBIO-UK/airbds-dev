@@ -52,8 +52,6 @@ airbds-metric/
 ├── metric/
 │   ├── airbds_metric_v0.3.yaml   # Canonical metric — all 28 questions (YAML)
 │   ├── airbds_metric_v0.3.csv    # Canonical metric — all 28 questions (CSV)
-│   ├── scoring_schema_v0.3.yaml  # Grade thresholds, weight definitions (YAML)
-│   ├── scoring_schema_v0.3.csv   # Grade thresholds, weight definitions (CSV)
 │   ├── README.md                 # Contributor guide — file coupling rules & update workflow
 │   ├── SKILL.md                  # AI agent skill — propagates metric changes across the repo
 │   ├── upstream/                 # The spreadsheet/sheet each metric version is generated from
@@ -117,7 +115,7 @@ For the spreadsheet workflow, see the [Beginner CSV Tutorial](docs/tutorial-csv.
 3. **Submit a PR** — see [CONTRIBUTING.md](CONTRIBUTING.md).
 4. **Automated processing** handles the rest: score calculation, grade assignment, CSV conversion, and file renaming — see [Automated Review Processing](#automated-review-processing) below.
 
-Full reviewer instructions are in [`metric/scoring_schema_v0.3.yaml`](metric/scoring_schema_v0.3.yaml).
+How scores and grades work is explained in [`reviews/GUIDANCE.md`](reviews/GUIDANCE.md); the authoritative numbers live in the metric YAML's `grade_points` / `grading`.
 
 ---
 

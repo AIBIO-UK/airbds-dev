@@ -122,28 +122,7 @@ jobs:
                       f'  → expected also changed: {companion}'
                   )
 
-          # -- Group B: scoring_schema pairs (versioned, like the metric) --
-          schema_yaml = {f for f in yaml_files
-                         if re.match(r'^metric/scoring_schema_v[\d.]+\.yaml$', f)}
-          schema_csv  = {f for f in csv_files
-                         if re.match(r'^metric/scoring_schema_v[\d.]+\.csv$', f)}
-
-          for f in schema_yaml:
-              companion = f.replace('.yaml', '.csv')
-              if companion not in schema_csv:
-                  mismatches.append(
-                      f'YAML changed without companion CSV: {f}\n'
-                      f'  → expected also changed: {companion}'
-                  )
-          for f in schema_csv:
-              companion = f.replace('.csv', '.yaml')
-              if companion not in schema_yaml:
-                  mismatches.append(
-                      f'CSV changed without companion YAML: {f}\n'
-                      f'  → expected also changed: {companion}'
-                  )
-
-          # -- Group C: review_template pair (lives under reviews/, but stays
+          # -- Group B: review_template pair (lives under reviews/, but stays
           #    version-locked to the metric, so it is checked here) --
           for y, c in [('reviews/review_template.yaml', 'reviews/review_template.csv')]:
               if y in yaml_files and c not in csv_files:
@@ -163,7 +142,7 @@ jobs:
           sys.exit(0)  # exit code handled by later steps
           EOF
 
-          # -- Group D: new-version downstream check --
+          # -- Group C: new-version downstream check --
           # If a brand-new versioned metric YAML was added, CHANGELOG.md and
           # README.md must also appear in the full repo diff for this push/PR.
           NEW_COUNT="${{ steps.collect.outputs.new_metric_yaml_count }}"

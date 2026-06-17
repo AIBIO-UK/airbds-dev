@@ -148,7 +148,7 @@ Look up your critical, important, and optional pass rates in this table:
 | Silver | ⚪ | = 1.0 (all) | ≥ 0.5 | any |
 | Gold | 🟡 | = 1.0 (all) | = 1.0 (all) | ≥ 0.5 |
 
-The full grade reference is in [metric/scoring_schema_v0.3.csv](../metric/scoring_schema_v0.3.csv).
+What the grades mean is explained in [reviews/GUIDANCE.md](../reviews/GUIDANCE.md); the thresholds are in the metric (`airbds_metric_v0.3.csv` / `.yaml`).
 
 ---
 

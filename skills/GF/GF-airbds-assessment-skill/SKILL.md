@@ -31,8 +31,7 @@ to the `reviews/testing/` folder of the project upon completion.
 
 The canonical metric and scoring rules are defined in:
 
-- `metric/airbds_metric_v0.3.yaml` — 28 questions with weights and guidance
-- `metric/scoring_schema_v0.3.yaml` — grade thresholds and weight points
+- `metric/airbds_metric_v0.3.yaml` — 28 questions with weights, guidance, and the `grade_points`/`grading` scoring rules
 - `reviews/review_template.yaml` — output YAML schema to follow exactly
 
 **Read these files before beginning the assessment if you have file access (Claude Code).**
@@ -237,7 +236,6 @@ result:
 
 | File | Purpose |
 |------|---------|
-| `metric/airbds_metric_v0.3.yaml` | Canonical 28-question metric with weights and guidance |
-| `metric/scoring_schema_v0.3.yaml` | Grade thresholds and weight point definitions |
+| `metric/airbds_metric_v0.3.yaml` | Canonical 28-question metric: questions, weights, guidance, and grading rules |
 | `reviews/review_template.yaml` | Blank YAML output schema |
 | `reviews/testing/` | Output directory for completed assessments |

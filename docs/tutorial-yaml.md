@@ -173,7 +173,7 @@ result:
   grade: "Silver"
 ```
 
-Full grade thresholds and rationale are in [`metric/scoring_schema_v0.3.yaml`](../metric/scoring_schema_v0.3.yaml).
+The grade thresholds are in the metric YAML's `grading` block; the rationale behind them is in [`reviews/GUIDANCE.md`](../reviews/GUIDANCE.md).
 
 ---
 

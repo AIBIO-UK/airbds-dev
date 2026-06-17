@@ -27,6 +27,12 @@ This project adheres to
 - Refreshed per-question `mapped_from` provenance codes to match the reworded
   questions.
 
+### Removed
+- `metric/scoring_schema_v0.3.{yaml,csv}` — redundant with the metric YAML
+  (`grade_points` / `grading`). The tier rationale, grade meanings, and badge
+  colours moved to `reviews/GUIDANCE.md`; the versioning policy already lives in
+  `CONTRIBUTING.md`.
+
 ---
 
 ## [0.4] — provisional (not yet validated)
