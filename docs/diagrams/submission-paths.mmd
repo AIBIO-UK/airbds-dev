@@ -34,7 +34,7 @@ flowchart TD
     %% ---------- Path B: auto-airbds website (defined first → renders on the right) ----------
     subgraph web["Path B · auto-airbds website"]
         direction TB
-        upload["Upload in browser<br/>POST /api/upload (YAML/JSON)"]
+        upload["Upload to https://auto-airbds.pages.dev"]
         val["Pages Function<br/>validate · recompute score and grade"]
         d1[("Cloudflare D1<br/>database")]
         spa["Website<br/>lists and displays assessment"]
