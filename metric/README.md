@@ -17,7 +17,7 @@ Changes to this folder have a disproportionate downstream impact. Multiple files
 | `scoring_schema_v0.3.yaml` | YAML | Grade thresholds (Caution/Bronze/Silver/Gold pass-rates and `min_score`), weight-point definitions, versioning policy | `scoring_schema_v0.3.csv` |
 | `scoring_schema_v0.3.csv` | CSV | Identical content to scoring_schema_v0.3.yaml | `scoring_schema_v0.3.yaml` |
 | `README.md` | Markdown | This file — contributor guide for the metric folder | — |
-| `SKILL.md` | Markdown | AI agent skill for propagating metric changes across the repo | — |
+| `skills/SKILL.md` | Markdown | AI agent skill for propagating metric changes across the repo | — |
 
 > **Note on versioning:** `scoring_schema` is versioned in its filename like the metric (e.g. `scoring_schema_v0.3.yaml`) — a metric version bump creates a new `scoring_schema_vNEW` pair and the old one is retained. `review_template` (now under `reviews/`) is **not** versioned in its filename — it always tracks the current metric — but it carries a `schema_version` field that must match the current metric version, so it is updated on every bump too.
 
@@ -130,7 +130,7 @@ Use this as a checklist when implementing any metric change.
 - `docs/tutorial-yaml.md` — update all `vX.Y` path references
 - `docs/tutorial-csv.md` — update all `vX.Y` path references
 
-> `metric/README.md` and `metric/SKILL.md` are documentation files. They do not have YAML/CSV counterparts and are excluded from the automated pair-checking. Update their version references when implementing MINOR or MAJOR changes.
+> `metric/README.md` and `metric/skills/SKILL.md` are documentation files. They do not have YAML/CSV counterparts and are excluded from the automated pair-checking. Update their version references when implementing MINOR or MAJOR changes.
 
 ---
 
@@ -150,7 +150,7 @@ Every push or pull request that touches a file under `metric/` — or the `revie
 
 **On alignment restored:** When a subsequent push resolves the misalignment, the workflow closes any open `metric-alignment` issue it finds for that PR/SHA.
 
-**Using the agent skill to fix misalignment:** If you are using Claude Code in this repository, invoke the `metric/SKILL.md` skill to propagate changes automatically. The skill will read the changed file(s), determine the change type, and update all coupled files with a summary of what was modified.
+**Using the agent skill to fix misalignment:** If you are using Claude Code in this repository, invoke the `metric/skills/SKILL.md` skill to propagate changes automatically. The skill will read the changed file(s), determine the change type, and update all coupled files with a summary of what was modified.
 
 ---
 

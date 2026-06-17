@@ -54,7 +54,7 @@ jobs:
       # -----------------------------------------------------------------------
       # Collect changed files under metric/ plus the review_template pair
       # (Added, Copied, Modified, Renamed).
-      # Exclude metric/README.md and metric/SKILL.md — documentation files
+      # Exclude metric/README.md and metric/skills/SKILL.md — documentation files
       # that have no YAML/CSV counterpart and are not subject to pair-checking.
       - name: Collect changed metric files
         id: collect
@@ -269,7 +269,7 @@ jobs:
                 '',
                 '**Option 1 — Use the agent skill (Claude Code users):**',
                 'Open Claude Code in this repository and run:',
-                '> "Use the metric/SKILL.md skill to propagate the metric change to all coupled files."',
+                '> "Use the metric/skills/SKILL.md skill to propagate the metric change to all coupled files."',
                 '',
                 'The skill will automatically identify what changed, regenerate companion files, and update downstream references.',
                 '',
@@ -334,7 +334,7 @@ jobs:
                 '**To fix:**',
                 '1. Update the missing files listed above and push to this branch.',
                 '2. See [`metric/README.md`](../blob/main/metric/README.md#coupled-file-groups-manifest) for the full Coupled File Groups manifest.',
-                '3. Claude Code users: use the [`metric/SKILL.md`](../blob/main/metric/SKILL.md) skill to propagate changes automatically.',
+                '3. Claude Code users: use the [`metric/skills/SKILL.md`](../blob/main/metric/skills/SKILL.md) skill to propagate changes automatically.',
                 '',
                 `This check must pass before the PR can be merged. See [workflow run](${runUrl}) for details.`,
               ].join('\n')
@@ -401,5 +401,5 @@ jobs:
           echo "::error::Metric alignment check failed — ${MISMATCH_COUNT} issue(s) found."
           echo "See the GitHub Issue and PR comment created by this run."
           echo "Refer to metric/README.md for the Coupled File Groups manifest."
-          echo "Use metric/SKILL.md (Claude Code) to propagate changes automatically."
+          echo "Use metric/skills/SKILL.md (Claude Code) to propagate changes automatically."
           exit 1
