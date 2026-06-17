@@ -56,7 +56,7 @@ airbds-metric/
 │   ├── scoring_schema_v0.3.csv   # Grade thresholds, weight definitions (CSV)
 │   ├── README.md                 # Contributor guide — file coupling rules & update workflow
 │   ├── SKILL.md                  # AI agent skill — propagates metric changes across the repo
-│   ├── source/                   # Source spreadsheet that generates the metric YAML/CSV
+│   ├── upstream/                 # The spreadsheet/sheet each metric version is generated from
 │   │   └── AIRBDS Core Metric scoring v0.3 - _initials_-_#_ TEMPLATE.xlsx
 │   └── src/                      # Metric-build tooling
 │       ├── scripts/

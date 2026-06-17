@@ -244,10 +244,10 @@ When the metric version changes:
 
 ## Step 4 — The source spreadsheet
 
-`metric/source/AIRBDS Core Metric scoring v0.3 - _initials_-_#_ TEMPLATE.xlsx` is the hand-edited source of truth for the metric content. The metric YAML and CSV are generated **from** it by `metric/src/scripts/build_metric_yaml_and_csv_from_spreadsheet_v0.3.py` (see "How the v0.3 metric files are generated" in `metric/README.md`); the spreadsheet itself is not programmatically regenerated.
+`metric/upstream/AIRBDS Core Metric scoring v0.3 - _initials_-_#_ TEMPLATE.xlsx` is the hand-edited source of truth for the metric content. The metric YAML and CSV are generated **from** it by `metric/src/scripts/build_metric_yaml_and_csv_from_spreadsheet_v0.3.py` (see "How the v0.3 metric files are generated" in `metric/README.md`); the spreadsheet itself is not programmatically regenerated.
 
 If a new metric version is released:
-1. Edit the spreadsheet in `metric/source/` (the `Scoring` and `Lookups` sheets), or copy it to a new versioned filename.
+1. Edit the spreadsheet in `metric/upstream/` (the `Scoring` and `Lookups` sheets), or copy it to a new versioned filename.
 2. Regenerate the YAML/CSV with the build script rather than hand-editing them.
 
 ---
@@ -280,7 +280,7 @@ After completing all applicable steps, produce a structured summary for the cont
 
 ### Files NOT updated and why:
 - skills/testing & skills/development assessment skills — bundle the metric via a symlink that already tracks the canonical YAML (repoint only on a new version file)
-- metric/source/AIRBDS Core Metric scoring v0.3...xlsx — hand-edited source; the YAML/CSV are regenerated from it with the build script
+- metric/upstream/AIRBDS Core Metric scoring v0.3...xlsx — hand-edited source; the YAML/CSV are regenerated from it with the build script
 
 ### Next step:
 Open a pull request referencing the originating GitHub Issue (#N):
