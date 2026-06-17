@@ -1,0 +1,46 @@
+name: Render Diagrams
+
+# Renders D2 diagram sources (*.d2) to SVG with a pinned d2 and commits the
+# result back, so the committed image always matches its source. Contributors
+# don't need d2 installed — but you can preview locally by running the same
+# script: scripts/render-diagrams.sh
+on:
+  push:
+    paths:
+      - '**/*.d2'
+      - scripts/render-diagrams.sh
+      - .github/workflows/render-diagrams.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
+
+      - name: Install d2 (pinned)
+        run: |
+          go install oss.terrastruct.com/d2@v0.7.1
+          echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
+
+      - name: Render diagrams
+        run: bash scripts/render-diagrams.sh
+
+      - name: Commit re-rendered SVGs
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A -- '*.svg'
+          if git diff --cached --quiet; then
+            echo "Diagrams already in sync — nothing to commit."
+          else
+            git commit -m "chore: re-render diagrams [skip ci]"
+            git push
+          fi
