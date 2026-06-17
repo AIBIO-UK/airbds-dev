@@ -232,7 +232,7 @@ Search for any `v0.3` version references in `metric/README.md` (the contributor 
 
 | Scheme | Used in | Example | Governs |
 |--------|---------|---------|---------|
-| **Metric version** | `airbds_metric_vX.Y.yaml`, `schema_version` field, `SCHEMA_VERSION` constant | `0.3`, `0.4`, `1.0` | The scoring metric itself (questions, weights, grades) |
+| **Metric version** | `airbds_metric_vX.Y.yaml` filename; the metric's and each review's `schema_version` field | `0.3`, `0.4`, `1.0` | The scoring metric itself (questions, weights, grades) |
 | **Skill version** | `SKILL.md` frontmatter `version:` field | `0.1.2`, `0.2.0-GF` | The assessment skill's behaviour and embedded content |
 
 When the metric version changes:
