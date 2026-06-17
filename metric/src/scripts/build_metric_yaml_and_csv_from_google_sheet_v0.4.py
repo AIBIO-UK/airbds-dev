@@ -30,9 +30,12 @@ Exit codes:
 
 import argparse
 import csv
+import hashlib
 import io
+import json
 import re
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
 import yaml
@@ -178,6 +181,19 @@ def fmt_score(value) -> str:
     return str(int(f)) if f.is_integer() else str(f)
 
 
+def source_sha256(scoring_csv: str, lookups_csv: str) -> str:
+    """Content hash of the exact source tabs — the content-addressed "revision".
+
+    Deterministic given the source content, so it is safe to embed in the YAML
+    (the --check byte comparison stays valid) and serves as the drift baseline.
+    """
+    h = hashlib.sha256()
+    h.update(scoring_csv.encode("utf-8"))
+    h.update(b"\n--LOOKUPS--\n")
+    h.update(lookups_csv.encode("utf-8"))
+    return h.hexdigest()
+
+
 # ── Sheet readers (operate on a CsvWorksheet / openpyxl worksheet) ───────────
 
 def read_questions(ws) -> list[dict]:
@@ -289,8 +305,11 @@ def render_footer(questions: list[dict], grade_points: dict) -> str:
     return "\n".join(lines)
 
 
-def render_yaml(questions, grade_points, grading) -> str:
+def render_yaml(questions, grade_points, grading, sheet_url, content_sha256) -> str:
     out = [HEADER_COMMENT, ""]
+    out.append(f"# Source: {sheet_url}")
+    out.append(f"# Source content sha256: {content_sha256}")
+    out.append("")
 
     for key, val in METADATA.items():
         out.append(f"{key}: {dq(val)}")
@@ -383,19 +402,48 @@ def validate(questions, grade_points, grading) -> None:
 # ── Main ─────────────────────────────────────────────────────────────────────
 
 def load_worksheets(args) -> tuple:
-    """Return (scoring_ws, lookups_ws, source_label) from files or the live sheet."""
+    """Return (scoring_ws, lookups_ws, src) from files or the live sheet.
+
+    `src` carries the raw tab CSVs (for hashing) and provenance: the sheet id/url
+    when fetched, or None/the files when working offline.
+    """
     if args.scoring_csv or args.lookups_csv:
         if not (args.scoring_csv and args.lookups_csv):
             sys.exit("ERROR: pass both --scoring-csv and --lookups-csv, or neither.")
         scoring = args.scoring_csv.read_text(encoding="utf-8")
         lookups = args.lookups_csv.read_text(encoding="utf-8")
-        return CsvWorksheet(scoring), CsvWorksheet(lookups), \
-            f"{args.scoring_csv.name} + {args.lookups_csv.name}"
+        src = {
+            "label": f"{args.scoring_csv.name} + {args.lookups_csv.name}",
+            "sheet_id": None,
+            "sheet_url": args.sheet,
+            "scoring_csv": scoring,
+            "lookups_csv": lookups,
+        }
+        return CsvWorksheet(scoring), CsvWorksheet(lookups), src
 
     sheet_id = extract_spreadsheet_id(args.sheet)
     tabs = fetch_named_tabs(sheet_id, CLASSIFIERS)
-    return CsvWorksheet(tabs["scoring"]), CsvWorksheet(tabs["lookups"]), \
-        f"Google Sheet {sheet_id}"
+    src = {
+        "label": f"Google Sheet {sheet_id}",
+        "sheet_id": sheet_id,
+        "sheet_url": args.sheet,
+        "scoring_csv": tabs["scoring"],
+        "lookups_csv": tabs["lookups"],
+    }
+    return CsvWorksheet(tabs["scoring"]), CsvWorksheet(tabs["lookups"]), src
+
+
+def write_manifest(path: Path, src: dict, content_sha256: str, generated_at: str) -> None:
+    """Write the provenance sidecar (JSON): which sheet and which revision (hash)."""
+    manifest = {
+        "metric_version": VERSION,
+        "sheet_url": src["sheet_url"],
+        "sheet_id": src["sheet_id"],
+        "content_sha256": content_sha256,
+        "generated_at": generated_at,
+        "generator": SCRIPT_PATH,
+    }
+    path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
 
 
 def main() -> None:
@@ -409,13 +457,15 @@ def main() -> None:
                     help="do not write; exit 1 if either output differs from what the sheet produces")
     args = ap.parse_args()
 
-    scoring_ws, lookups_ws, source = load_worksheets(args)
+    scoring_ws, lookups_ws, src = load_worksheets(args)
     questions = read_questions(scoring_ws)
     grade_points = read_grade_points(lookups_ws)
     grading = read_grading(lookups_ws)
     validate(questions, grade_points, grading)
 
-    generated_yaml = render_yaml(questions, grade_points, grading)
+    content_sha256 = source_sha256(src["scoring_csv"], src["lookups_csv"])
+    generated_yaml = render_yaml(questions, grade_points, grading,
+                                 src["sheet_url"], content_sha256)
     generated_csv = render_csv(questions, grade_points)
     yaml.safe_load(generated_yaml)  # confirm the YAML is valid before trusting it
 
@@ -423,24 +473,31 @@ def main() -> None:
                (args.output_csv, generated_csv.encode("utf-8"))]
 
     if args.check:
+        # The source hash is embedded in the YAML breadcrumb, so a byte mismatch
+        # also catches any change to the upstream source content.
         drifted = [path for path, content in targets
                    if (path.read_bytes() if path.exists() else b"") != content]
         if not drifted:
             print(f"OK: {args.output.name} and {args.output_csv.name} are in sync "
-                  f"with {source} ({len(questions)} questions)")
+                  f"with {src['label']} (sha256 {content_sha256[:12]}, {len(questions)} questions)")
             sys.exit(0)
         for path in drifted:
-            print(f"DRIFT: {path} differs from {source}.", file=sys.stderr)
+            print(f"DRIFT: {path} differs from {src['label']}.", file=sys.stderr)
         print(f"Regenerate with: python3 {SCRIPT_PATH}", file=sys.stderr)
         sys.exit(1)
+
+    manifest_path = args.output.parent / f"{args.output.stem}.upstream.json"
+    generated_at = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    write_manifest(manifest_path, src, content_sha256, generated_at)
 
     for path, content in targets:
         path.write_bytes(content)
     print(f"Wrote: {args.output}\n"
           f"Wrote: {args.output_csv}\n"
+          f"Wrote: {manifest_path}\n"
           f"{len(questions)} questions, "
           f"{sum(q['scope'] in NA_DEFAULT_SCOPES for q in questions)} ethics\n"
-          f"Source: {source}")
+          f"Source: {src['label']} (sha256 {content_sha256[:12]})")
 
 
 if __name__ == "__main__":
