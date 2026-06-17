@@ -12,10 +12,15 @@ Changes to this folder have a disproportionate downstream impact. Multiple files
 
 | Filename | Format | Purpose | Paired With |
 |----------|--------|---------|-------------|
-| `airbds_metric_v0.3.yaml` | YAML | **Canonical** 28-question metric: question text, grades, guidance, scopes, and the `grade_points`/`grading` scoring rules | `airbds_metric_v0.3.csv` |
+| `airbds_metric_v0.3.yaml` | YAML | **Canonical — current/recommended.** 28-question metric: question text, grades, guidance, scopes, and the `grade_points`/`grading` scoring rules | `airbds_metric_v0.3.csv` |
 | `airbds_metric_v0.3.csv` | CSV | Identical content to the YAML metric; used by spreadsheet workflow | `airbds_metric_v0.3.yaml` |
+| `airbds_metric_v0.4.yaml` | YAML | **Provisional** (in development) — generated from the Google Sheet; not yet validated. See the v0.4 note below. | `airbds_metric_v0.4.csv` |
+| `airbds_metric_v0.4.csv` | CSV | Identical content to airbds_metric_v0.4.yaml | `airbds_metric_v0.4.yaml` |
+| `airbds_metric_v0.4.upstream.json` | JSON | v0.4 provenance: source sheet id/url + `content_sha256` "revision" + generation timestamp | — |
 | `README.md` | Markdown | This file — contributor guide for the metric folder | — |
 | `skills/SKILL.md` | Markdown | AI agent skill for propagating metric changes across the repo | — |
+
+> **v0.4 is provisional.** `airbds_metric_v0.4.*` is generated from the working group's Google Sheet and is **not yet validated** in assessment or tooling — **v0.3 remains the current, recommended version.** See [How the v0.4 metric files are generated](#how-the-v04-metric-files-are-generated) and the `[0.4]` entry in [CHANGELOG.md](../CHANGELOG.md).
 
 > **Note on versioning:** `review_template` (under `reviews/`) is **not** versioned in its filename — it always tracks the current metric — but it carries a `schema_version` field that must match the current metric version, so it is updated on every bump.
 

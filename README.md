@@ -200,6 +200,12 @@ Each metric version is a separate YAML file (`metric/airbds_metric_vX.Y.yaml`).
 Completed reviews reference the metric version they were scored with via the
 `schema_version` field. See [CHANGELOG.md](CHANGELOG.md) for full history.
 
+> **v0.4 is in development.** A v0.4 metric (`metric/airbds_metric_v0.4.*`) is being
+> drafted from the working group's Google Sheet, but it is **not yet validated** in
+> assessment or tooling — this documentation and the assessment tooling target
+> **v0.3**, the current recommended version. See the `[0.4]` entry in
+> [CHANGELOG.md](CHANGELOG.md).
+
 ---
 
 ## Contributing
