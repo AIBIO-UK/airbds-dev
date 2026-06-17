@@ -134,26 +134,21 @@ Update `schema_version: "0.3"` → `"NEW"`.
 
 Then regenerate `reviews/review_template.csv`.
 
-#### H. Update `reviews/src/scripts/review_processor.py`
+#### H. Review processor & review workflows — no change needed
 
-Three locations to update:
-1. **Line 31:** `SCHEMA_VERSION = "0.3"` → `SCHEMA_VERSION = "NEW"`
-2. In the script's docstring or module comment: update the `--metric metric/airbds_metric_v0.3.yaml` example path
-3. The `help=` string in the argparse `--metric` argument definition (search for `"Path to airbds_metric_v0.3.yaml"`)
+`reviews/src/scripts/review_processor.py` is **metric-driven**: it scores each
+review against `metric/airbds_metric_v<schema_version>.yaml`, selected from the
+review's own `schema_version`. Once the new metric file exists (Step E), vNEW
+reviews are scored automatically — there is no `SCHEMA_VERSION` constant or
+`--metric` path to update.
 
-Use `grep -n "0\.3" reviews/src/scripts/review_processor.py` to find all occurrences before editing.
+#### I. `.github/workflows/review-check.yml` — no change needed
 
-#### I. Update `.github/workflows/review-check.yml`
+It no longer passes `--metric`; the processor auto-selects the version.
 
-Search for `airbds_metric_v0.3.yaml` in this file. There are 2 occurrences:
-- Line 63: `--metric metric/airbds_metric_v0.3.yaml` in the `Process review files` step
-- Line 103: in the Fork PR notice step summary
+#### J. `.github/workflows/review-test.yml` — no change needed
 
-Update both to `--metric metric/airbds_metric_vNEW.yaml`.
-
-#### J. Update `.github/workflows/review-test.yml`
-
-Search for `airbds_metric_v0.3.yaml`. There are 5 occurrences (one per test case). Update all to `metric/airbds_metric_vNEW.yaml`.
+Same — no metric path is hardcoded.
 
 #### K. Update `README.md`
 
@@ -162,7 +157,6 @@ Search for `v0.3` and `0.3` throughout the file. Key locations:
 - File structure listing (filename references to `airbds_metric_v0.3`)
 - Download link references
 - Question table (update if any question text changed — MINOR/MAJOR with question changes)
-- Processor command example: `--metric metric/airbds_metric_v0.3.yaml`
 
 Use `grep -n "v0\.3\|0\.3" README.md` to locate all occurrences before editing.
 
@@ -276,9 +270,6 @@ After completing all applicable steps, produce a structured summary for the cont
 - metric/scoring_schema_vNEW.csv — regenerated
 - reviews/review_template.yaml — schema_version updated to NEW
 - reviews/review_template.csv — regenerated
-- reviews/src/scripts/review_processor.py — SCHEMA_VERSION and --metric path updated
-- .github/workflows/review-check.yml — --metric path updated (2 occurrences)
-- .github/workflows/review-test.yml — --metric path updated (5 occurrences)
 - README.md — version badge, file listing, download links updated
 - CHANGELOG.md — new entry added for vNEW
 - CITATION.cff — version and date-released updated
@@ -308,9 +299,9 @@ Open a pull request referencing the originating GitHub Issue (#N):
 | `metric/scoring_schema_vX.Y.csv` | ✅* | ✅ | ✅ |
 | `reviews/review_template.yaml` | ✅* | ✅ | ✅ |
 | `reviews/review_template.csv` | ✅* | ✅ | ✅ |
-| `reviews/src/scripts/review_processor.py` | — | ✅ | ✅ |
-| `.github/workflows/review-check.yml` | — | ✅ | ✅ |
-| `.github/workflows/review-test.yml` | — | ✅ | ✅ |
+| `reviews/src/scripts/review_processor.py` (metric-driven) | — | — | — |
+| `.github/workflows/review-check.yml` | — | — | — |
+| `.github/workflows/review-test.yml` | — | — | — |
 | `README.md` | — | ✅ | ✅ |
 | `CHANGELOG.md` | — | ✅ | ✅ |
 | `CITATION.cff` | — | ✅ | ✅ |

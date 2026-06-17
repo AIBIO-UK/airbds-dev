@@ -62,9 +62,6 @@ For any **MINOR** change (question additions, deletions, or rewordings) or **MAJ
 
 | File | What breaks if not updated |
 |------|---------------------------|
-| `reviews/src/scripts/review_processor.py` | `SCHEMA_VERSION` constant (line 31) still references old version; reviews may be validated against the wrong schema |
-| `.github/workflows/review-check.yml` | `--metric metric/airbds_metric_v0.3.yaml` path (2 occurrences) still points to old metric; new reviews auto-scored with old questions |
-| `.github/workflows/review-test.yml` | `--metric` path (5 occurrences) still points to old metric; test suite silently runs against old schema |
 | `README.md` | Version badge, question table, download links, and processor command examples all reference the old version |
 | `CHANGELOG.md` | No record of the change; violates the project's versioning contract with users |
 | `CITATION.cff` | `version` and `date-released` fields are stale; published citations will reference the wrong version |
@@ -122,9 +119,7 @@ Use this as a checklist when implementing any metric change.
 - `README.md` — version badge, question table, download links, processor command examples
 - `CHANGELOG.md` — add a new entry at the top referencing the originating Issue
 - `CITATION.cff` — update `version:` and `date-released:` fields
-- `reviews/src/scripts/review_processor.py` — update `SCHEMA_VERSION` constant and `--metric` path references
-- `.github/workflows/review-check.yml` — update `--metric metric/airbds_metric_vX.Y.yaml` (2 occurrences)
-- `.github/workflows/review-test.yml` — update `--metric` path (5 occurrences)
+- The review processor and its workflows (`review-check.yml`, `review-test.yml`) need **no update** — the processor auto-selects `metric/airbds_metric_v<schema_version>.yaml` per review.
 - `skills/GF/GF-airbds-assessment-skill/SKILL.md` — update embedded templates, question table, file paths, skill version
 - `skills/testing/airbds-assessment-skill/SKILL.md` — update template filename **only if the XLSX is also regenerated**
 - `docs/tutorial-yaml.md` — update all `vX.Y` path references
