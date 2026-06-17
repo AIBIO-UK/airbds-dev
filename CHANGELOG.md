@@ -29,6 +29,34 @@ This project adheres to
 
 ---
 
+## [0.4] — provisional (not yet validated)
+
+> **Not yet widely tested**, in either assessment or tooling: no datasets have
+> been scored against v0.4, auto-airbds still scores against v0.3, and the
+> assessment skills still target v0.3. The review processor is version-aware and
+> will score v0.4 reviews, but v0.4 should be treated as a draft pending
+> validation — **v0.3 remains the recommended version for now.**
+
+### Changed
+- Authored in and generated from the working group's public Google Sheet (via
+  `metric/src/scripts/build_metric_yaml_and_csv_from_google_sheet_v0.4.py`)
+  rather than the v0.3 `.xlsx`. The source sheet and a content-hash "revision"
+  are recorded in `airbds_metric_v0.4.upstream.json` and a `# Source:` YAML
+  breadcrumb.
+- Question ids changed from `ACM-N` to zero-padded `ABC-NN`.
+- 27 questions (was 28): Ethics drops to 4 — the v0.3 authentication /
+  access-controls question (ACM-27) has no v0.4 successor.
+- Questions reworded throughout.
+- Grade thresholds (`min_score`) are now fractional (e.g. Silver 667.5);
+  maximum score 711 (was 716). Weight tiers unchanged (Critical 80, Important 5,
+  Optional 2).
+
+### Removed
+- The per-question `theme` and `mapped_from` fields (absent from the v0.4 source
+  sheet).
+
+---
+
 ## [0.3] — Initial public release
 
 ### Added
