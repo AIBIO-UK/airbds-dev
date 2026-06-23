@@ -1,5 +1,4 @@
 import type { Metric, Review, ReviewAnswer } from "./types.ts";
-import { SCHEMA_VERSION } from "./types.ts";
 import type { SheetAnswer } from "./parse-sheet.ts";
 
 /** Return the first non-empty value among the given normalized labels. */
@@ -13,9 +12,9 @@ function pick(info: Map<string, string>, ...keys: string[]): string {
 
 /**
  * Assemble a Review from the parsed sheet tabs, driven by the canonical metric's
- * question list. Never fabricates answers: anything not exactly "Yes"/"No" is
- * left blank and reported as a warning, so a mid-review sheet converts to a
- * clearly-incomplete draft rather than a misleading "all No".
+ * question list and schema version. Never fabricates answers: anything not
+ * exactly "Yes"/"No" is left blank and reported as a warning, so a mid-review
+ * sheet converts to a clearly-incomplete draft rather than a misleading "all No".
  */
 export function buildReview(
   info: Map<string, string>,
@@ -30,10 +29,14 @@ export function buildReview(
     "Reviewer initials are blank (not in the sheet) — add them before submitting.",
   );
 
-  // The spreadsheet has no review date; the reviewer adds it afterwards.
-  warnings.push(
-    "Review date is blank (not in the sheet) — add it before submitting.",
-  );
+  // v0.4 sheets carry a review date; v0.3 sheets do not. Read it when present,
+  // and only warn when it is actually blank.
+  const reviewDate = pick(info, "review date");
+  if (!reviewDate) {
+    warnings.push(
+      "Review date is blank (not in the sheet) — add it before submitting.",
+    );
+  }
 
   // The spreadsheet carries no affiliation, but review_processor.py requires it.
   warnings.push(
@@ -74,13 +77,13 @@ export function buildReview(
   }
 
   const review: Review = {
-    schema_version: SCHEMA_VERSION,
+    schema_version: metric.schemaVersion,
     reviewer: {
       name,
       initials: "",
       orcid: "",
       affiliation: "",
-      review_date: "",
+      review_date: reviewDate,
     },
     dataset: {
       name: pick(info, "dataset name"),

@@ -3,38 +3,45 @@
  * Convert an AIRBDS assessment Google Sheet (or its exported CSV tabs) into a
  * review YAML conforming to reviews/review_template.yaml.
  *
+ * The metric version is read from the sheet itself — the "AIRBDS … Metric vX.Y"
+ * label on the Instructions tab — and the matching metric/airbds_metric_vX.Y.yaml
+ * is loaded automatically. The sheet is trusted for the version; it is only ever
+ * distrusted for the score, which is left to review_processor.py / CI.
+ *
  *   # From a public Google Sheet (shared "anyone with the link"):
- *   node reviews/src/scripts/convert_review_google_sheet_to_yaml_v0.3.mts <url-or-id> review.yaml
+ *   node reviews/src/scripts/convert_review_google_sheet_to_yaml.mts <url-or-id> review.yaml
  *
  *   # Offline / private sheet — supply the two exported CSV tabs:
- *   node reviews/src/scripts/convert_review_google_sheet_to_yaml_v0.3.mts \
+ *   node reviews/src/scripts/convert_review_google_sheet_to_yaml.mts \
  *       --review-csv review-info.csv --questions-csv questions.csv review.yaml
- *
- * Scoring is intentionally NOT done here: `result` is left blank and
- * reviews/src/scripts/review_processor.py / CI compute the score and grade.
  *
  * This is a thin adapter over the pure ../google-sheet-converter library.
  */
 import { readFile, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
-import { convert, fetchSheet, parseMetric } from "../google-sheet-converter/index.ts";
+import {
+  convert,
+  detectSchemaVersion,
+  fetchSheet,
+  parseMetric,
+} from "../google-sheet-converter/index.ts";
 
-// metric/airbds_metric_v0.3.yaml is the single source of truth, referenced from
-// the repo root — never copied into the converter.
-const DEFAULT_METRIC = fileURLToPath(
-  new URL("../../../metric/airbds_metric_v0.3.yaml", import.meta.url),
-);
+// The bundled metric for a given version, referenced from the repo root — the
+// single source of truth, never copied into the converter.
+const metricPathFor = (version: string): string =>
+  fileURLToPath(
+    new URL(`../../../metric/airbds_metric_v${version}.yaml`, import.meta.url),
+  );
 
 interface Args {
   sheet?: string;
   reviewCsv?: string;
   questionsCsv?: string;
   out?: string;
-  metric: string;
 }
 
 function parseArgs(argv: string[]): Args {
-  const args: Args = { metric: DEFAULT_METRIC };
+  const args: Args = {};
   const positionals: string[] = [];
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
@@ -42,7 +49,6 @@ function parseArgs(argv: string[]): Args {
     switch (a) {
       case "--review-csv": args.reviewCsv = next(); break;
       case "--questions-csv": args.questionsCsv = next(); break;
-      case "--metric": args.metric = next(); break;
       case "--help":
       case "-h": printUsageAndExit(0);
       // falls through (printUsageAndExit never returns)
@@ -65,18 +71,20 @@ function parseArgs(argv: string[]): Args {
 function printUsageAndExit(code: number): never {
   const text = `Convert an AIRBDS assessment Google Sheet to a review YAML.
 
+The metric version is detected from the sheet's Instructions tab ("AIRBDS … Metric
+vX.Y") and the matching metric/airbds_metric_v<version>.yaml is loaded automatically.
+
 Usage:
-  convert_review_google_sheet_to_yaml_v0.3.mts <sheet-url-or-id> [output.yaml]
-  convert_review_google_sheet_to_yaml_v0.3.mts --review-csv <f> --questions-csv <f> [output.yaml]
+  convert_review_google_sheet_to_yaml.mts <sheet-url-or-id> [output.yaml]
+  convert_review_google_sheet_to_yaml.mts --review-csv <f> --questions-csv <f> [output.yaml]
 
 Arguments:
   <sheet-url-or-id>        Public Google Sheet — full URL or just the spreadsheet id
   [output.yaml]            Output path (optional; default: stdout)
 
 Options:
-  --review-csv <file>      Offline: the review-information tab as CSV
+  --review-csv <file>      Offline: the review-information (Instructions) tab as CSV
   --questions-csv <file>   Offline: the questions tab as CSV
-  --metric <file>          Metric YAML (default: repo metric/airbds_metric_v0.3.yaml)
   --help, -h               Show this help
 
 The sheet must be shared "anyone with the link".`;
@@ -103,12 +111,30 @@ async function main(): Promise<void> {
     printUsageAndExit(1);
   }
 
-  const metric = parseMetric(await readFile(args.metric, "utf8"));
+  // The sheet declares its own metric version on the Instructions tab.
+  const version = detectSchemaVersion(reviewCsv);
+  if (!version) {
+    throw new Error(
+      "Could not determine the metric version from the sheet — expected an " +
+        '"AIRBDS … Metric vX.Y" label on the Instructions tab.',
+    );
+  }
+
+  let metricYaml: string;
+  try {
+    metricYaml = await readFile(metricPathFor(version), "utf8");
+  } catch {
+    throw new Error(
+      `The sheet declares metric version v${version}, but ` +
+        `metric/airbds_metric_v${version}.yaml was not found.`,
+    );
+  }
+  const metric = parseMetric(metricYaml);
   const { yaml, warnings } = convert(reviewCsv, questionsCsv, metric);
 
   if (args.out) {
     await writeFile(args.out, yaml, "utf8");
-    console.error(`Wrote ${args.out}`);
+    console.error(`Wrote ${args.out} (detected metric v${version})`);
   } else {
     process.stdout.write(yaml);
   }

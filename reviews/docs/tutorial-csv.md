@@ -10,7 +10,7 @@ This tutorial walks you through scoring a bioscience dataset for AI-readiness us
 
 ## What you will do
 
-You will open a CSV template, fill in your answers to 28 Yes/No questions about a dataset, and calculate a grade (Caution / Bronze / Silver / Gold) that summarises its AI-readiness.
+You will open a CSV template, fill in your answers to 27 Yes/No questions about a dataset, and calculate a grade (Caution / Bronze / Silver / Gold) that summarises its AI-readiness.
 
 ---
 
@@ -22,7 +22,7 @@ Download the blank review template directly from the repository:
 
 To download: click the link above, then on GitHub click the **Download raw file** button (the down-arrow icon near the top-right of the file view).
 
-> The canonical question reference — with full guidance text, weights, and source mappings — is in [metric/airbds_metric_v0.3.csv](../../metric/airbds_metric_v0.3.csv).
+> The canonical question reference — with full guidance text and weights — is in [metric/airbds_metric_v0.4.csv](../../metric/airbds_metric_v0.4.csv).
 
 ---
 
@@ -38,7 +38,7 @@ You will see two sections in the spreadsheet:
 | 1–12 | **Section A** — Reviewer and dataset information (fill in the `value` column) |
 | 13 | Blank separator row |
 | 14 | Column headers for the answer table |
-| 15–42 | **Section B** — 28 questions (fill in the `answer` and `comments` columns) |
+| 15–41 | **Section B** — 27 questions (fill in the `answer` and `comments` columns) |
 
 ---
 
@@ -48,7 +48,7 @@ Click in the **`value`** cell next to each field and type your information:
 
 | Field | What to enter |
 |---|---|
-| `schema_version` | Leave as `0.3` |
+| `schema_version` | Leave as `0.4` |
 | `reviewer_name` | Your full name |
 | `reviewer_initials` | Your initials (e.g. `CH`) |
 | `reviewer_orcid` | Your ORCID (e.g. `0000-0000-0000-0000`), or leave blank |
@@ -62,15 +62,14 @@ Click in the **`value`** cell next to each field and type your information:
 
 ---
 
-## Step 4 — Answer the 28 questions (Section B)
+## Step 4 — Answer the 27 questions (Section B)
 
 Scroll down to row 15. You will see the answer table with these columns:
 
 | Column | Purpose |
 |---|---|
-| `question_id` | Question identifier (ACM-1 through ACM-28) — do not edit |
+| `question_id` | Question identifier (ABC-01 through ABC-27) — do not edit |
 | `scope` | Topic area — do not edit |
-| `theme` | Sub-topic — do not edit |
 | `weight` | Critical / Important / Optional — do not edit |
 | `question` | The question text — do not edit |
 | `guidance` | Explanation to help you decide — read this, do not edit |
@@ -78,60 +77,60 @@ Scroll down to row 15. You will see the answer table with these columns:
 | **`not_applicable`** | **See Step 5** |
 | **`comments`** | **Optional notes about your answer** |
 
-For each of the 28 rows, read the `question` and `guidance` columns, then type **`Yes`** or **`No`** in the `answer` column.
+For each of the 27 rows, read the `question` and `guidance` columns, then type **`Yes`** or **`No`** in the `answer` column.
 
 > **Tip:** You can hide the `guidance` column once you have read it to make the table easier to navigate. Right-click the column header and choose "Hide column".
 
 ---
 
-## Step 5 — Handle Ethics questions (ACM-24 to ACM-28)
+## Step 5 — Handle Ethics questions (ABC-24 to ABC-27)
 
-The last five questions (ACM-24 to ACM-28) apply only to datasets that contain **human or animal subject data**.
+The last four questions (ABC-24 to ABC-27) apply only to datasets that contain **human or animal subject data**.
 
-- **If your dataset contains no human or animal subjects:** type **`Yes`** in the `answer` column and **`TRUE`** in the `not_applicable` column for each of ACM-24 to ACM-28.
+- **If your dataset contains no human or animal subjects:** type **`Yes`** in the `answer` column and **`TRUE`** in the `not_applicable` column for each of ABC-24 to ABC-27.
 - **If your dataset does contain human or animal subjects:** answer each question normally (`Yes` or `No`) and leave `not_applicable` as `FALSE`.
 
 ---
 
 ## Step 6 — Calculate your weighted score
 
-The score is the sum of (answer × weight points) across all 28 questions.
+The score is the sum of (answer × weight points) across all 27 questions.
 
 - Yes = 1, No = 0
 - Critical = 80 pts, Important = 5 pts, Optional = 2 pts
 
 ### Excel / Sheets formula
 
-Add a new column (or use a blank cell elsewhere) and paste this formula. It assumes your answer table starts at row 15 with `weight` in column D and `answer` in column G — adjust column letters if your spreadsheet differs.
+Add a new column (or use a blank cell elsewhere) and paste this formula. It assumes your answer table starts at row 15 with `weight` in column C and `answer` in column F — adjust column letters if your spreadsheet differs.
 
 This formula counts the number of Yes answers per weight tier:
 
 ```
 Critical Yes count:
-=COUNTIFS(D15:D42,"Critical",G15:G42,"Yes")
+=COUNTIFS(C15:C41,"Critical",F15:F41,"Yes")
 
 Important Yes count:
-=COUNTIFS(D15:D42,"Important",G15:G42,"Yes")
+=COUNTIFS(C15:C41,"Important",F15:F41,"Yes")
 
 Optional Yes count:
-=COUNTIFS(D15:D42,"Optional",G15:G42,"Yes")
+=COUNTIFS(C15:C41,"Optional",F15:F41,"Yes")
 ```
 
 Then compute pass rates (proportion correct per tier):
 
 ```
-Critical pass rate:   =COUNTIFS(D15:D42,"Critical",G15:G42,"Yes") / COUNTIF(D15:D42,"Critical")
-Important pass rate:  =COUNTIFS(D15:D42,"Important",G15:G42,"Yes") / COUNTIF(D15:D42,"Important")
-Optional pass rate:   =COUNTIFS(D15:D42,"Optional",G15:G42,"Yes") / COUNTIF(D15:D42,"Optional")
+Critical pass rate:   =COUNTIFS(C15:C41,"Critical",F15:F41,"Yes") / COUNTIF(C15:C41,"Critical")
+Important pass rate:  =COUNTIFS(C15:C41,"Important",F15:F41,"Yes") / COUNTIF(C15:C41,"Important")
+Optional pass rate:   =COUNTIFS(C15:C41,"Optional",F15:F41,"Yes") / COUNTIF(C15:C41,"Optional")
 ```
 
 Or for the total weighted score in one formula:
 
 ```
 =SUMPRODUCT(
-  (G15:G42="Yes") * (D15:D42="Critical") * 80
-  + (G15:G42="Yes") * (D15:D42="Important") * 5
-  + (G15:G42="Yes") * (D15:D42="Optional") * 2
+  (F15:F41="Yes") * (C15:C41="Critical") * 80
+  + (F15:F41="Yes") * (C15:C41="Important") * 5
+  + (F15:F41="Yes") * (C15:C41="Optional") * 2
 )
 ```
 
@@ -148,7 +147,7 @@ Look up your critical, important, and optional pass rates in this table:
 | Silver | ⚪ | = 1.0 (all) | ≥ 0.5 | any |
 | Gold | 🟡 | = 1.0 (all) | = 1.0 (all) | ≥ 0.5 |
 
-What the grades mean is explained in [reviews/GUIDANCE.md](../GUIDANCE.md); the thresholds are in the metric (`airbds_metric_v0.3.csv` / `.yaml`).
+What the grades mean is explained in [reviews/GUIDANCE.md](../GUIDANCE.md); the thresholds are in the metric (`airbds_metric_v0.4.csv` / `.yaml`).
 
 ---
 

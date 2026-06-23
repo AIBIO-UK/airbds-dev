@@ -3,8 +3,9 @@
 The reusable AIRBDS review-converter library — turns an assessment spreadsheet
 into a review YAML conforming to
 [`review_template.yaml`](../../review_template.yaml). It is the
-shared core used by the CLI
-(`../scripts/convert_review_google_sheet_to_yaml_v0.3.mts`) and by the
+shared, metric-version-agnostic core used by the CLI
+(`../scripts/convert_review_google_sheet_to_yaml.mts`, which reads the metric
+version from the sheet) and by the
 [`auto-airbds`](../../../../../auto-airbds) website's server-side import route, which
 depends on it as the published npm package **`@airbds/converter-tools`**.
 
@@ -13,8 +14,8 @@ live here. For how to *run* the converter, see the
 [workspace README](../README.md); this file is for working on the library itself.
 
 The public surface is [`index.ts`](./index.ts) (`fetchSheet`, `convert`,
-`buildReview`, `parseCsv`, `extractReviewInfo`, `extractAnswers`, `emitYaml`,
-`parseMetric`, and the shared types). `fetchSheet`/`convert` use only the global
+`buildReview`, `parseCsv`, `extractReviewInfo`, `extractAnswers`,
+`detectSchemaVersion`, `emitYaml`, `parseMetric`, and the shared types). `fetchSheet`/`convert` use only the global
 `fetch`, `csv-parse`, and `yaml`, so they run server-side in a Cloudflare Pages
 Function (which needs the `nodejs_compat` flag for `csv-parse`'s `Buffer`/`stream`
 usage).

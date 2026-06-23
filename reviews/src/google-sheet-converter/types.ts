@@ -7,7 +7,7 @@ export interface ReviewAnswer {
   /** "Yes" | "No" | "" — empty means unanswered (a draft, not yet submittable). */
   answer: string;
   comments: string;
-  /** Present only for Ethics-scope questions (ACM-24…28). */
+  /** Present only for Ethics-scope questions (those with a not_applicable_default). */
   not_applicable?: boolean;
 }
 
@@ -38,11 +38,14 @@ export interface Review {
 }
 
 /**
- * The slice of the canonical metric the converter needs: the ordered question
- * ids and which of them are Ethics-scope. Parsed from the single source of
- * truth, metric/airbds_metric_v0.3.yaml — never hardcoded or copied here.
+ * The slice of the canonical metric the converter needs: the schema version, the
+ * ordered question ids, and which of them are Ethics-scope (carry a
+ * not_applicable flag). Parsed from the single source of truth — the versioned
+ * metric/airbds_metric_v*.yaml — never hardcoded or copied here, so a new metric
+ * version (e.g. v0.3's ACM-1…28 vs v0.4's ABC-01…27) flows through automatically.
  */
 export interface Metric {
+  schemaVersion: string;
   questionIds: string[];
   ethicsIds: Set<string>;
 }
@@ -58,5 +61,3 @@ export interface SheetCsvs {
   reviewCsv: string;
   questionsCsv: string;
 }
-
-export const SCHEMA_VERSION = "0.3";

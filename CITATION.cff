@@ -4,8 +4,8 @@ message: >
   please cite it using the metadata below.
 
 title: "AIRBDS AI-Readiness Dataset Scoring Metric"
-version: "0.3"
-date-released: "2025"
+version: "0.4"
+date-released: "2026"
 license: CC-BY-4.0
 repository-code: "https://github.com/AIBIO-UK/airbds-metric"
 url: "https://aibio.ac.uk/about/working-groups/airbds/"

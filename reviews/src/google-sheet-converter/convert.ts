@@ -6,7 +6,7 @@ import { emitYaml } from "./emit-yaml.ts";
 /**
  * Pure core: the two CSV tabs plus the parsed metric → review YAML. No IO, no
  * network — the CLI and the website both call this with already-fetched CSV
- * text and a Metric parsed from the canonical metric/airbds_metric_v0.3.yaml.
+ * text and a Metric parsed from the canonical, versioned metric/airbds_metric_v*.yaml.
  */
 export function convert(
   reviewCsv: string,

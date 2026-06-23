@@ -12,7 +12,9 @@ assessment spreadsheet into a review YAML conforming to
 [`review_template.yaml`](../review_template.yaml). It is the shared
 core — the CLI uses it today, and a website will use it server-side to parse
 incoming spreadsheet links. The CLI is
-`scripts/convert_review_google_sheet_to_yaml_v0.3.mts`.
+`scripts/convert_review_google_sheet_to_yaml.mts`; it reads the metric version
+from the sheet (the "AIRBDS … Metric vX.Y" label on the Instructions tab) and
+loads the matching metric automatically, so one command handles any version.
 
 ### Setup & run
 
@@ -26,7 +28,7 @@ bun install
 
 # 3. Convert a sheet → review YAML (run the CLI from reviews/src/scripts)
 cd ../scripts
-bun ./convert_review_google_sheet_to_yaml_v0.3.mts <google-sheets-url-or-id> review.yaml
+bun ./convert_review_google_sheet_to_yaml.mts <google-sheets-url-or-id> review.yaml
 ```
 
 The first argument is the sheet, the second (optional) is the output path
@@ -38,7 +40,7 @@ Offline / private sheets — export the two relevant tabs to CSV yourself and pa
 them in instead of `--sheet`:
 
 ```bash
-bun ./convert_review_google_sheet_to_yaml_v0.3.mts \
+bun ./convert_review_google_sheet_to_yaml.mts \
     --review-csv review-info.csv --questions-csv questions.csv review.yaml
 ```
 
@@ -46,9 +48,9 @@ Notes:
 
 - The converter **does not score**. It leaves `result` blank; `review_processor.py`
   / CI compute the weighted score and grade and rename the file.
-- The spreadsheet has no reviewer initials, ORCID, affiliation, or review date, so
-  those are left blank for you to fill in (warnings flag them). Warnings also list
-  any unanswered questions — the file is a draft until every question is `Yes`/`No`.
+- The spreadsheet has no reviewer initials, ORCID, or affiliation, so those are
+  left blank for you to fill in (warnings flag them). Warnings also list any
+  unanswered questions — the file is a draft until every question is `Yes`/`No`.
 - After converting, name the file per
   [`CONTRIBUTING.md`](../../CONTRIBUTING.md) (`<accession>_<INITIALS>_<n>.yaml`) and
   submit it; CI scores it on the way in.

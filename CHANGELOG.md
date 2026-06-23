@@ -35,13 +35,16 @@ This project adheres to
 
 ---
 
-## [0.4] — provisional (not yet validated)
+## [0.4] — current
 
-> **Not yet widely tested**, in either assessment or tooling: no datasets have
-> been scored against v0.4, auto-airbds still scores against v0.3, and the
-> assessment skills still target v0.3. The review processor is version-aware and
-> will score v0.4 reviews, but v0.4 should be treated as a draft pending
-> validation — **v0.3 remains the recommended version for now.**
+> **v0.4 is now the current version.** The review templates
+> (`reviews/review_template.{yaml,csv}`), the sheet→YAML converter, and
+> `review_processor.py` all default to / support it. The review processor is
+> version-aware — it scores each review against the metric matching its
+> `schema_version`, so existing v0.3 reviews still score correctly, and the v0.3
+> metric and review template are retained (the latter under
+> `reviews/archived_templates/`). Migration of auto-airbds and the assessment
+> skills to v0.4 is tracked separately.
 
 ### Changed
 - Authored in and generated from the working group's public Google Sheet (via

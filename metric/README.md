@@ -12,17 +12,17 @@ Changes to this folder have a disproportionate downstream impact. Multiple files
 
 | Filename | Format | Purpose | Paired With |
 |----------|--------|---------|-------------|
-| `airbds_metric_v0.3.yaml` | YAML | **Canonical — current/recommended.** 28-question metric: question text, grades, guidance, scopes, and the `grade_points`/`grading` scoring rules | `airbds_metric_v0.3.csv` |
-| `airbds_metric_v0.3.csv` | CSV | Identical content to the YAML metric; used by spreadsheet workflow | `airbds_metric_v0.3.yaml` |
-| `airbds_metric_v0.4.yaml` | YAML | **Provisional** (in development) — generated from the Google Sheet; not yet validated. See the v0.4 note below. | `airbds_metric_v0.4.csv` |
-| `airbds_metric_v0.4.csv` | CSV | Identical content to airbds_metric_v0.4.yaml | `airbds_metric_v0.4.yaml` |
+| `airbds_metric_v0.4.yaml` | YAML | **Canonical — current.** 27-question metric: question text, grades, guidance, scopes, and the `grade_points`/`grading` scoring rules | `airbds_metric_v0.4.csv` |
+| `airbds_metric_v0.4.csv` | CSV | Identical content to the YAML metric; used by the spreadsheet workflow | `airbds_metric_v0.4.yaml` |
 | `airbds_metric_v0.4.upstream.json` | JSON | v0.4 provenance: source sheet id/url + `content_sha256` "revision" + generation timestamp | — |
+| `airbds_metric_v0.3.yaml` | YAML | **Previous version — retained.** 28-question metric; reviews carrying `schema_version: "0.3"` still score against it | `airbds_metric_v0.3.csv` |
+| `airbds_metric_v0.3.csv` | CSV | Identical content to the v0.3 YAML metric | `airbds_metric_v0.3.yaml` |
 | `README.md` | Markdown | This file — contributor guide for the metric folder | — |
 | `skills/SKILL.md` | Markdown | AI agent skill for propagating metric changes across the repo | — |
 
-> **v0.4 is provisional.** `airbds_metric_v0.4.*` is generated from the working group's Google Sheet and is **not yet validated** in assessment or tooling — **v0.3 remains the current, recommended version.** See [How the v0.4 metric files are generated](#how-the-v04-metric-files-are-generated) and the `[0.4]` entry in [CHANGELOG.md](../CHANGELOG.md).
+> **v0.4 is the current version.** `airbds_metric_v0.4.*` is generated from the working group's Google Sheet (see [How the v0.4 metric files are generated](#how-the-v04-metric-files-are-generated) and the `[0.4]` entry in [CHANGELOG.md](../CHANGELOG.md)). **v0.3 is retained** for reference and for re-scoring older reviews — the review processor auto-selects the metric matching each review's `schema_version`.
 
-> **Note on versioning:** `review_template` (under `reviews/`) is **not** versioned in its filename — it always tracks the current metric — but it carries a `schema_version` field that must match the current metric version, so it is updated on every bump.
+> **Note on versioning:** the **current** `review_template` pair (under `reviews/`) is **not** versioned in its filename — `reviews/review_template.{yaml,csv}` always tracks the current metric (now v0.4), so non-technical reviewers always download the right file. It carries a `schema_version` field that must match the current metric version, so it is updated on every bump. On a bump, the outgoing pair is first copied to `reviews/archived_templates/review_template_v<old>.{yaml,csv}` (e.g. `review_template_v0.3.{yaml,csv}`) before the unversioned pair is overwritten — so previous versions stay retrievable as files, not just in git history.
 
 > **Note on new metric versions:** A version bump creates new files (e.g. `airbds_metric_v0.4.yaml` + `.csv`). Old versions are **retained** for archival — reviews carry `schema_version` to record which version they were scored against.
 
@@ -86,7 +86,7 @@ For any **MINOR** change (question additions, deletions, or rewordings) or **MAJ
 1. **Check existing Issues** at [github.com/AIBIO-UK/airbds-metric/issues](https://github.com/AIBIO-UK/airbds-metric/issues) before opening a new one — the change may already be under discussion.
 
 2. **Open a GitHub Issue** before writing any code or YAML. Use the title prefix `[Metric Change]`. In the body, state:
-   - Which question(s) are affected (e.g. ACM-12, ACM-17)
+   - Which question(s) are affected (e.g. ABC-12, ABC-16)
    - The rationale for the change
    - Whether this is a guidance-only change (**PATCH**), a question rewording/addition/deletion (**MINOR**), or a weight/threshold change (**MAJOR**)
    
@@ -112,7 +112,7 @@ Use this as a checklist when implementing any metric change.
 - `metric/airbds_metric_vX.Y.yaml`
 - `metric/airbds_metric_vX.Y.csv`
 
-> For v0.3, both are generated together by `metric/src/scripts/build_metric_yaml_and_csv_from_spreadsheet_v0.3.py` — edit the spreadsheet and regenerate rather than hand-editing either file. See [How the v0.3 metric files are generated](#how-the-v03-metric-files-are-generated).
+> Both are generated together — never hand-edit either file. For v0.4 (current) they are generated from the working group's Google Sheet by `metric/src/scripts/build_metric_yaml_and_csv_from_google_sheet_v0.4.py`; for v0.3 by `metric/src/scripts/build_metric_yaml_and_csv_from_spreadsheet_v0.3.py`. See [How the v0.4 metric files are generated](#how-the-v04-metric-files-are-generated).
 
 ### Group B — Review template pair *(always change together)*
 - `reviews/review_template.yaml`
@@ -157,9 +157,9 @@ Every push or pull request that touches a file under `metric/` — or the `revie
 
 | Change type | Description | Version bump | Files to update |
 |-------------|-------------|-------------|-----------------|
-| **PATCH** | Guidance text clarification only — no change to question meaning, weights, or IDs | `0.3` → `0.3.1` | Groups A, B |
-| **MINOR** | Question added, removed, or reworded | `0.3` → `0.4` | Groups A, B, C |
-| **MAJOR** | Weight point value or grade threshold changed | `0.3` → `1.0` | Groups A, B, C |
+| **PATCH** | Guidance text clarification only — no change to question meaning, weights, or IDs | `0.4` → `0.4.1` | Groups A, B |
+| **MINOR** | Question added, removed, or reworded | `0.4` → `0.5` | Groups A, B, C |
+| **MAJOR** | Weight point value or grade threshold changed | `0.4` → `1.0` | Groups A, B, C |
 
 The canonical versioning policy is defined in [CONTRIBUTING.md](../CONTRIBUTING.md).
 

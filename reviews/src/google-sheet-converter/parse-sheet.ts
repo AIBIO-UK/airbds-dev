@@ -32,15 +32,36 @@ export function extractReviewInfo(rows: string[][]): Map<string, string> {
   return info;
 }
 
+/** Matches the "… Metric v0.4" version label on the Instructions tab. */
+const METRIC_VERSION = /Metric\s+v\.?\s*(\d+\.\d+)/i;
+
+/**
+ * Read the metric version the sheet declares for itself, from the review-info
+ * (Instructions) tab — e.g. the "AIRBDS Dataset Metric v0.4" title cell. The
+ * sheet is trusted for the version (it is only ever distrusted for the score),
+ * so the right metric/airbds_metric_v<version>.yaml can be selected without a
+ * flag. Returns the version string (e.g. "0.4") or null if no version is found.
+ */
+export function detectSchemaVersion(reviewCsv: string): string | null {
+  for (const row of parseCsv(reviewCsv)) {
+    for (const cell of row) {
+      const m = (cell ?? "").match(METRIC_VERSION);
+      if (m) return m[1];
+    }
+  }
+  return null;
+}
+
 export interface SheetAnswer {
   answer: string;
   comments: string;
 }
 
 /**
- * The questions tab has a header row beginning with "Q ID". Maps each ACM-N row
- * to its Answer and Comments, locating columns by header name so a reordered
- * sheet still parses. Footer rows (TOTAL, etc.) are ignored.
+ * The questions tab has a header row beginning with "Q ID". Maps each
+ * question-id row (ACM-1, ABC-01, …) to its Answer and Comments, locating
+ * columns by header name so a reordered sheet still parses. Footer rows
+ * (TOTAL, etc.) are ignored.
  */
 export function extractAnswers(rows: string[][]): Map<string, SheetAnswer> {
   const headerIdx = rows.findIndex((r) => (r[0] ?? "").trim() === "Q ID");
@@ -60,7 +81,7 @@ export function extractAnswers(rows: string[][]): Map<string, SheetAnswer> {
   const answers = new Map<string, SheetAnswer>();
   for (const row of rows.slice(headerIdx + 1)) {
     const id = (row[idCol] ?? "").trim();
-    if (!/^ACM-\d+$/.test(id)) continue;
+    if (!/^[A-Za-z]+-\d+$/.test(id)) continue;
     answers.set(id, {
       answer: (row[answerCol] ?? "").trim(),
       comments: commentsCol === -1 ? "" : (row[commentsCol] ?? "").trim(),

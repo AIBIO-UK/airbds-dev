@@ -32,7 +32,7 @@ and rewriting them carries no benefit.
 google-sheet-converter/convert.ts   convert(reviewCsv, questionsCsv, metric, opts) → { yaml, review, warnings }
                                     PURE: strings in, value out. No IO, no network.
 google-sheet-converter/fetch-sheet.ts   fetchSheet(url) → { reviewCsv, questionsCsv }   (network, shared)
-scripts/…_v0.3.mts      CLI adapter: arg parsing + fs read/write
+scripts/…_to_yaml.mts   CLI adapter: arg parsing + fs read/write; detects the sheet's version
 (website, later)       HTTP adapter: request in, YAML/JSON out
 ```
 
@@ -42,15 +42,24 @@ each a thin shell over `convert()`.
 
 ## Single source of truth: the metric is referenced, never copied
 
-The converter needs to know which questions exist (ACM-1…28) and which are
-Ethics-scope (they carry `not_applicable`). That information is **read from the
-canonical `metric/airbds_metric_v0.3.yaml` in the repo root** — it is never
-hardcoded in the converter and never copied into a bundled asset.
+The converter needs to know which questions exist (v0.3's ACM-1…28, v0.4's
+ABC-01…27, …), the schema version, and which questions are Ethics-scope (they
+carry `not_applicable`). All of that is **read from the canonical, versioned
+`metric/airbds_metric_v*.yaml` in the repo root** — it is never hardcoded in the
+converter and never copied into a bundled asset.
 
 Mechanically, the metric is **injected**: `convert()` takes a parsed `Metric`
-argument, the CLI reads `metric/airbds_metric_v0.3.yaml` and passes it in, and
-the website supplies the same metric it already has. A new metric version flows
-through automatically with no converter edits. Likewise, `review_template.yaml`
+argument, the CLI reads the appropriate `metric/airbds_metric_v*.yaml` and passes
+it in, and the website supplies the same metric it already has. The converter is
+metric-version-agnostic — the question ids, schema version, and Ethics set all
+come from the injected metric, so a new metric version flows through with no
+converter code edits.
+
+Which metric to inject is itself read from the sheet: the CLI calls
+`detectSchemaVersion()` on the review-info (Instructions) tab — the
+"AIRBDS … Metric vX.Y" label — and loads the matching `metric/airbds_metric_v*.yaml`.
+The sheet is trusted for the *version* but never for the *score*; the version is
+not inferred from the question-id prefix. Likewise, `review_template.yaml`
 is not read or copied — the small wrapper shape (reviewer/dataset/result) is part
 of the converter's output format, not metric data.
 
@@ -68,8 +77,8 @@ deliberately omitted.
 unquoted `Yes`/`No`/`y`/`n`/`off`… is read as a **boolean**, which
 `review_processor.py` rejects. `emit-yaml.ts` therefore force-quotes every string
 scalar (`defaultStringType: "QUOTE_DOUBLE"`), so the output round-trips as
-strings. `schema_version: "0.3"` is quoted for the same reason (otherwise read as
-a float).
+strings. The `schema_version` value (e.g. `"0.4"`) is quoted for the same reason
+(otherwise read as a float).
 
 ## Sheet ingestion
 

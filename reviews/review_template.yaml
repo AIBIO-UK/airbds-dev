@@ -1,11 +1,11 @@
-# Review template — AIRBDS AI-Readiness Dataset Scoring Metric v0.3
+# Review template — AIRBDS AI-Readiness Dataset Scoring Metric v0.4
 # Fill in all fields. For each question, set answer to "Yes" or "No".
-# This YAML lists answer slots by question id; see airbds_metric_v0.3.yaml (or
+# This YAML lists answer slots by question id; see airbds_metric_v0.4.yaml (or
 # review_template.csv) for the full question text and guidance.
 # See reviews/GUIDANCE.md and the metric YAML's grading block for grading details.
 # Submit completed file as a PR to https://github.com/AIBIO-UK/airbds-metric
 
-schema_version: "0.3"
+schema_version: "0.4"
 
 reviewer:
   name: ""            # Full name
@@ -24,35 +24,34 @@ dataset:
 process_comments: ""
 
 answers:
-  ACM-1:  { answer: "", comments: "" }
-  ACM-2:  { answer: "", comments: "" }
-  ACM-3:  { answer: "", comments: "" }
-  ACM-4:  { answer: "", comments: "" }
-  ACM-5:  { answer: "", comments: "" }
-  ACM-6:  { answer: "", comments: "" }
-  ACM-7:  { answer: "", comments: "" }
-  ACM-8:  { answer: "", comments: "" }
-  ACM-9:  { answer: "", comments: "" }
-  ACM-10: { answer: "", comments: "" }
-  ACM-11: { answer: "", comments: "" }
-  ACM-12: { answer: "", comments: "" }
-  ACM-13: { answer: "", comments: "" }
-  ACM-14: { answer: "", comments: "" }
-  ACM-15: { answer: "", comments: "" }
-  ACM-16: { answer: "", comments: "" }
-  ACM-17: { answer: "", comments: "" }
-  ACM-18: { answer: "", comments: "" }
-  ACM-19: { answer: "", comments: "" }
-  ACM-20: { answer: "", comments: "" }
-  ACM-21: { answer: "", comments: "" }
-  ACM-22: { answer: "", comments: "" }
-  ACM-23: { answer: "", comments: "" }
+  ABC-01: { answer: "", comments: "" }
+  ABC-02: { answer: "", comments: "" }
+  ABC-03: { answer: "", comments: "" }
+  ABC-04: { answer: "", comments: "" }
+  ABC-05: { answer: "", comments: "" }
+  ABC-06: { answer: "", comments: "" }
+  ABC-07: { answer: "", comments: "" }
+  ABC-08: { answer: "", comments: "" }
+  ABC-09: { answer: "", comments: "" }
+  ABC-10: { answer: "", comments: "" }
+  ABC-11: { answer: "", comments: "" }
+  ABC-12: { answer: "", comments: "" }
+  ABC-13: { answer: "", comments: "" }
+  ABC-14: { answer: "", comments: "" }
+  ABC-15: { answer: "", comments: "" }
+  ABC-16: { answer: "", comments: "" }
+  ABC-17: { answer: "", comments: "" }
+  ABC-18: { answer: "", comments: "" }
+  ABC-19: { answer: "", comments: "" }
+  ABC-20: { answer: "", comments: "" }
+  ABC-21: { answer: "", comments: "" }
+  ABC-22: { answer: "", comments: "" }
+  ABC-23: { answer: "", comments: "" }
   # Ethics questions — answer "Yes" if dataset has no human/animal subjects
-  ACM-24: { answer: "", comments: "", not_applicable: false }
-  ACM-25: { answer: "", comments: "", not_applicable: false }
-  ACM-26: { answer: "", comments: "", not_applicable: false }
-  ACM-27: { answer: "", comments: "", not_applicable: false }
-  ACM-28: { answer: "", comments: "", not_applicable: false }
+  ABC-24: { answer: "", comments: "", not_applicable: false }
+  ABC-25: { answer: "", comments: "", not_applicable: false }
+  ABC-26: { answer: "", comments: "", not_applicable: false }
+  ABC-27: { answer: "", comments: "", not_applicable: false }
 
 # Calculated fields — complete after scoring
 result:

@@ -1,7 +1,7 @@
 # AIRBDS AI-Readiness Dataset Scoring Metric
 
 [![License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
-[![Version](https://img.shields.io/badge/metric%20version-v0.3-blue)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/metric%20version-v0.4-blue)](CHANGELOG.md)
 [![AIBIO-UK](https://img.shields.io/badge/AIBIO--UK-AIRBDS%20Working%20Group-green)](https://aibio.ac.uk/about/working-groups/airbds/)
 [![Review Check](https://github.com/AIBIO-UK/airbds-metric/actions/workflows/review-check.yml/badge.svg)](https://github.com/AIBIO-UK/airbds-metric/actions/workflows/review-check.yml)
 [![Metric Alignment Check](https://github.com/AIBIO-UK/airbds-metric/actions/workflows/metric-alignment-check.yml/badge.svg)](https://github.com/AIBIO-UK/airbds-metric/actions/workflows/metric-alignment-check.yml)
@@ -17,7 +17,7 @@ of the [AIBIO-UK](https://aibio.ac.uk) network, funded by BBSRC.
 
 The AIRBDS metric provides a structured checklist that researchers, data
 curators, and repository managers can use to assess how suitable a bioscience
-dataset is for use in AI/ML workflows. Each of the **28 questions** is answered
+dataset is for use in AI/ML workflows. Each of the **27 questions** is answered
 Yes/No and contributes a weighted score. Datasets are then assigned one of four
 grades:
 
@@ -32,14 +32,14 @@ Questions are grouped into **four scopes** and **three weight tiers**:
 
 | Scope | Questions | Weight tiers covered |
 |---|---|---|
-| Infrastructure | ACM-1 – ACM-10 | Critical, Important, Optional |
-| Metadata | ACM-11 – ACM-17 | Critical, Important, Optional |
-| Content | ACM-18 – ACM-23 | Critical, Important, Optional |
-| Ethics | ACM-24 – ACM-28 | Critical, Important, Optional |
+| Infrastructure | ABC-01 – ABC-10 | Critical, Important, Optional |
+| Metadata | ABC-11 – ABC-17 | Critical, Important, Optional |
+| Content | ABC-18 – ABC-23 | Critical, Important, Optional |
+| Ethics | ABC-24 – ABC-27 | Critical, Important, Optional |
 
 **Weight points:** Critical = 80 pts · Important = 5 pts · Optional = 2 pts
 
-> **Ethics note:** Questions ACM-24 to ACM-28 apply to datasets containing
+> **Ethics note:** Questions ABC-24 to ABC-27 apply to datasets containing
 > human or animal subject data. For datasets with no such data, these questions
 > default to "Yes" (not applicable) and should be noted in the review file.
 
@@ -61,7 +61,7 @@ airbds-metric/
 
 ## Formats & Tutorials
 
-The metric is available in two formats. Both cover the same 28 questions and produce the same grade — choose whichever suits your workflow.
+The metric is available in two formats. Both cover the same 27 questions and produce the same grade — choose whichever suits your workflow.
 
 **[→ Interactive tutorial site](https://aibio-uk.github.io/airbds-metric-tutorial/)** — step-by-step guide that helps you choose the right format and walks you through the full review process.
 
@@ -80,7 +80,7 @@ For the spreadsheet workflow, see the [Beginner CSV Tutorial](reviews/docs/tutor
    ```bash
    cp reviews/review_template.yaml reviews/testing/<accession>_<initials>_1.yaml
    ```
-2. **Answer all 28 questions** (`"Yes"` or `"No"`) in your copy.
+2. **Answer all 27 questions** (`"Yes"` or `"No"`) in your copy.
 3. **Submit a PR** — see [CONTRIBUTING.md](CONTRIBUTING.md).
 4. **Automated processing** handles the rest: score calculation, grade assignment, CSV conversion, and file renaming — see [Automated Review Processing](#automated-review-processing) below.
 
@@ -90,59 +90,58 @@ How scores and grades work is explained in [`reviews/GUIDANCE.md`](reviews/GUIDA
 
 ## Metric Questions at a Glance
 
-### Infrastructure (ACM-1 – ACM-10)
+### Infrastructure (ABC-01 – ABC-10)
 
-| ID | Theme | Weight | Question (short) |
-|---|---|---|---|
-| ACM-1 | Access | Important | Can the dataset be accessed in its entirety? |
-| ACM-2 | Metadata | Important | Is the metadata provided along with the data? |
-| ACM-3 | Integrity | Optional | Does the dataset include a mechanism for verifying its integrity? |
-| ACM-4 | Licence | **Critical** | Is the dataset released with a clear licence or terms of use? |
-| ACM-5 | Licence | Important | Is the licence standardised and machine-readable? |
-| ACM-6 | Resource | Important | Is the dataset deposited in a FAIR-compliant archive? |
-| ACM-7 | Resource | Important | Is the dataset deposited in a domain-appropriate infrastructure? |
-| ACM-8 | Resource | Optional | Is the dataset hosted in a searchable infrastructure? |
-| ACM-9 | UID | **Critical** | Does the dataset have a globally unique, persistent identifier? |
-| ACM-10 | Updates | Optional | If subject to updates, does it use a version control system? |
+| ID | Weight | Question (short) |
+|---|---|---|
+| ABC-01 | Important | Can the dataset be accessed in its entirety? |
+| ABC-02 | Important | Is the metadata provided along with the data? |
+| ABC-03 | Optional | Does the dataset include a mechanism for verifying its integrity? |
+| ABC-04 | **Critical** | Is the dataset released with a clear licence or terms of use? |
+| ABC-05 | Important | Is the licence standardised and machine-readable? |
+| ABC-06 | Important | Is the dataset deposited in a FAIR-compliant archive? |
+| ABC-07 | Important | Is the dataset deposited in a domain-appropriate infrastructure? |
+| ABC-08 | Optional | Is the dataset hosted in a searchable infrastructure? |
+| ABC-09 | **Critical** | Does the dataset have a globally unique, persistent identifier? |
+| ABC-10 | Optional | If subject to updates, does it use a version control system? |
 
-### Metadata (ACM-11 – ACM-17)
+### Metadata (ABC-11 – ABC-17)
 
-| ID | Theme | Weight | Question (short) |
-|---|---|---|---|
-| ACM-11 | Bias | Important | Is consideration of bias documented in the metadata? |
-| ACM-12 | Metadata | **Critical** | Does the dataset use a machine-readable, domain-appropriate metadata standard? |
-| ACM-13 | Metadata | **Critical** | Does the metadata include the identifier of the dataset? |
-| ACM-14 | Metadata | Optional | Does the metadata specify intended access controls? |
-| ACM-15 | Metadata | Optional | Does the metadata document the modalities used? |
-| ACM-16 | Preprocessing | Important | Are transformation and preprocessing steps documented to be reproducible? |
-| ACM-17 | Provenance | **Critical** | Is the provenance of the dataset clearly documented? |
+| ID | Weight | Question (short) |
+|---|---|---|
+| ABC-11 | **Critical** | Does the dataset use a machine-readable, domain-appropriate metadata standard? |
+| ABC-12 | **Critical** | Does the metadata include the identifier of the dataset? |
+| ABC-13 | Optional | Does the metadata specify intended access controls? |
+| ABC-14 | Optional | Does the metadata document the modalities used? |
+| ABC-15 | Important | Are transformation and preprocessing steps documented to be reproducible? |
+| ABC-16 | **Critical** | Is the provenance of the dataset clearly documented? |
+| ABC-17 | Important | Is consideration of bias documented in the metadata? |
 
-### Content (ACM-18 – ACM-23)
+### Content (ABC-18 – ABC-23)
 
-| ID | Theme | Weight | Question (short) |
-|---|---|---|---|
-| ACM-18 | Quality | Important | Is the dataset free of duplicate records? |
-| ACM-19 | Quality | Important | Does the dataset include all expected records and content? |
-| ACM-20 | Format | **Critical** | Are units, data types and parameter names consistent between entries? |
-| ACM-21 | Standards | Important | Does the dataset follow domain standards for units, data types, parameter names? |
-| ACM-22 | Format | Optional | Does the data use an appropriate file format? |
-| ACM-23 | Format | Optional | Is the data available in at least one open, non-proprietary format? |
+| ID | Weight | Question (short) |
+|---|---|---|
+| ABC-18 | Important | Is the dataset free of duplicate records? |
+| ABC-19 | Important | Does the dataset include all expected records and content? |
+| ABC-20 | **Critical** | Are units, data types and parameter names consistent between entries? |
+| ABC-21 | Important | Does the dataset follow domain standards for units, data types, parameter names? |
+| ABC-22 | Optional | Does the data use an appropriate file format? |
+| ABC-23 | Optional | Is the data available in at least one open, non-proprietary format? |
 
-### Ethics (ACM-24 – ACM-28) †
+### Ethics (ABC-24 – ABC-27) †
 
-| ID | Theme | Weight | Question (short) |
-|---|---|---|---|
-| ACM-24 | Ethics | **Critical** | Does the dataset include an ethical assessment covering acquisition? |
-| ACM-25 | Privacy | **Critical** | Does the dataset preserve the privacy of human subjects? |
-| ACM-26 | Ethics | Important | Does the dataset include an ethical assessment covering data management? |
-| ACM-27 | Security | Important | Does the dataset have necessary authentication and access controls? |
-| ACM-28 | Metadata | Optional | Does the metadata document data protection declarations? |
+| ID | Weight | Question (short) |
+|---|---|---|
+| ABC-24 | **Critical** | Does the dataset include an ethical assessment covering acquisition? |
+| ABC-25 | **Critical** | Does the dataset preserve the privacy of human subjects? |
+| ABC-26 | Important | Does the dataset include an ethical assessment covering data management? |
+| ABC-27 | Optional | Does the metadata document data protection declarations? |
 
 † *Default answer "Yes" if dataset contains no human or animal subject data.*
 
 Full questions with complete guidance text are in
-[`metric/airbds_metric_v0.3.yaml`](metric/airbds_metric_v0.3.yaml) (YAML) and
-[`metric/airbds_metric_v0.3.csv`](metric/airbds_metric_v0.3.csv) (CSV).
+[`metric/airbds_metric_v0.4.yaml`](metric/airbds_metric_v0.4.yaml) (YAML) and
+[`metric/airbds_metric_v0.4.csv`](metric/airbds_metric_v0.4.csv) (CSV).
 
 ---
 
@@ -159,7 +158,7 @@ Full setup and known-issues documentation is in [`skills/README.md`](skills/READ
 
 This repository uses [Semantic Versioning](https://semver.org/):
 
-- **PATCH** — guidance clarifications only (e.g. v0.3.1)
+- **PATCH** — guidance clarifications only (e.g. v0.4.1)
 - **MINOR** — question additions, deletions, or rewordings (e.g. v0.4.0)
 - **MAJOR** — changes to weights or grade thresholds (e.g. v1.0.0)
 
@@ -167,11 +166,11 @@ Each metric version is a separate YAML file (`metric/airbds_metric_vX.Y.yaml`).
 Completed reviews reference the metric version they were scored with via the
 `schema_version` field. See [CHANGELOG.md](CHANGELOG.md) for full history.
 
-> **v0.4 is in development.** A v0.4 metric (`metric/airbds_metric_v0.4.*`) is being
-> drafted from the working group's Google Sheet, but it is **not yet validated** in
-> assessment or tooling — this documentation and the assessment tooling target
-> **v0.3**, the current recommended version. See the `[0.4]` entry in
-> [CHANGELOG.md](CHANGELOG.md).
+> **v0.4 is the current version.** The metric, the review templates, and the
+> sheet→YAML converter target v0.4. v0.3 is retained — the version-aware review
+> processor scores each review against the metric matching its `schema_version`
+> (auto-airbds and the assessment skills are still being migrated to v0.4). See
+> the `[0.4]` entry in [CHANGELOG.md](CHANGELOG.md).
 
 ---
 
@@ -227,8 +226,8 @@ Example test files demonstrating compliant and non-compliant inputs are in
 
 If you use this metric, please cite it as:
 
-> AIRBDS Working Group, AIBIO-UK. (2025). *AIRBDS AI-Readiness Dataset
-> Scoring Metric* (v0.3). GitHub.
+> AIRBDS Working Group, AIBIO-UK. (2026). *AIRBDS AI-Readiness Dataset
+> Scoring Metric* (v0.4). GitHub.
 > <https://github.com/AIBIO-UK/airbds-metric>
 
 Full citation metadata (including all working group members) is available in

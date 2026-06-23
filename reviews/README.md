@@ -7,7 +7,10 @@ This directory holds the blank review template, the completed reviews (under
 
 Completed review files are YAML and CSV. Each follows the schema defined in
 [`review_template.yaml`](review_template.yaml) (YAML) or
-[`review_template.csv`](review_template.csv) (CSV).
+[`review_template.csv`](review_template.csv) (CSV). These always track the
+**current** metric version (v0.4). Previous versions are retained under
+[`archived_templates/`](archived_templates/) — use one only if you specifically
+need to review against an older metric.
 
 **Naming convention:** `<dataset_accession>_<reviewer_initials>_<n>.<yaml|csv>`
 
