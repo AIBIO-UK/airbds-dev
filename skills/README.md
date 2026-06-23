@@ -7,30 +7,6 @@ Skill versions under development are in `development/`
 
 There are no production skills yet.
 
-## Version manifest (`versions.json`)
-
-`versions.json` is the source of truth for the **current** assessment skill on
-each channel. It is served over GitHub raw at
-<https://raw.githubusercontent.com/AIBIO-UK/airbds-metric/main/skills/versions.json>.
-Each entry under `channels` records the `metric_version` that channel's current
-skill assesses against, a `skill_version`, and a `skill_update_url`.
-
-At start-up an assessment skill makes a best-effort fetch of this manifest and
-compares the manifest's `metric_version` for **its own channel only** against
-the `metric_version` declared in its own frontmatter. If the manifest is
-strictly newer, the skill pauses and **asks the user** whether to proceed with
-the older bundled metric or stop and update to the newer skill first — it does
-not start the assessment until they choose. If the fetch fails it is silently
-skipped (a failed fetch never blocks an assessment). A skill never looks at
-other channels — so a `testing` skill is **not** nudged when `development` moves
-ahead.
-
-**Maintenance:** bump a channel's `metric_version` here whenever that channel's
-released skill starts targeting a new AIRBDS metric version (i.e. whenever you
-update the skill's bundled `templates/airbds_metric_v*.yaml` and its
-`metric_version` frontmatter). Keep this file in step with the per-channel skill
-frontmatter, otherwise the update check goes stale.
-
 For information on Gavin's skill under test please see `GF/README.md`
 
 We recommend you use the most capable model you have to perform the assessment.
@@ -81,3 +57,9 @@ Anthropic's full guide: <https://support.claude.com/en/articles/12512180-use-ski
 /plugin marketplace add AIBIO-UK/airbds-metric
 /plugin install airbds-assessment@airbds-metric
 ```
+
+---
+
+> **Maintaining the skills?** Release channels, the `versions.json` update
+> manifest, and how to propagate a metric version bump are documented in
+> [`docs/MAINTENANCE.md`](docs/MAINTENANCE.md).
