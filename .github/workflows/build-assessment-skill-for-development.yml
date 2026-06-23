@@ -28,6 +28,17 @@ jobs:
           # so the symlinked metric template is dereferenced into a real file.
           ( cd skills/development/airbds-assessment-skill && zip -r - . ) > airbds-assessment-skill-dev.zip
 
+      - name: Delete previous release and tag
+        # softprops/action-gh-release updates an existing release's assets but
+        # leaves the git tag and publish date on the old commit, so the release
+        # page looks stale even though the zip was rebuilt. Delete the previous
+        # release + tag first so the next step recreates them at this commit
+        # with a fresh date. The download URL (tag + filename) is unchanged.
+        # `|| true` covers the first run, when no release exists yet.
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release delete assessment-skill-development --cleanup-tag --yes || true
+
       - name: Update Development Release
         uses: softprops/action-gh-release@v2
         with:
