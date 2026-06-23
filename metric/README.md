@@ -125,6 +125,7 @@ Use this as a checklist when implementing any metric change.
 - The review processor and its workflows (`review-check.yml`, `review-test.yml`) need **no update** — the processor auto-selects `metric/airbds_metric_v<schema_version>.yaml` per review.
 - `skills/GF/GF-airbds-assessment-skill/SKILL.md` — update embedded templates, question table, file paths, skill version
 - `skills/testing/airbds-assessment-skill/SKILL.md` — update template filename **only if the XLSX is also regenerated**
+- `skills/versions.json` — per-channel update manifest the assessment skills read at runtime; bump a channel's `metric_version` only when that channel's skill is actually repointed to the new metric (leave channels intentionally kept on the old metric untouched). Validate with `scripts/validate-skills-versions.py`
 - `reviews/docs/tutorial-yaml.md` — update all `vX.Y` path references
 - `reviews/docs/tutorial-csv.md` — update all `vX.Y` path references
 

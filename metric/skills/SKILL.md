@@ -194,7 +194,10 @@ Use `grep -n "v0\.3\|0\.3\|0\.1\.0-GF" skills/GF/GF-airbds-assessment-skill/SKIL
 If a new metric version creates a new file (`metric/airbds_metric_vNEW.yaml`):
 - Repoint each skill's `templates/airbds_metric_v0.3.yaml` symlink to the new file.
 - Update the `templates/airbds_metric_v0.3.yaml` path references in each SKILL.md body to `vNEW`.
+- Update each skill's frontmatter `metric_version:` to `NEW` (where present) — this is the value the runtime update-check compares against the manifest.
 - Bump each skill's `version:` if its behaviour or bundled metric changed.
+
+**Also update `skills/versions.json` (the runtime update manifest).** This file advertises, per release channel, the metric version that channel's current skill targets; each assessment skill fetches it at start-up and prompts the user when its own channel has moved to a newer metric. When you repoint a channel's skill to `vNEW` above, bump that **same channel's** `metric_version` in `skills/versions.json` to `NEW` (and refresh `skill_version`/`skill_update_url` if they changed). Only change the channels you actually moved: if `testing` intentionally stays on the old metric while `development` advances to `vNEW`, edit only the `development` entry. A stale entry here will either suppress a needed update prompt or nag users who are already current. After editing, run `python3 scripts/validate-skills-versions.py` (also enforced by the `validate-skills-versions` workflow).
 
 #### O. Update `reviews/docs/tutorial-yaml.md`
 
@@ -260,6 +263,7 @@ After completing all applicable steps, produce a structured summary for the cont
 - CHANGELOG.md — new entry added for vNEW
 - CITATION.cff — version and date-released updated
 - skills/GF/GF-airbds-assessment-skill/SKILL.md — embedded templates, paths, skill version updated
+- skills/versions.json — bumped metric_version for each channel repointed to NEW (note which channels were left on the old metric)
 - reviews/docs/tutorial-yaml.md — path references updated
 - reviews/docs/tutorial-csv.md — path references updated
 - metric/README.md — version references updated
@@ -291,6 +295,7 @@ Open a pull request referencing the originating GitHub Issue (#N):
 | `CITATION.cff` | — | ✅ | ✅ |
 | `skills/GF/GF-airbds-assessment-skill/SKILL.md` | — | ✅ | ✅ |
 | `skills/testing/airbds-assessment-skill/SKILL.md` | — | if XLSX regenerated | if XLSX regenerated |
+| `skills/versions.json` (per-channel update manifest) | — | per channel repointed | per channel repointed |
 | `reviews/docs/tutorial-yaml.md` | — | ✅ | ✅ |
 | `reviews/docs/tutorial-csv.md` | — | ✅ | ✅ |
 | `metric/README.md` (this folder) | — | ✅ | ✅ |

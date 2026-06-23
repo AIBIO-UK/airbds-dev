@@ -1,0 +1,39 @@
+name: Validate Skills Versions Manifest
+
+# Validates skills/versions.json — the per-channel skill update manifest the
+# assessment skills read at runtime. Confirms it is well-formed JSON with the
+# required per-channel fields, and that every advertised metric_version has a
+# matching metric/airbds_metric_v<version>.yaml file.
+# Runs when the manifest, the metric YAMLs, or the validator script change.
+
+on:
+  push:
+    paths:
+      - 'skills/versions.json'
+      - 'metric/airbds_metric_v*.yaml'
+      - 'scripts/validate-skills-versions.py'
+      - '.github/workflows/validate-skills-versions.yml'
+  pull_request:
+    paths:
+      - 'skills/versions.json'
+      - 'metric/airbds_metric_v*.yaml'
+      - 'scripts/validate-skills-versions.py'
+      - '.github/workflows/validate-skills-versions.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Validate skills/versions.json
+        run: python3 scripts/validate-skills-versions.py

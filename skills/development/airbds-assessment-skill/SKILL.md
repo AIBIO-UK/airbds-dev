@@ -2,6 +2,8 @@
 name: airbds-assessment-skill
 description: Use this skill whenever a user wants to assess, score, or evaluate a life science dataset against the AIRBDS (AI-Ready Biological Data Sets) criteria. Triggers include any mention of "AIRBDS", "AI-ready dataset", "dataset scoring", or requests to grade a biological/biomedical dataset's AI-readiness. Activate when the user provides a dataset URL and asks for an assessment, audit, or readiness check. Do NOT use for general data quality reviews unrelated to AIRBDS or for non-life-science datasets.
 version: 0.2.0-dev
+metric_version: "0.3"
+channel: development
 metadata:
   hermes:
     tags: [science]
@@ -22,7 +24,18 @@ Your only goal is to evaluate datasets based on the AIRBDS (AI-Ready Biological 
 
 - When the session starts, introduce yourself and state your assignment clearly.
 - Specify that you are using the AIRBDS metric (v0.3) as your evaluation framework.
-- Ask the user to provide the URL of the dataset they wish to have assessed.
+- **Check for a newer skill (best-effort fetch).** Before asking for the dataset, try once to fetch the version manifest at `https://raw.githubusercontent.com/AIBIO-UK/airbds-metric/main/skills/versions.json`.
+  - If you cannot reach it for any reason (no network access, fetching not supported in this environment, an error, or a timeout), silently skip this check and carry on to ask for the dataset. Do not mention the failure, do not retry, and never let a *failed fetch* block the assessment.
+  - If you can read it, look up **only this skill's own channel** — the `channel` field in this skill's frontmatter (`development`) — at `channels.development` in the manifest. Ignore every other channel: a newer version on a different channel must NOT trigger a notice.
+  - Compare the manifest's `channels.development.metric_version` to this skill's own `metric_version` frontmatter value (`0.3`) using semantic-version ordering.
+  - **If the manifest's version is the same or older**, say nothing about updates and continue to ask for the dataset.
+  - **If the manifest's version is strictly newer**, do **not** start the assessment yet. Surface it and make the user decide:
+    - Tell them, in one or two lines, that a newer AIRBDS assessment skill is available on the `development` channel which assesses against metric v<manifest `metric_version`>, whereas this skill assesses against the older v0.3; and that assessing against the newer metric requires updating the skill first (give the manifest's `skill_update_url`).
+    - Then **ask them explicitly whether they want to proceed with the older v0.3 metric, and wait for their reply** — for example: "Would you like to proceed now with the older v0.3 metric, or stop here so you can update to the v<newer> skill first?"
+    - Only continue (ask for the dataset URL and run the assessment) if they choose to proceed with v0.3.
+    - If they choose to update, **stop** — do not ask for a dataset or run any assessment in this session. Briefly restate the `skill_update_url` and invite them to re-run once they have updated.
+    - Use the manifest's actual `metric_version` and `skill_update_url` values in everything you say; do not invent version numbers.
+- Ask the user to provide the URL of the dataset they wish to have assessed (only once the update check above has either passed or the user has chosen to proceed with v0.3).
 
 2. **Assessment Process**
 
@@ -81,3 +94,13 @@ The review-template shape is at `templates/review_template_v0.3.yaml`, also
 bundled with this skill. It is the blank assessment template used for the
 optional saved YAML file (see step 4): a top-level `schema_version`, a
 `reviewer` block, a `dataset` block, and an `answers` map keyed by question id.
+
+The version manifest is **not bundled** — it is fetched remotely at
+`https://raw.githubusercontent.com/AIBIO-UK/airbds-metric/main/skills/versions.json`
+and used only for the best-effort newer-skill check in step 1. It maps each
+release `channel` to the `metric_version` its current skill targets, a
+`skill_version`, and a `skill_update_url`. This skill reads only its own
+channel (`development`). A *failed fetch* never blocks the assessment; but when
+a strictly newer metric version is detected, the skill pauses and asks the user
+whether to proceed with the older bundled metric or stop and update first (see
+step 1).
