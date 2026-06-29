@@ -19,14 +19,19 @@ Other instructions to follow. Pull requests containing instructions or code for 
 
 When a skill is installed the assistant will automtically pick it up when relevant. So to perform an assessment you can prompt something like "Please perform an AIRBDS assessment on <dataset-url>", e.g. "Please perform an AIRBDS assessment on https://www.gbif.org/dataset/50c9509d-22c7-4a22-a47d-8c48425ef4a7"
 
-## Gemini
+## Gemini (deprecated until AIRBDS assessment v1.0)
 
-For Gemini, the skill has to be run as a 'Gem'. This either has to be done:
-
-- By going to [this shared Google Gem URL](https://gemini.google.com/gem/14YUoz1uJqOSO0YA0jty4vrux3FoU_dBU?usp=sharing) or
-- Manually from this repository, using the contents of the SKILL.md and uploading the template file
-
-You will need to have already registered for Google Gemini for the link to work. We strongly recommend that you use the latest Pro model to run the assessment.
+> ⚠️ **Gemini support is paused for now.**
+>
+> Gemini can only run the skill as a 'Gem', which cannot be built directly from
+> this repository — a Gem has to be created and shared manually. That makes it
+> painful to keep in sync with the skill and impossible to test automatically
+> (see [`testing/ISSUES.md`](testing/ISSUES.md)), so we've paused it rather than
+> ship a Gem that quietly drifts out of date.
+>
+> We plan to bring Gemini support back once the AIRBDS assessment reaches v1.0
+> and the skill workflow has stabilised. In the meantime, please use Claude
+> (Web, Desktop, or Code) below.
 
 ## Claude Web (claude.ai) and Claude Desktop
 

@@ -1,3 +1,3 @@
 # ISSUES
 
-- A google gem cannot be created directly from a Github repository. At the moment I (justincc) am having to manually update and share a gem as linked in the README. This is a major issue since it means that gems cannot be automatically built and used for testing.
+- **[Deferred until AIRBDS assessment v1.0]** A google gem cannot be created directly from a Github repository. This forced manual updating and sharing of a gem, which couldn't be automatically built or used for testing. Rather than maintain a hand-updated gem, **Gemini/Gem support has been deprecated for now** (see `skills/README.md`) and will be revisited at v1.0.

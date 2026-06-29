@@ -27,6 +27,13 @@ This project adheres to
 - Refreshed per-question `mapped_from` provenance codes to match the reworded
   questions.
 
+### Deprecated
+- Gemini ('Gem') support for the assessment skill is paused until the AIRBDS
+  assessment reaches v1.0. A Gem can't be built from this repository — it has to
+  be created and shared manually, so it can't be kept in sync or tested
+  automatically. Use Claude (Web, Desktop, or Code) in the meantime. See
+  `skills/README.md`.
+
 ### Removed
 - `metric/scoring_schema_v0.3.{yaml,csv}` — redundant with the metric YAML
   (`grade_points` / `grading`). The tier rationale, grade meanings, and badge
