@@ -27,6 +27,10 @@ This project adheres to
 - Refreshed per-question `mapped_from` provenance codes to match the reworded
   questions.
 
+- Assessment skill 0.3.1 (both `development` and `testing` channels): in the
+  optional saved-YAML step, dropped the not-yet-ready manual submission option
+  and marked the public results site (auto-airbds) as a test site under
+  construction whose submissions are purely for test purposes.
 - Promoted the `development` assessment skill to the `testing` channel: the
   `testing` skill now assesses against AIRBDS metric v0.4 (was v0.3) at skill
   version 0.3.0 (was 0.2.1), bundling the metric and review template under

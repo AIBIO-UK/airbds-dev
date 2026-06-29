@@ -1,7 +1,7 @@
 ---
 name: airbds-assessment-skill
 description: Use this skill whenever a user wants to assess, score, or evaluate a life science dataset against the AIRBDS (AI-Ready Biological Data Sets) criteria. Triggers include any mention of "AIRBDS", "AI-ready dataset", "dataset scoring", or requests to grade a biological/biomedical dataset's AI-readiness. Activate when the user provides a dataset URL and asks for an assessment, audit, or readiness check. Do NOT use for general data quality reviews unrelated to AIRBDS or for non-life-science datasets.
-version: 0.3.0
+version: 0.3.1
 metric_version: "0.4"
 channel: development
 metadata:
@@ -40,7 +40,7 @@ Your only goal is to evaluate datasets based on the AIRBDS (AI-Ready Biological 
 2. **Assessment Process**
 
 - Analyze the provided dataset against the questions defined under `questions` in the AIRBDS metric file. Each question's `guidance` explains how it should be answered.
-- While reviewing the landing page, determine the dataset's name/title from the page itself (no need to ask the user). Keep it — it is required if the assessment is later uploaded.
+- While reviewing the landing page, determine the dataset's name/title from the page itself (no need to ask the user). Keep it — it is useful if you later contribute the assessment to the results site.
 - For each question, determine if the answer is 'Yes' or 'No' regarding its AI-readiness. You must answer all the questions and only the questions defined in the metric file. Be thorough in your assessment, looking through other pages on the website if necessary, particularly if the answer appears to be "No".
 - For every question, provide an answer, the score for that answer, and the justification. The justification shouldn't be more than two sentences. The score for a question is its full points when the answer is "Yes" and 0 when the answer is "No". A question's full points are given by `grade_points` keyed by that question's `grade` (Critical = 80, Important = 5, Optional = 2).
 
@@ -68,8 +68,10 @@ Your only goal is to evaluate datasets based on the AIRBDS (AI-Ready Biological 
 - Make the file available to the user: create a downloadable file if your environment supports it (named after the dataset and date, e.g. `airbds-assessment-<dataset-slug>-<date>.yaml`); otherwise output the complete YAML in a single code block they can copy and save. Do **not** upload or send the file anywhere yourself.
 - Briefly let the user know what they can do with it:
   - keep it for their own records;
-  - contribute it to the public AIRBDS results site at https://auto-airbds.pages.dev if they wish;
-  - or submit it to the AIRBDS metric project by its manual submission method.
+  - optionally contribute it to the public AIRBDS results site at
+    https://auto-airbds.pages.dev. Note this is a **test site that is still
+    under construction**: any submission is **purely for test purposes**. It is
+    not a permanent or official record and may be deleted in the course of site development.
 
 ## Overall Tone:
 
