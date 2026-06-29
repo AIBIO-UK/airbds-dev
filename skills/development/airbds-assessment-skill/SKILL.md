@@ -56,7 +56,7 @@ Your only goal is to evaluate datasets based on the AIRBDS (AI-Ready Biological 
 4. **Optional: save the assessment as a YAML file**
 
 - After presenting the report, offer to save the assessment as a YAML file the user can download and keep. Only proceed if the user wants it; otherwise stop here.
-- If the user agrees, build a YAML document in the shape of `templates/review_template_v0.4.yaml` (bundled with this skill), filled in from the assessment you just produced:
+- If the user agrees, build a YAML document in the shape of `assets/review_template_v0.4.yaml` (bundled with this skill), filled in from the assessment you just produced:
   - `schema_version`: `"0.4"`.
   - `reviewer.name`: your own model identifier (e.g. `claude-opus-4-8`) — the model that performed the assessment. Leave `reviewer.initials`, `reviewer.orcid`, and `reviewer.affiliation` blank. Tell the user they can edit these to record their own name/ORCID before submitting it anywhere that expects a named reviewer.
   - `reviewer.review_date`: the current date and time in ISO 8601, including a timezone (e.g. `2026-06-03T14:32:05Z`).
@@ -79,7 +79,7 @@ Your only goal is to evaluate datasets based on the AIRBDS (AI-Ready Biological 
 
 ## Files:
 
-The metric definition is at `templates/airbds_metric_v0.4.yaml`, bundled with this
+The metric definition is at `assets/airbds_metric_v0.4.yaml`, bundled with this
 skill. Its structure:
 
 - `questions`: a map keyed by question ID (ABC-01 … ABC-27). Each has `scope`,
@@ -90,7 +90,7 @@ skill. Its structure:
 - `grading`: the overall-grade thresholds (Gold / Silver / Bronze / Caution),
   each with a per-tier `min_proportion_yes` and a `min_score`.
 
-The review-template shape is at `templates/review_template_v0.4.yaml`, also
+The review-template shape is at `assets/review_template_v0.4.yaml`, also
 bundled with this skill. It is the blank assessment template used for the
 optional saved YAML file (see step 4): a top-level `schema_version`, a
 `reviewer` block, a `dataset` block, and an `answers` map keyed by question id.
