@@ -189,11 +189,11 @@ Use `grep -n "v0\.3\|0\.3\|0\.1\.0-GF" skills/GF/GF-airbds-assessment-skill/SKIL
 
 #### N. Update the testing and development assessment skills
 
-`skills/testing/airbds-assessment-skill/` and `skills/development/airbds-assessment-skill/` bundle the canonical metric as `templates/airbds_metric_v0.3.yaml` — a symlink to `metric/airbds_metric_v0.3.yaml`. For an in-place PATCH the symlink already tracks the canonical file, so nothing changes.
+`skills/testing/airbds-assessment-skill/` and `skills/development/airbds-assessment-skill/` bundle the canonical metric as `assets/airbds_metric_v0.4.yaml` — a symlink to `metric/airbds_metric_v0.4.yaml`. For an in-place PATCH the symlink already tracks the canonical file, so nothing changes.
 
 If a new metric version creates a new file (`metric/airbds_metric_vNEW.yaml`):
-- Repoint each skill's `templates/airbds_metric_v0.3.yaml` symlink to the new file.
-- Update the `templates/airbds_metric_v0.3.yaml` path references in each SKILL.md body to `vNEW`.
+- Repoint each skill's `assets/airbds_metric_v0.4.yaml` symlink to the new file.
+- Update the `assets/airbds_metric_v0.4.yaml` path references in each SKILL.md body to `vNEW`.
 - Update each skill's frontmatter `metric_version:` to `NEW` (where present) — this is the value the runtime update-check compares against the manifest.
 - Bump each skill's `version:` if its behaviour or bundled metric changed.
 

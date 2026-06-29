@@ -8,7 +8,7 @@ on:
       - skills-testing
     paths:
       - 'skills/testing/airbds-assessment-skill/SKILL.md'
-      - 'skills/testing/airbds-assessment-skill/templates/*'
+      - 'skills/testing/airbds-assessment-skill/assets/*'
   workflow_dispatch:
 
 jobs:
@@ -24,7 +24,7 @@ jobs:
       - name: Create ZIP file
         run: |
           # Zip from inside the skill directory so its structure (including
-          # templates/) is preserved with the skill dir as the zip root. No -y,
+          # assets/) is preserved with the skill dir as the zip root. No -y,
           # so the symlinked metric template is dereferenced into a real file.
           ( cd skills/testing/airbds-assessment-skill && zip -r - . ) > airbds-assessment-skill.zip
 
