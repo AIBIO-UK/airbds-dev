@@ -57,6 +57,34 @@ updating `versions.json` alongside every other coupled file; `versions.json`
 is also listed in the Coupled File Groups manifest in
 [`metric/README.md`](../../metric/README.md).
 
+## Release builds (GitHub Actions)
+
+Each channel's downloadable skill zip is built and published by a GitHub Actions
+workflow:
+
+- `testing` → [`.github/workflows/build-assessment-skill-for-test.yml`](../../.github/workflows/build-assessment-skill-for-test.yml)
+  (release tag `assessment-skill-testing`, asset `airbds-assessment-skill.zip`).
+- `development` → [`.github/workflows/build-assessment-skill-for-development.yml`](../../.github/workflows/build-assessment-skill-for-development.yml)
+  (release tag `assessment-skill-development`, asset `airbds-assessment-skill-dev.zip`).
+
+Each pushes on `main`, zips its channel's skill directory (dereferencing the
+symlinked metric/template into real files), and recreates its release so the
+`skill_update_url` in `versions.json` always serves the latest build.
+
+**These workflows are coupled to the skill directory structure — keep them in
+step when it changes.** In particular, if you rename or restructure a skill's
+bundle directory (e.g. the `templates/` → `assets/` move), update, for the
+affected channel's workflow:
+
+- the `on.push.paths` filter (so the right files actually trigger a rebuild — a
+  stale path silently stops builds firing), and
+- the `zip` step and its comment (so the new structure is what gets packaged).
+
+A workflow file only takes effect once it's merged to the default branch, since
+Actions runs the version of the workflow on `main`. Both build workflows also
+support `workflow_dispatch`, so you can trigger a rebuild manually from the
+Actions tab without a code change.
+
 ## Validation
 
 `versions.json` is checked in CI by the `validate-skills-versions` workflow,
