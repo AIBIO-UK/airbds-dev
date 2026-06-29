@@ -27,6 +27,12 @@ This project adheres to
 - Refreshed per-question `mapped_from` provenance codes to match the reworded
   questions.
 
+- Promoted the `development` assessment skill to the `testing` channel: the
+  `testing` skill now assesses against AIRBDS metric v0.4 (was v0.3) at skill
+  version 0.3.0 (was 0.2.1), bundling the metric and review template under
+  `assets/` (was `templates/`). `skills/versions.json` `channels.testing` is
+  bumped to match.
+
 ### Deprecated
 - Gemini ('Gem') support for the assessment skill is paused until the AIRBDS
   assessment reaches v1.0. A Gem can't be built from this repository — it has to
