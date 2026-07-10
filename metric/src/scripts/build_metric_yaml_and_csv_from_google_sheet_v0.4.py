@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
-"""Build the canonical v0.4 metric YAML and CSV from the AIRBDS Google Sheet.
+"""Build the canonical v0.4 metric YAML from the AIRBDS Google Sheet.
 
 v0.4 is authored in a public Google Sheet (the working group's live doc) rather
 than the v0.3 source .xlsx. This script pulls the Scoring and Lookups tabs via
-the public CSV export and regenerates both metric files from them, so the pair
-can never drift apart. The v0.3 build (from the .xlsx) stays in place unchanged.
+the public CSV export (the sheet's own export format, not this script's output
+format) and regenerates the metric YAML from them. Metric output is YAML-only —
+CSV metric output was dropped; the source sheet tabs are still fetched as CSV.
 
 Usage:
-    # Regenerate metric/airbds_metric_v0.4.{yaml,csv} from the live sheet
+    # Regenerate metric/airbds_metric_v0.4.yaml from the live sheet
     python3 metric/src/scripts/build_metric_yaml_and_csv_from_google_sheet_v0.4.py
 
-    # Verify the committed files still match the live sheet (the drift check)
+    # Verify the committed file still matches the live sheet (the drift check)
     python3 metric/src/scripts/build_metric_yaml_and_csv_from_google_sheet_v0.4.py --check
 
     # Work offline from exported CSVs instead of fetching
@@ -29,9 +30,7 @@ Exit codes:
 """
 
 import argparse
-import csv
 import hashlib
-import io
 import json
 import re
 import sys
@@ -57,13 +56,6 @@ VERSION = "0.4"
 
 DEFAULT_SHEET = "https://docs.google.com/spreadsheets/d/1eriM8bXAoNXsIR9l8OpI1XYEp8FbtBWt05CTIP9cVeg/edit"
 DEFAULT_OUTPUT = REPO_ROOT / "metric" / "airbds_metric_v0.4.yaml"
-DEFAULT_OUTPUT_CSV = REPO_ROOT / "metric" / "airbds_metric_v0.4.csv"
-
-# v0.4 drops theme and mapped_from (absent from the sheet).
-CSV_COLUMNS = [
-    "question_id", "scope", "weight", "weight_points",
-    "question", "guidance", "not_applicable_default",
-]
 
 METADATA = {
     "schema_version": VERSION,
@@ -365,23 +357,6 @@ def render_yaml(questions, grade_points, grading, sheet_url, content_sha256) -> 
     return "\n".join(out) + "\n"
 
 
-def render_csv(questions, grade_points) -> str:
-    buf = io.StringIO()
-    writer = csv.writer(buf, lineterminator="\r\n", quoting=csv.QUOTE_MINIMAL)
-    writer.writerow(CSV_COLUMNS)
-    for q in questions:
-        writer.writerow([
-            q["id"],
-            q["scope"],
-            q["grade"],
-            grade_points[q["grade"]],
-            q["question"],
-            q["guidance"],
-            "Yes" if q["scope"] in NA_DEFAULT_SCOPES else "",
-        ])
-    return buf.getvalue()
-
-
 # ── Validation ───────────────────────────────────────────────────────────────
 
 def validate(questions, grade_points, grading) -> None:
@@ -447,14 +422,13 @@ def write_manifest(path: Path, src: dict, content_sha256: str, generated_at: str
 
 
 def main() -> None:
-    ap = argparse.ArgumentParser(description="Build the v0.4 metric YAML/CSV from the Google Sheet.")
+    ap = argparse.ArgumentParser(description="Build the v0.4 metric YAML from the Google Sheet.")
     ap.add_argument("--sheet", default=DEFAULT_SHEET, help="sheet URL or id (default: the canonical sheet)")
     ap.add_argument("--scoring-csv", type=Path, help="local Scoring tab CSV (offline; with --lookups-csv)")
     ap.add_argument("--lookups-csv", type=Path, help="local Lookups tab CSV (offline; with --scoring-csv)")
     ap.add_argument("--output", type=Path, default=DEFAULT_OUTPUT, help="path to write the metric YAML")
-    ap.add_argument("--output-csv", type=Path, default=DEFAULT_OUTPUT_CSV, help="path to write the metric CSV")
     ap.add_argument("--check", action="store_true",
-                    help="do not write; exit 1 if either output differs from what the sheet produces")
+                    help="do not write; exit 1 if the output differs from what the sheet produces")
     args = ap.parse_args()
 
     scoring_ws, lookups_ws, src = load_worksheets(args)
@@ -466,23 +440,17 @@ def main() -> None:
     content_sha256 = source_sha256(src["scoring_csv"], src["lookups_csv"])
     generated_yaml = render_yaml(questions, grade_points, grading,
                                  src["sheet_url"], content_sha256)
-    generated_csv = render_csv(questions, grade_points)
     yaml.safe_load(generated_yaml)  # confirm the YAML is valid before trusting it
-
-    targets = [(args.output, generated_yaml.encode("utf-8")),
-               (args.output_csv, generated_csv.encode("utf-8"))]
 
     if args.check:
         # The source hash is embedded in the YAML breadcrumb, so a byte mismatch
         # also catches any change to the upstream source content.
-        drifted = [path for path, content in targets
-                   if (path.read_bytes() if path.exists() else b"") != content]
-        if not drifted:
-            print(f"OK: {args.output.name} and {args.output_csv.name} are in sync "
+        current = args.output.read_bytes() if args.output.exists() else b""
+        if current == generated_yaml.encode("utf-8"):
+            print(f"OK: {args.output.name} is in sync "
                   f"with {src['label']} (sha256 {content_sha256[:12]}, {len(questions)} questions)")
             sys.exit(0)
-        for path in drifted:
-            print(f"DRIFT: {path} differs from {src['label']}.", file=sys.stderr)
+        print(f"DRIFT: {args.output} differs from {src['label']}.", file=sys.stderr)
         print(f"Regenerate with: python3 {SCRIPT_PATH}", file=sys.stderr)
         sys.exit(1)
 
@@ -490,10 +458,8 @@ def main() -> None:
     generated_at = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     write_manifest(manifest_path, src, content_sha256, generated_at)
 
-    for path, content in targets:
-        path.write_bytes(content)
+    args.output.write_bytes(generated_yaml.encode("utf-8"))
     print(f"Wrote: {args.output}\n"
-          f"Wrote: {args.output_csv}\n"
           f"Wrote: {manifest_path}\n"
           f"{len(questions)} questions, "
           f"{sum(q['scope'] in NA_DEFAULT_SCOPES for q in questions)} ethics\n"

@@ -1,5 +1,9 @@
 # Review Examples
 
+> **⚠️ Archived** along with the rest of the review-submission subsystem — see
+> [`archive/deactivated/reviews/`](../). Paths below are relative to this
+> archived location, not the (paused) live `reviews/` folder.
+
 This directory contains example review files for testing and reference.
 
 | File | Format | Compliant? | Purpose |
@@ -16,16 +20,17 @@ This directory contains example review files for testing and reference.
 pip install pyyaml
 
 # Test a compliant YAML (should rename file and generate CSV companion)
-echo "reviews/examples/E-MTAB-0001_TS_1.yaml" > /tmp/test.txt
-python3 reviews/src/scripts/review_processor.py --files /tmp/test.txt
+echo "archive/deactivated/reviews/examples/E-MTAB-0001_TS_1.yaml" > /tmp/test.txt
+python3 archive/deactivated/reviews/src/scripts/review_processor.py --files /tmp/test.txt
 echo "Exit code: $?"
 
 # Test non-compliant content (should exit 1 with errors)
-echo "reviews/examples/E-MTAB-0003_TS_1.yaml" > /tmp/test.txt
-python3 reviews/src/scripts/review_processor.py --files /tmp/test.txt
+echo "archive/deactivated/reviews/examples/E-MTAB-0003_TS_1.yaml" > /tmp/test.txt
+python3 archive/deactivated/reviews/src/scripts/review_processor.py --files /tmp/test.txt
 echo "Exit code: $?"
 ```
 
-> **Note:** Files in this directory are excluded from the automated CI workflow.
-> See the [workflow](.github/workflows/review-check.yml) for details.
-> To trigger a full end-to-end test, see the [test workflow](.github/workflows/review-test.yml).
+> **Note:** Files in this directory were excluded from the automated CI workflow
+> when it was live. See the archived [workflow](../../workflows/review-check.yml)
+> for details. To trigger a full end-to-end test, see the archived
+> [test workflow](../../workflows/review-test.yml).

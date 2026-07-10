@@ -37,30 +37,23 @@ Requests (PRs) which are reviewed and merged by the working group maintainers.
 The primary contribution type is a completed dataset review scored using the
 AIRBDS metric.
 
-1. **Copy the template:** Start from
-   [`reviews/review_template.yaml`](reviews/review_template.yaml) (YAML) or
-   [`reviews/review_template.csv`](reviews/review_template.csv) (CSV spreadsheet).
+1. **Base your review on the metric:** the 27 questions are in the Google Sheet
+   or [`metric/airbds_metric_v0.4.yaml`](metric/airbds_metric_v0.4.yaml) — see
+   [Use the Metric](README.md#use-the-metric). The
+   [interactive tutorial site](https://aibio-uk.github.io/airbds-metric-tutorial/)
+   walks through the exact YAML format.
 2. **Name your file:** Use the convention
-   `reviews/testing/<dataset_accession>_<reviewer_initials>_<n>.yaml`  
-   e.g. `reviews/testing/E-MTAB-1234_CH_1.yaml`  
+   `reviews/<dataset_accession>_<reviewer_initials>_<n>.yaml`  
+   e.g. `reviews/E-MTAB-1234_CH_1.yaml`  
    Initials must be **uppercase letters only** (A-Z, 2–6 characters).
 3. **Fill in all fields:** Answer all 27 questions (`"Yes"` or `"No"`, case-sensitive, quoted). For Ethics
    questions (ABC-24 to ABC-27), if the dataset contains no human or animal
    subject data record the answer as `"Yes"` and set `not_applicable: true`
    with a brief comment.
-4. **Leave the `result:` block empty** — the automated workflow calculates your
-   weighted score and grade when you open a pull request. You do not need to
-   fill in `weighted_score` or `grade` manually.
+4. **Calculate and fill in the `result:` block** — there is no automated scorer
+   right now, so work out `weighted_score` and `grade` yourself. See
+   [`reviews/GUIDANCE.md`](reviews/GUIDANCE.md) for how the calculation works.
 5. **Submit a PR** — see [Pull Requests](#pull-requests).
-
-Once your PR is open, the [Review Check workflow](.github/workflows/review-check.yml) will:
-- Validate your filename and all required fields
-- Calculate your score and grade
-- Generate the companion format (YAML ↔ CSV)
-- Rename the file to include the score and grade (e.g. `E-MTAB-1234_CH_1_595_Silver.yaml`)
-- Commit the changes back to your branch
-
-If validation fails, the **Actions** tab of your PR shows a full error report.
 
 Inter-rater reliability is important. Where possible, datasets should be
 reviewed independently by at least two members before the review is merged.
@@ -114,7 +107,7 @@ If you find an error, broken link, or inconsistency anywhere in the repository:
    ```
 4. **Commit your changes** using the [convention below](#commit-message-convention):
    ```bash
-   git add reviews/testing/E-MTAB-1234_CH_1.yaml
+   git add reviews/E-MTAB-1234_CH_1.yaml
    git commit -m "review: add review for E-MTAB-1234 (CH)"
    ```
 5. **Push to your fork:**
@@ -130,7 +123,7 @@ If you find an error, broken link, or inconsistency anywhere in the repository:
 
 ## What to Contribute
 
-- ✅ Completed dataset reviews (`reviews/testing/*.yaml`)
+- ✅ Completed dataset reviews (`reviews/*.yaml`, see [Submitting Dataset Reviews](#submitting-dataset-reviews) above)
 - ✅ Corrections to existing reviews (factual errors, updated dataset versions)
 - ✅ Proposed question additions, removals, or rewordings — via Issue first
 - ✅ Guidance clarifications (PATCH-level) — directly as a PR
@@ -155,24 +148,19 @@ If you find an error, broken link, or inconsistency anywhere in the repository:
 ```
 airbds-metric/
 ├── metric/
-│   └── airbds_metric_v0.4.yaml   # Canonical metric (questions, weights, grading rules)
-├── reviews/                      # Reviews + review tooling
-│   ├── review_template.yaml      # Blank template for new reviews
-│   └── testing/                  # Completed dataset reviews (one file per review)
-│       └── <accession>_<initials>_<n>.yaml
+│   ├── airbds_metric_v0.4.yaml   # Canonical metric (questions, weights, grading rules)
+│   └── CHANGELOG.md
+├── reviews/                      # Deposit reviews here
 ├── CITATION.cff
 ├── CODE_OF_CONDUCT.md
 ├── CONTRIBUTING.md
 ├── LICENSE.md
-├── CHANGELOG.md
 └── README.md
 ```
 
-All metric and review files are YAML. Key rules:
+The metric and reviews are both YAML. Key rules:
 - Use `"Yes"` or `"No"` (quoted strings) for all answer fields.
-- Do not leave required fields blank in submitted reviews (use `""` only in
-  the template).
-- Follow the exact field names defined in `review_template.yaml`.
+- Do not leave required fields blank in submitted reviews.
 - Ensure all YAML is valid before submitting (see `python3 -c "import yaml; ..."` above).
 
 ---
@@ -192,7 +180,7 @@ The canonical metric file is versioned in its filename
 (e.g. `airbds_metric_v0.4.yaml`). When a new version is released:
 1. The new YAML file is added (e.g. `airbds_metric_v1.0.yaml`)
 2. The old file is kept for archival purposes
-3. `CHANGELOG.md` is updated
+3. `metric/CHANGELOG.md` is updated
 4. A GitHub Release is tagged (e.g. `v1.0.0`)
 5. `CITATION.cff` is updated with the new version
 
