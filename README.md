@@ -74,7 +74,7 @@ airbds-metric/
 
 **[→ Interactive tutorial site](https://aibio-uk.github.io/airbds-metric-tutorial/)** — step-by-step guide to scoring a dataset against the metric.
 
-Guidance comes from one of two places: the **Google Sheet** or the **YAML metric** (see [Use the Metric](#use-the-metric) above). There is no automated scorer right now — scores are calculated manually; automated YAML-based scoring is planned infrastructure, not yet built.
+For the full rationale behind the weighting and grades, see "Part 1 — The Metric & Scoring" in [`metric/README.md`](metric/README.md).
 
 ---
 
