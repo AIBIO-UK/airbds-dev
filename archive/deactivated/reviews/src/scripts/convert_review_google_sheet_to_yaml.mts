@@ -30,7 +30,7 @@ import {
 // single source of truth, never copied into the converter.
 const metricPathFor = (version: string): string =>
   fileURLToPath(
-    new URL(`../../../metric/airbds_metric_v${version}.yaml`, import.meta.url),
+    new URL(`../../../../../metric/airbds_metric_v${version}.yaml`, import.meta.url),
   );
 
 interface Args {

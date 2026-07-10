@@ -2,11 +2,11 @@ name: Metric Upstream Drift Check
 
 # Polls the public AIRBDS Google Sheet (the v0.4 source of truth) on a schedule
 # and opens/updates a single GitHub issue when it has drifted from the committed
-# metric/airbds_metric_v0.4.{yaml,csv}. It re-runs the generator's --check against
+# metric/airbds_metric_v0.4.yaml. It re-runs the generator's --check against
 # the live sheet — read-only; it never writes the repo. The run stays green; the
 # issue is the signal. Manually runnable via "Run workflow".
 #
-# NOTE: only meaningful once metric/airbds_metric_v0.4.{yaml,csv} are committed —
+# NOTE: only meaningful once metric/airbds_metric_v0.4.yaml is committed —
 # until then there is no baseline and every run reports drift.
 on:
   schedule:
@@ -33,7 +33,7 @@ jobs:
         id: drift
         run: |
           set +e
-          OUT=$(python3 metric/src/scripts/build_metric_yaml_and_csv_from_google_sheet_v0.4.py --check 2>&1)
+          OUT=$(python3 admin/scripts/build_metric_yaml_and_csv_from_google_sheet_v0.4.py --check 2>&1)
           CODE=$?
           echo "$OUT"
           echo "exit_code=$CODE" >> "$GITHUB_OUTPUT"
@@ -55,13 +55,13 @@ jobs:
             const title = 'Upstream metric sheet has drifted from the committed metric';
             const body = [
               'The scheduled drift check found that the canonical Google Sheet no longer',
-              'matches the committed `metric/airbds_metric_v0.4.{yaml,csv}`.',
+              'matches the committed `metric/airbds_metric_v0.4.yaml`.',
               '',
               'When you are ready to take the change, regenerate and review the diff:',
               '',
               '```bash',
-              'python3 metric/src/scripts/build_metric_yaml_and_csv_from_google_sheet_v0.4.py',
-              'git diff metric/airbds_metric_v0.4.yaml metric/airbds_metric_v0.4.csv',
+              'python3 admin/scripts/build_metric_yaml_and_csv_from_google_sheet_v0.4.py',
+              'git diff metric/airbds_metric_v0.4.yaml',
               '```',
               '',
               '<details><summary>check output</summary>',

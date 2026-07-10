@@ -2,6 +2,12 @@
 
 **Format: YAML · Intermediate · Requires a text editor and basic command-line familiarity**
 
+> **⚠️ Archived.** This file moved from `reviews/docs/` to `archive/deactivated/reviews/docs/`
+> along with the rest of the review-submission subsystem — not deleted, just no longer
+> live at the repo's `reviews/` folder (which is now a simple drop folder; see
+> [`reviews/README.md`](../../../../reviews/README.md)). Automated scoring on PR
+> (Step 9 below) is currently paused — see [CONTRIBUTING.md](../../../../CONTRIBUTING.md).
+
 > **Full interactive version:** [airbds-metric-tutorial](https://aibio-uk.github.io/airbds-metric-tutorial/chapters/chapter_03_yaml/) — rendered lesson site with navigation, tips, and format chooser.
 
 This tutorial walks you through scoring a bioscience dataset for AI-readiness using the YAML workflow. It assumes you are comfortable opening a terminal, running basic commands, and editing plain text files.
@@ -37,10 +43,10 @@ Or, if you plan to submit your review, fork the repository on GitHub first, then
 
 ## Step 2 — Copy the template
 
-Create a new file in the `reviews/testing/` folder using the naming convention `<accession>_<initials>_<n>.yaml`:
+Create a new file in the `reviews/` folder using the naming convention `<accession>_<initials>_<n>.yaml`:
 
 ```bash
-cp reviews/review_template.yaml reviews/testing/E-MTAB-1234_CH_1.yaml
+cp archive/deactivated/reviews/review_template.yaml reviews/E-MTAB-1234_CH_1.yaml
 ```
 
 Replace `E-MTAB-1234` with the dataset's accession number and `CH` with your initials. If there is no accession number, use a short descriptive slug.
@@ -94,7 +100,7 @@ Rules:
 - `comments` is optional — leave as `""` if you have nothing to add.
 - Do not delete any question block, even if you answer `"No"`.
 
-The question text and guidance for each ID are in [`metric/airbds_metric_v0.4.yaml`](../../metric/airbds_metric_v0.4.yaml).
+The question text and guidance for each ID are in [`metric/airbds_metric_v0.4.yaml`](../../../../metric/airbds_metric_v0.4.yaml).
 
 ---
 
@@ -125,7 +131,7 @@ If the dataset **does contain** human or animal subjects, answer normally and le
 Before calculating the score, check that your file is valid YAML:
 
 ```bash
-python3 -c "import yaml; yaml.safe_load(open('reviews/testing/E-MTAB-1234_CH_1.yaml')); print('YAML is valid')"
+python3 -c "import yaml; yaml.safe_load(open('reviews/E-MTAB-1234_CH_1.yaml')); print('YAML is valid')"
 ```
 
 If you see `YAML is valid`, proceed. If you see an error, it will show you the line number to fix (common mistakes: missing quotes around `Yes`/`No`, inconsistent indentation).
@@ -152,7 +158,7 @@ Important pass rate = (number of Important "Yes" answers) / 11
 Optional pass rate  = (number of Optional "Yes" answers) / 8
 ```
 
-See [`metric/airbds_metric_v0.4.yaml`](../../metric/airbds_metric_v0.4.yaml) for which questions belong to each tier.
+See [`metric/airbds_metric_v0.4.yaml`](../../../../metric/airbds_metric_v0.4.yaml) for which questions belong to each tier.
 
 ---
 
@@ -183,7 +189,7 @@ The grade thresholds are in the metric YAML's `grading` block; the rationale beh
 
 ```bash
 git checkout -b review/add-E-MTAB-1234
-git add reviews/testing/E-MTAB-1234_CH_1.yaml
+git add reviews/E-MTAB-1234_CH_1.yaml
 git commit -m "review: add review for E-MTAB-1234 (CH)"
 ```
 
@@ -195,7 +201,7 @@ git push -u origin review/add-E-MTAB-1234
 
 3. Open a pull request on GitHub against the `main` branch of [AIBIO-UK/airbds-metric](https://github.com/AIBIO-UK/airbds-metric).
 
-For full contribution guidelines, including naming conventions and inter-rater reliability recommendations, see [CONTRIBUTING.md](../../CONTRIBUTING.md).
+For full contribution guidelines, including naming conventions and inter-rater reliability recommendations, see [CONTRIBUTING.md](../../../../CONTRIBUTING.md).
 
 ---
 

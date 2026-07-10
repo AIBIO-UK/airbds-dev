@@ -15,7 +15,6 @@ Requests (PRs) which are reviewed and merged by the working group maintainers.
 ## Table of Contents
 
 - [Ways to Contribute](#ways-to-contribute)
-  - [Submitting Dataset Reviews](#submitting-dataset-reviews)
   - [Proposing Metric Changes](#proposing-metric-changes)
   - [Reporting Issues](#reporting-issues)
   - [Pull Requests](#pull-requests)
@@ -31,41 +30,6 @@ Requests (PRs) which are reviewed and merged by the working group maintainers.
 ---
 
 ## Ways to Contribute
-
-### Submitting Dataset Reviews
-
-The primary contribution type is a completed dataset review scored using the
-AIRBDS metric.
-
-1. **Copy the template:** Start from
-   [`reviews/review_template.yaml`](reviews/review_template.yaml) (YAML) or
-   [`reviews/review_template.csv`](reviews/review_template.csv) (CSV spreadsheet).
-2. **Name your file:** Use the convention
-   `reviews/testing/<dataset_accession>_<reviewer_initials>_<n>.yaml`  
-   e.g. `reviews/testing/E-MTAB-1234_CH_1.yaml`  
-   Initials must be **uppercase letters only** (A-Z, 2–6 characters).
-3. **Fill in all fields:** Answer all 27 questions (`"Yes"` or `"No"`, case-sensitive, quoted). For Ethics
-   questions (ABC-24 to ABC-27), if the dataset contains no human or animal
-   subject data record the answer as `"Yes"` and set `not_applicable: true`
-   with a brief comment.
-4. **Leave the `result:` block empty** — the automated workflow calculates your
-   weighted score and grade when you open a pull request. You do not need to
-   fill in `weighted_score` or `grade` manually.
-5. **Submit a PR** — see [Pull Requests](#pull-requests).
-
-Once your PR is open, the [Review Check workflow](.github/workflows/review-check.yml) will:
-- Validate your filename and all required fields
-- Calculate your score and grade
-- Generate the companion format (YAML ↔ CSV)
-- Rename the file to include the score and grade (e.g. `E-MTAB-1234_CH_1_595_Silver.yaml`)
-- Commit the changes back to your branch
-
-If validation fails, the **Actions** tab of your PR shows a full error report.
-
-Inter-rater reliability is important. Where possible, datasets should be
-reviewed independently by at least two members before the review is merged.
-
----
 
 ### Proposing Metric Changes
 
@@ -105,7 +69,7 @@ If you find an error, broken link, or inconsistency anywhere in the repository:
 
 1. **Fork the repository** and create a new branch:
    ```bash
-   git checkout -b feat/add-review-E-MTAB-1234
+   git checkout -b metric/42-add-abc-29-reproducibility
    ```
 2. **Make your changes** following the YAML formats described below.
 3. **Validate your YAML** — ensure it is valid YAML:
@@ -114,24 +78,21 @@ If you find an error, broken link, or inconsistency anywhere in the repository:
    ```
 4. **Commit your changes** using the [convention below](#commit-message-convention):
    ```bash
-   git add reviews/testing/E-MTAB-1234_CH_1.yaml
-   git commit -m "review: add review for E-MTAB-1234 (CH)"
+   git add metric/airbds_metric_v0.4.yaml metric/CHANGELOG.md
+   git commit -m "metric: add ABC-29 reproducibility question"
    ```
 5. **Push to your fork:**
    ```bash
-   git push origin feat/add-review-E-MTAB-1234
+   git push origin metric/42-add-abc-29-reproducibility
    ```
 6. **Open a PR** against the `main` branch. Provide:
    - A clear title and description
-   - The dataset name and accession (for review PRs)
-   - A summary of any metric changes proposed (for metric PRs)
+   - A summary of the proposed change and the originating Issue
 
 ---
 
 ## What to Contribute
 
-- ✅ Completed dataset reviews (`reviews/testing/*.yaml`)
-- ✅ Corrections to existing reviews (factual errors, updated dataset versions)
 - ✅ Proposed question additions, removals, or rewordings — via Issue first
 - ✅ Guidance clarifications (PATCH-level) — directly as a PR
 - ✅ Fixes for typos, broken links, or formatting errors
@@ -144,7 +105,6 @@ If you find an error, broken link, or inconsistency anywhere in the repository:
 - ❌ Changes to the core metric YAML without prior working-group discussion
   (open an Issue first)
 - ❌ Proprietary or closed datasets that cannot be publicly linked
-- ❌ Reviews submitted in formats other than YAML (e.g. Excel, CSV)
 - ❌ Changes to CI/CD or repository infrastructure without prior discussion
 - ❌ Promotional content unrelated to AI-ready bioscience datasets
 
@@ -155,24 +115,17 @@ If you find an error, broken link, or inconsistency anywhere in the repository:
 ```
 airbds-metric/
 ├── metric/
-│   └── airbds_metric_v0.4.yaml   # Canonical metric (questions, weights, grading rules)
-├── reviews/                      # Reviews + review tooling
-│   ├── review_template.yaml      # Blank template for new reviews
-│   └── testing/                  # Completed dataset reviews (one file per review)
-│       └── <accession>_<initials>_<n>.yaml
+│   ├── airbds_metric_v0.4.yaml   # Canonical metric (questions, weights, grading rules)
+│   └── CHANGELOG.md
 ├── CITATION.cff
 ├── CODE_OF_CONDUCT.md
 ├── CONTRIBUTING.md
 ├── LICENSE.md
-├── CHANGELOG.md
 └── README.md
 ```
 
-All metric and review files are YAML. Key rules:
+The metric is YAML. Key rules:
 - Use `"Yes"` or `"No"` (quoted strings) for all answer fields.
-- Do not leave required fields blank in submitted reviews (use `""` only in
-  the template).
-- Follow the exact field names defined in `review_template.yaml`.
 - Ensure all YAML is valid before submitting (see `python3 -c "import yaml; ..."` above).
 
 ---
@@ -192,12 +145,9 @@ The canonical metric file is versioned in its filename
 (e.g. `airbds_metric_v0.4.yaml`). When a new version is released:
 1. The new YAML file is added (e.g. `airbds_metric_v1.0.yaml`)
 2. The old file is kept for archival purposes
-3. `CHANGELOG.md` is updated
+3. `metric/CHANGELOG.md` is updated
 4. A GitHub Release is tagged (e.g. `v1.0.0`)
 5. `CITATION.cff` is updated with the new version
-
-Existing dataset reviews reference the metric version they were scored against
-via the `schema_version` field.
 
 ---
 
@@ -207,14 +157,13 @@ Use the following prefixes for clarity:
 
 | Prefix | Use for |
 |---|---|
-| `review:` | Adding or updating a dataset review |
 | `metric:` | Changes to the metric YAML |
 | `docs:` | Documentation changes (README, CONTRIBUTING, etc.) |
 | `fix:` | Typo, broken link, or formatting fix |
 | `chore:` | Repo infrastructure (CI, .gitignore, etc.) |
 | `release:` | Version bump and release preparation |
 
-Example: `review: add review for ArrayExpress E-GEOD-12345 (CH)`
+Example: `metric: add ABC-29 reproducibility question`
 
 ---
 
@@ -224,7 +173,6 @@ Working group maintainers will review all Pull Requests.
 
 - We aim to respond within **14 days**.
 - Feedback may be provided via PR comments; please respond or revise promptly.
-- For dataset reviews: a second independent review is encouraged before merging.
 - For metric changes: working-group consensus (via the linked Issue) is required
   before merging.
 - Once approved, a maintainer will merge into `main`.
