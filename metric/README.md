@@ -2,7 +2,7 @@
 
 > **Before editing any file in this folder, read this document.**
 
-The `metric/` folder is the **single source of truth** for the AIRBDS scoring metric — the versioned question set plus the `grade_points`/`grading` scoring rules, in a machine-readable YAML format. The blank review template and completed dataset reviews live in `reviews/`.
+The `metric/` folder is the **single source of truth** for the AIRBDS scoring metric — the versioned question set plus the `grade_points`/`grading` scoring rules, in a machine-readable YAML format.
 
 Changes to this folder have a disproportionate downstream impact. `README.md`, `CHANGELOG.md`, and `CITATION.cff` all reference the exact metric version. A partial update (e.g. bumping the version without updating the README) creates silent inconsistencies.
 
@@ -15,7 +15,7 @@ Two ways to use v0.4 directly:
 - **[Open the Google Sheet](https://docs.google.com/spreadsheets/d/1eriM8bXAoNXsIR9l8OpI1XYEp8FbtBWt05CTIP9cVeg/edit)** — the live source of truth. Browse, filter, or copy it.
 - **[`airbds_metric_v0.4.yaml`](airbds_metric_v0.4.yaml)** — the generated YAML, for anything programmatic.
 
-To score a dataset against the metric, see the **[interactive tutorial site](https://aibio-uk.github.io/airbds-metric-tutorial/)** for a step-by-step walkthrough, and [`reviews/GUIDANCE.md`](../reviews/GUIDANCE.md) for the rationale behind the weighting and grades (`grade_points` / `grading` below are the authoritative numbers).
+To score a dataset against the metric, see the **[interactive tutorial site](https://aibio-uk.github.io/airbds-metric-tutorial/)** for a step-by-step walkthrough (`grade_points` / `grading` below are the authoritative numbers).
 
 There is no automated scorer right now — scores are calculated manually (e.g. in a spreadsheet against the Google Sheet). Automated YAML-based scoring is planned infrastructure, not yet built.
 
@@ -28,10 +28,10 @@ A weekly check (`.github/workflows/metric-upstream-drift-check.yml`) confirms th
 | Filename | Format | Purpose |
 |----------|--------|---------|
 | `airbds_metric_v0.4.yaml` | YAML | **Canonical — current.** 27-question metric: question text, grades, guidance, scopes, and the `grade_points`/`grading` scoring rules |
-| `airbds_metric_v0.4.upstream.json` | JSON | v0.4 provenance: source sheet id/url + `content_sha256` "revision" + generation timestamp |
-| `airbds_metric_v0.3.yaml` | YAML | Previous version, retained — reviews carrying `schema_version: "0.3"` score against it |
 | `CHANGELOG.md` | Markdown | Full version history of the metric |
 | `README.md` | Markdown | This file — contributor guide for the metric folder |
+
+The generator script, its provenance sidecar (`airbds_metric_v0.4.upstream.json`), and the drift-check workflow live in [`admin/`](../admin/) — see [How the v0.4 metric file is generated](#how-the-v04-metric-file-is-generated).
 
 Metric output is YAML-only.
 
@@ -39,7 +39,7 @@ Metric output is YAML-only.
 
 ## How the v0.4 metric file is generated
 
-The metric is authored in the working group's **public Google Sheet**. `metric/src/scripts/build_metric_yaml_and_csv_from_google_sheet_v0.4.py` pulls the Scoring and Lookups tabs and regenerates `airbds_metric_v0.4.yaml`, recording which sheet and a content-hash "revision" in `airbds_metric_v0.4.upstream.json` plus a `# Source:` breadcrumb in the YAML. See [`metric/src/README.md`](src/README.md) for the commands, the `--check` drift check, and offline use.
+The metric is authored in the working group's **public Google Sheet**. [`admin/scripts/build_metric_yaml_and_csv_from_google_sheet_v0.4.py`](../admin/scripts/build_metric_yaml_and_csv_from_google_sheet_v0.4.py) pulls the Scoring and Lookups tabs and regenerates `airbds_metric_v0.4.yaml`, recording which sheet and a content-hash "revision" in [`admin/airbds_metric_v0.4.upstream.json`](../admin/airbds_metric_v0.4.upstream.json) plus a `# Source:` breadcrumb in the YAML. See [`admin/README.md`](../admin/README.md) for the commands, the `--check` drift check, and offline use.
 
 ---
 
@@ -87,7 +87,7 @@ Use this as a checklist when implementing any metric change.
 ### Group A — Core metric file
 - `metric/airbds_metric_vX.Y.yaml`
 
-> Never hand-edit. For v0.4 (current) it is generated from the working group's Google Sheet by `metric/src/scripts/build_metric_yaml_and_csv_from_google_sheet_v0.4.py`. See [How the v0.4 metric file is generated](#how-the-v04-metric-file-is-generated).
+> Never hand-edit. For v0.4 (current) it is generated from the working group's Google Sheet by `admin/scripts/build_metric_yaml_and_csv_from_google_sheet_v0.4.py`. See [How the v0.4 metric file is generated](#how-the-v04-metric-file-is-generated).
 
 ### Group B — Downstream version-carrying files *(MINOR or MAJOR changes only)*
 - `README.md` — version badge, question table

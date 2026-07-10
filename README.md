@@ -62,10 +62,11 @@ The YAML is machine-generated from the Google Sheet and kept in sync automatical
 ```
 airbds-metric/
 ├── metric/    # The versioned scoring metric (YAML), synced live from the Google Sheet, and CHANGELOG
-└── reviews/   # Deposit dataset reviews here — see reviews/README.md for the format
+├── admin/     # Metric-build tooling: the Google Sheet → YAML generator and its provenance sidecar
+└── skills/    # AI agent assessment skill — see AI Agent Skill (Beta) below
 ```
 
-`metric/` carries its own `README.md` with full details. (Kept one level deep on purpose, so it doesn't drift out of date.)
+`metric/` and `admin/` each carry their own `README.md` with full details. (Kept one level deep on purpose, so they don't drift out of date.)
 
 ---
 
@@ -73,7 +74,7 @@ airbds-metric/
 
 **[→ Interactive tutorial site](https://aibio-uk.github.io/airbds-metric-tutorial/)** — step-by-step guide to scoring a dataset against the metric.
 
-Guidance comes from one of two places: the **Google Sheet** or the **YAML metric** (see [Use the Metric](#use-the-metric) above). For the rationale behind scoring and grades, see [`reviews/GUIDANCE.md`](reviews/GUIDANCE.md). There is no automated scorer right now — scores are calculated manually; automated YAML-based scoring is planned infrastructure, not yet built.
+Guidance comes from one of two places: the **Google Sheet** or the **YAML metric** (see [Use the Metric](#use-the-metric) above). There is no automated scorer right now — scores are calculated manually; automated YAML-based scoring is planned infrastructure, not yet built.
 
 ---
 
@@ -136,7 +137,7 @@ Full questions with complete guidance text are in
 ## AI Agent Skill (Beta)
 
 Automated AIRBDS assessment via an AI agent skill is in beta at
-**[AIBIO-UK/airbds-skill](https://github.com/AIBIO-UK/airbds-skill)**.
+[`skills/airbds-assessment-skill/`](skills/airbds-assessment-skill/) in this repo.
 
 ---
 
@@ -149,8 +150,7 @@ This repository uses [Semantic Versioning](https://semver.org/):
 - **MAJOR** — changes to weights or grade thresholds (e.g. v1.0.0)
 
 Each metric version is a separate YAML file (`metric/airbds_metric_vX.Y.yaml`).
-Completed reviews reference the metric version they were scored with via the
-`schema_version` field. See [CHANGELOG.md](metric/CHANGELOG.md) for full history.
+See [CHANGELOG.md](metric/CHANGELOG.md) for full history.
 
 > **v0.4 is the current version.** See the `[0.4]` entry in
 > [CHANGELOG.md](metric/CHANGELOG.md).
@@ -159,9 +159,9 @@ Completed reviews reference the metric version they were scored with via the
 
 ## Contributing
 
-We welcome contributions including dataset reviews, metric improvements, and
-documentation fixes. Please read [CONTRIBUTING.md](CONTRIBUTING.md) before
-opening a PR. All contributors must abide by our [Code of Conduct](CODE_OF_CONDUCT.md).
+We welcome contributions including metric improvements and documentation
+fixes. Please read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a PR.
+All contributors must abide by our [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ---
 

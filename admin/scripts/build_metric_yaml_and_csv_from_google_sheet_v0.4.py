@@ -9,13 +9,13 @@ CSV metric output was dropped; the source sheet tabs are still fetched as CSV.
 
 Usage:
     # Regenerate metric/airbds_metric_v0.4.yaml from the live sheet
-    python3 metric/src/scripts/build_metric_yaml_and_csv_from_google_sheet_v0.4.py
+    python3 admin/scripts/build_metric_yaml_and_csv_from_google_sheet_v0.4.py
 
     # Verify the committed file still matches the live sheet (the drift check)
-    python3 metric/src/scripts/build_metric_yaml_and_csv_from_google_sheet_v0.4.py --check
+    python3 admin/scripts/build_metric_yaml_and_csv_from_google_sheet_v0.4.py --check
 
     # Work offline from exported CSVs instead of fetching
-    python3 metric/src/scripts/build_metric_yaml_and_csv_from_google_sheet_v0.4.py \
+    python3 admin/scripts/build_metric_yaml_and_csv_from_google_sheet_v0.4.py \
         --scoring-csv scoring.csv --lookups-csv lookups.csv
 
 Schema note (v0.4 vs v0.3): question ids are ABC-NN; there is no `theme` or
@@ -46,9 +46,9 @@ from sheet_source import (  # noqa: E402  (sibling module, after sys.path tweak)
     fetch_named_tabs,
 )
 
-# Repo root is four levels up: <root>/metric/src/scripts/<this file>.
-REPO_ROOT = Path(__file__).resolve().parent.parent.parent.parent
-SCRIPT_PATH = f"metric/src/scripts/{Path(__file__).name}"
+# Repo root is three levels up: <root>/admin/scripts/<this file>.
+REPO_ROOT = Path(__file__).resolve().parent.parent.parent
+SCRIPT_PATH = f"admin/scripts/{Path(__file__).name}"
 
 # ── Editorial config (NOT in the sheet — edit here) ──────────────────────────
 
@@ -454,7 +454,7 @@ def main() -> None:
         print(f"Regenerate with: python3 {SCRIPT_PATH}", file=sys.stderr)
         sys.exit(1)
 
-    manifest_path = args.output.parent / f"{args.output.stem}.upstream.json"
+    manifest_path = REPO_ROOT / "admin" / f"{args.output.stem}.upstream.json"
     generated_at = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     write_manifest(manifest_path, src, content_sha256, generated_at)
 
