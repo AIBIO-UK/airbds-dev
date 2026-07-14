@@ -4,7 +4,7 @@
 
 The `metric/` folder is the **single source of truth** for the AIRBDS scoring metric — the versioned question set plus the `grade_points`/`grading` scoring rules, in two machine-readable formats. The blank review template and completed dataset reviews live in `reviews/`, not here — but the template stays version-locked to the metric (see Group B below).
 
-Changes to this folder have a disproportionate downstream impact. Multiple files across the repository — scripts, GitHub Actions workflows, skills, tutorials, and documentation — all reference the exact metric version and file paths. A partial update (e.g. editing the YAML without regenerating the CSV, or bumping the version without updating the workflow paths) creates silent failures that corrupt inter-rater reliability or break the CI/CD pipeline.
+Changes to this folder have a disproportionate downstream impact. Multiple files across the repository — scripts, GitHub Actions workflows, skills, tutorials, and documentation — all reference the exact metric version and file paths. A partial update (e.g. regenerating the metric YAML without updating the review template, or bumping the version without updating the workflow paths) creates silent failures that corrupt inter-rater reliability or break the CI/CD pipeline.
 
 ---
 
@@ -12,11 +12,9 @@ Changes to this folder have a disproportionate downstream impact. Multiple files
 
 | Filename | Format | Purpose | Paired With |
 |----------|--------|---------|-------------|
-| `airbds_metric_v0.4.yaml` | YAML | **Canonical — current.** 27-question metric: question text, grades, guidance, scopes, and the `grade_points`/`grading` scoring rules | `airbds_metric_v0.4.csv` |
-| `airbds_metric_v0.4.csv` | CSV | Identical content to the YAML metric; used by the spreadsheet workflow | `airbds_metric_v0.4.yaml` |
+| `airbds_metric_v0.4.yaml` | YAML | **Canonical — current.** 27-question metric: question text, grades, guidance, scopes, and the `grade_points`/`grading` scoring rules | — |
 | `airbds_metric_v0.4.upstream.json` | JSON | v0.4 provenance: source sheet id/url + `content_sha256` "revision" + generation timestamp | — |
-| `airbds_metric_v0.3.yaml` | YAML | **Previous version — retained.** 28-question metric; reviews carrying `schema_version: "0.3"` still score against it | `airbds_metric_v0.3.csv` |
-| `airbds_metric_v0.3.csv` | CSV | Identical content to the v0.3 YAML metric | `airbds_metric_v0.3.yaml` |
+| `airbds_metric_v0.3.yaml` | YAML | **Previous version — retained.** 28-question metric; reviews carrying `schema_version: "0.3"` still score against it | — |
 | `README.md` | Markdown | This file — contributor guide for the metric folder | — |
 | `skills/SKILL.md` | Markdown | AI agent skill for propagating metric changes across the repo | — |
 
@@ -24,44 +22,42 @@ Changes to this folder have a disproportionate downstream impact. Multiple files
 
 > **Note on versioning:** the **current** `review_template` pair (under `reviews/`) is **not** versioned in its filename — `reviews/review_template.{yaml,csv}` always tracks the current metric (now v0.4), so non-technical reviewers always download the right file. It carries a `schema_version` field that must match the current metric version, so it is updated on every bump. On a bump, the outgoing pair is first copied to `reviews/archived_templates/review_template_v<old>.{yaml,csv}` (e.g. `review_template_v0.3.{yaml,csv}`) before the unversioned pair is overwritten — so previous versions stay retrievable as files, not just in git history.
 
-> **Note on new metric versions:** A version bump creates new files (e.g. `airbds_metric_v0.4.yaml` + `.csv`). Old versions are **retained** for archival — reviews carry `schema_version` to record which version they were scored against.
+> **Note on new metric versions:** A version bump creates a new file (e.g. `airbds_metric_v0.4.yaml`). Old versions are **retained** for archival — reviews carry `schema_version` to record which version they were scored against.
 
 ---
 
 ## How the v0.3 metric files are generated
 
-`airbds_metric_v0.3.yaml` and `airbds_metric_v0.3.csv` are **generated, not hand-edited.** Both are produced from a single source — the scoring spreadsheet (`AIRBDS Core Metric scoring v0.3 - _initials_-_#_ TEMPLATE.xlsx` in `metric/upstream/`) — by one script:
+`airbds_metric_v0.3.yaml` is **generated, not hand-edited.** It is produced from a single source — the scoring spreadsheet (`AIRBDS Core Metric scoring v0.3 - _initials_-_#_ TEMPLATE.xlsx` in `metric/upstream/`) — by one script:
 
 ```
-metric/src/scripts/build_metric_yaml_and_csv_from_spreadsheet_v0.3.py
+metric/src/scripts/build_metric_yaml_from_spreadsheet_v0.3.py
 ```
-
-Because that one script writes **both** formats from the same question data, the Group A pair can never drift apart.
 
 - **To change metric content** (questions, themes, grades, mapped-from references): edit the `Scoring` and `Lookups` sheets of the spreadsheet, then regenerate:
   ```
-  python3 metric/src/scripts/build_metric_yaml_and_csv_from_spreadsheet_v0.3.py
+  python3 metric/src/scripts/build_metric_yaml_from_spreadsheet_v0.3.py
   ```
 - **Document-level metadata not held in the spreadsheet** (licence, repository, contact, the prose description, scope descriptions) lives in a `CONFIG` block at the top of the script — edit it there.
-- **To verify** the committed files are in sync with the spreadsheet (suitable for CI):
+- **To verify** the committed file is in sync with the spreadsheet (suitable for CI):
   ```
-  python3 metric/src/scripts/build_metric_yaml_and_csv_from_spreadsheet_v0.3.py --check
+  python3 metric/src/scripts/build_metric_yaml_from_spreadsheet_v0.3.py --check
   ```
-  This exits non-zero if either file is out of date.
+  This exits non-zero if the file is out of date.
 
-> The YAML carries a **GENERATED FILE — DO NOT EDIT BY HAND** banner. Edit the spreadsheet (or the script's `CONFIG`) and regenerate rather than editing the YAML/CSV directly. CSV has no comment syntax, so it carries no banner — but it is regenerated by the same command.
+> The YAML carries a **GENERATED FILE — DO NOT EDIT BY HAND** banner. Edit the spreadsheet (or the script's `CONFIG`) and regenerate rather than editing the YAML directly.
 
 ## How the v0.4 metric files are generated
 
-From v0.4 the metric is authored in the working group's **public Google Sheet** rather than a committed `.xlsx`. `metric/src/scripts/build_metric_yaml_and_csv_from_google_sheet_v0.4.py` pulls the Scoring and Lookups tabs and regenerates `airbds_metric_v0.4.{yaml,csv}`, recording which sheet and a content-hash "revision" in `airbds_metric_v0.4.upstream.json` plus a `# Source:` breadcrumb in the YAML. See [`metric/src/README.md`](src/README.md) for the commands, the `--check` drift check, and offline use. The v0.3 `.xlsx` chain stays in place unchanged.
+From v0.4 the metric is authored in the working group's **public Google Sheet** rather than a committed `.xlsx`. `metric/src/scripts/build_metric_yaml_from_google_sheet_v0.4.py` pulls the Scoring and Lookups tabs and regenerates `airbds_metric_v0.4.yaml`, recording which sheet and a content-hash "revision" in `airbds_metric_v0.4.upstream.json` plus a `# Source:` breadcrumb in the YAML. See [`metric/src/README.md`](src/README.md) for the commands, the `--check` drift check, and offline use. The v0.3 `.xlsx` chain stays in place unchanged.
 
 ---
 
 ## Why ALL Files Must Change Together
 
-### The YAML ↔ CSV pairs must always be identical in content
+### The review-template YAML ↔ CSV pair must always be identical in content
 
-YAML and CSV files are **not** derived from each other at read time — both are independent files that are read directly. The automated review processor (`reviews/src/scripts/review_processor.py`) loads whichever format was changed; the human spreadsheet workflow reads the CSV. If the YAML is updated but the CSV is not, a researcher using the spreadsheet workflow scores against a different version of the metric than one using the YAML workflow. This is **silent**, produces no error, and **invalidates inter-rater reliability**.
+The **review template** ships in both formats (`reviews/review_template.{yaml,csv}`) and they are **not** derived from each other at read time — both are independent files that are read directly. The automated review processor (`reviews/src/scripts/review_processor.py`) loads whichever format the reviewer submitted; the human spreadsheet workflow reads the CSV. If one is updated without the other, a researcher using the spreadsheet workflow scores against a different template than one using the YAML workflow. This is **silent**, produces no error, and **invalidates inter-rater reliability**.
 
 ### The downstream impact chain
 
@@ -77,7 +73,7 @@ For any **MINOR** change (question additions, deletions, or rewordings) or **MAJ
 | `reviews/docs/tutorial-yaml.md` | File path references to `v0.3` in instructions become broken |
 | `reviews/docs/tutorial-csv.md` | Same as above for spreadsheet tutorial |
 
-**PATCH** changes (guidance text only — no change to question meaning, weight, or ID) are lighter: update only the YAML/CSV pairs. Downstream files are not required unless they quote guidance text verbatim.
+**PATCH** changes (guidance text only — no change to question meaning, weight, or ID) are lighter: regenerate the metric YAML and update the review-template pair. Downstream files are not required unless they quote guidance text verbatim.
 
 ---
 
@@ -108,11 +104,10 @@ For any **MINOR** change (question additions, deletions, or rewordings) or **MAJ
 
 Use this as a checklist when implementing any metric change.
 
-### Group A — Core metric pair *(always change together)*
+### Group A — Core metric *(generated, never hand-edited)*
 - `metric/airbds_metric_vX.Y.yaml`
-- `metric/airbds_metric_vX.Y.csv`
 
-> Both are generated together — never hand-edit either file. For v0.4 (current) they are generated from the working group's Google Sheet by `metric/src/scripts/build_metric_yaml_and_csv_from_google_sheet_v0.4.py`; for v0.3 by `metric/src/scripts/build_metric_yaml_and_csv_from_spreadsheet_v0.3.py`. See [How the v0.4 metric files are generated](#how-the-v04-metric-files-are-generated).
+> Never hand-edit these files. v0.4 (current) is generated from the working group's Google Sheet by `metric/src/scripts/build_metric_yaml_from_google_sheet_v0.4.py`; v0.3 by `metric/src/scripts/build_metric_yaml_from_spreadsheet_v0.3.py`. See [How the v0.4 metric files are generated](#how-the-v04-metric-files-are-generated).
 
 ### Group B — Review template pair *(always change together)*
 - `reviews/review_template.yaml`

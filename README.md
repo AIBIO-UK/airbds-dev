@@ -140,8 +140,7 @@ How scores and grades work is explained in [`reviews/GUIDANCE.md`](reviews/GUIDA
 † *Default answer "Yes" if dataset contains no human or animal subject data.*
 
 Full questions with complete guidance text are in
-[`metric/airbds_metric_v0.4.yaml`](metric/airbds_metric_v0.4.yaml) (YAML) and
-[`metric/airbds_metric_v0.4.csv`](metric/airbds_metric_v0.4.csv) (CSV).
+[`metric/airbds_metric_v0.4.yaml`](metric/airbds_metric_v0.4.yaml).
 
 ---
 

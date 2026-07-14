@@ -73,15 +73,11 @@ Work through the relevant steps below. Mark each as complete before moving to th
 
 Confirm the intended change is correct and complete in the YAML file before regenerating any companions.
 
-#### B. Regenerate the CSV companion for each changed YAML
+#### B. Regenerate the review template CSV if its YAML changed
 
-The CSV files must exactly mirror their YAML counterparts in content. Use the existing CSV file as a structural reference for column order and formatting.
+The metric YAML files are regenerated from their sources by the generator scripts (`metric/src/scripts/build_metric_yaml_from_google_sheet_v0.4.py` for v0.4, `metric/src/scripts/build_metric_yaml_from_spreadsheet_v0.3.py` for v0.3) — never hand-write them.
 
-**For `metric/airbds_metric_vX.Y.csv`:**
-The CSV has one header row and one row per question. Columns (in order):
-`question_id, scope, theme, weight, weight_points, mapped_from, question, guidance, not_applicable_default`
-
-Read `metric/airbds_metric_v0.3.csv` to confirm the exact column names and order before writing.
+The review template, however, ships as a YAML/CSV pair that must exactly mirror each other in content.
 
 **For `reviews/review_template.csv`:**
 The CSV template has two sections:
@@ -90,15 +86,15 @@ The CSV template has two sections:
 
 Read `reviews/review_template.csv` to confirm the exact structure before writing.
 
-#### C. Write the regenerated CSV file(s) to disk
+#### C. Write the regenerated file(s) to disk
 
-Use the Write tool to overwrite the existing CSV file(s) with the regenerated content.
+Use the generator scripts for the metric YAML; use the Write tool to overwrite `reviews/review_template.csv` with the regenerated content.
 
 ---
 
 ### For MINOR and MAJOR changes only (new metric version required)
 
-> For PATCH changes, skip this section entirely. PATCH changes edit the existing `v0.3.yaml/csv` files in place; no new version file is created and no downstream files need updating.
+> For PATCH changes, skip this section entirely. PATCH changes regenerate the existing versioned YAML in place; no new version file is created and no downstream files need updating.
 
 #### D. Determine the new version number
 
@@ -111,10 +107,9 @@ Confirm the current version by reading the `version:` field in `metric/airbds_me
 #### E. Create new metric version files (keep old versions)
 
 Create:
-- `metric/airbds_metric_vNEW.yaml` — copy from the old YAML, apply your changes, update the `version:` and `schema_version:` fields to `"NEW"`
-- `metric/airbds_metric_vNEW.csv` — regenerate from the new YAML content
+- `metric/airbds_metric_vNEW.yaml` — regenerate from the source (Google Sheet or spreadsheet) with the `version:` and `schema_version:` fields set to `"NEW"`
 
-**Do NOT delete** `metric/airbds_metric_v0.3.yaml` or `metric/airbds_metric_v0.3.csv`. Old versions are retained for archival so that existing reviews (which carry `schema_version: "0.3"`) can still be validated.
+**Do NOT delete** `metric/airbds_metric_v0.3.yaml`. Old versions are retained for archival so that existing reviews (which carry `schema_version: "0.3"`) can still be validated.
 
 #### F. Update `reviews/review_template.yaml`
 
@@ -235,11 +230,11 @@ When the metric version changes:
 
 ## Step 4 — The source spreadsheet
 
-`metric/upstream/AIRBDS Core Metric scoring v0.3 - _initials_-_#_ TEMPLATE.xlsx` is the hand-edited source of truth for the metric content. The metric YAML and CSV are generated **from** it by `metric/src/scripts/build_metric_yaml_and_csv_from_spreadsheet_v0.3.py` (see "How the v0.3 metric files are generated" in `metric/README.md`); the spreadsheet itself is not programmatically regenerated.
+`metric/upstream/AIRBDS Core Metric scoring v0.3 - _initials_-_#_ TEMPLATE.xlsx` is the hand-edited source of truth for the metric content. The metric YAML is generated **from** it by `metric/src/scripts/build_metric_yaml_from_spreadsheet_v0.3.py` (see "How the v0.3 metric files are generated" in `metric/README.md`); the spreadsheet itself is not programmatically regenerated.
 
 If a new metric version is released:
 1. Edit the spreadsheet in `metric/upstream/` (the `Scoring` and `Lookups` sheets), or copy it to a new versioned filename.
-2. Regenerate the YAML/CSV with the build script rather than hand-editing them.
+2. Regenerate the YAML with the build script rather than hand-editing it.
 
 ---
 
@@ -256,7 +251,6 @@ After completing all applicable steps, produce a structured summary for the cont
 
 ### Files modified:
 - metric/airbds_metric_vNEW.yaml — [description of change]
-- metric/airbds_metric_vNEW.csv — regenerated from YAML
 - reviews/review_template.yaml — schema_version updated to NEW
 - reviews/review_template.csv — regenerated
 - README.md — version badge, file listing, download links updated
@@ -270,7 +264,7 @@ After completing all applicable steps, produce a structured summary for the cont
 
 ### Files NOT updated and why:
 - skills/testing & skills/development assessment skills — bundle the metric via a symlink that already tracks the canonical YAML (repoint only on a new version file)
-- metric/upstream/AIRBDS Core Metric scoring v0.3...xlsx — hand-edited source; the YAML/CSV are regenerated from it with the build script
+- metric/upstream/AIRBDS Core Metric scoring v0.3...xlsx — hand-edited source; the YAML is regenerated from it with the build script
 
 ### Next step:
 Open a pull request referencing the originating GitHub Issue (#N):
@@ -284,7 +278,6 @@ Open a pull request referencing the originating GitHub Issue (#N):
 | File | PATCH | MINOR | MAJOR |
 |------|-------|-------|-------|
 | `metric/airbds_metric_vX.Y.yaml` (in-place or new) | ✅ | ✅ | ✅ |
-| `metric/airbds_metric_vX.Y.csv` | ✅ | ✅ | ✅ |
 | `reviews/review_template.yaml` | ✅* | ✅ | ✅ |
 | `reviews/review_template.csv` | ✅* | ✅ | ✅ |
 | `reviews/src/scripts/review_processor.py` (metric-driven) | — | — | — |

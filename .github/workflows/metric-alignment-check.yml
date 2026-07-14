@@ -101,26 +101,8 @@ jobs:
           csv_files  = {f for f in changed if f.endswith('.csv')}
           mismatches = []
 
-          # -- Group A: versioned metric pairs (airbds_metric_vX.Y.yaml / .csv) --
-          metric_yaml = {f for f in yaml_files
-                         if re.match(r'^metric/airbds_metric_v[\d.]+\.yaml$', f)}
-          metric_csv  = {f for f in csv_files
-                         if re.match(r'^metric/airbds_metric_v[\d.]+\.csv$', f)}
-
-          for f in metric_yaml:
-              companion = f.replace('.yaml', '.csv')
-              if companion not in metric_csv:
-                  mismatches.append(
-                      f'YAML changed without companion CSV: {f}\n'
-                      f'  → expected also changed: {companion}'
-                  )
-          for f in metric_csv:
-              companion = f.replace('.csv', '.yaml')
-              if companion not in metric_yaml:
-                  mismatches.append(
-                      f'CSV changed without companion YAML: {f}\n'
-                      f'  → expected also changed: {companion}'
-                  )
+          # (The metric YAML itself has no companion-file rule — it is generated
+          # standalone and checked against its source by the generator scripts.)
 
           # -- Group B: review_template pair (lives under reviews/, but stays
           #    version-locked to the metric, so it is checked here) --

@@ -22,7 +22,7 @@ TypeScript also lets the CLI and the website share **one implementation, one set
 of types, and one test suite**. So: TypeScript, with mature libraries —
 `csv-parse` and `yaml` — rather than hand-rolled parsing.
 
-`review_processor.py` and `build_metric_yaml_and_csv_from_spreadsheet_v0.3.py`
+`review_processor.py` and `build_metric_yaml_from_spreadsheet_v0.3.py`
 **stay Python**: they are CI/local tools, not part of the website request path,
 and rewriting them carries no benefit.
 

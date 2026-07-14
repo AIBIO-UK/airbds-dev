@@ -11,6 +11,16 @@ This project adheres to
 
 ## [Unreleased]
 
+### Removed
+- The metric CSV distribution format (`metric/airbds_metric_v0.3.csv` and
+  `metric/airbds_metric_v0.4.csv`): the metric is now YAML-only. The CSV was
+  development-only and had no meaningful consumers — auto-airbds reads the
+  YAML. The generator scripts were renamed accordingly
+  (`build_metric_yaml_from_spreadsheet_v0.3.py`,
+  `build_metric_yaml_from_google_sheet_v0.4.py`). Reintroduces the metric
+  half of the slim-down from PR #14 in adapted form. The review template
+  (`reviews/review_template.{yaml,csv}`) is unaffected and keeps both formats.
+
 ### Changed
 - Reworded ACM-2, ACM-3, ACM-5, ACM-6, and ACM-7 to the canonical AIRBDS
   question set (e.g. ACM-2 now covers metadata colocation, ACM-3 dataset

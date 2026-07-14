@@ -22,7 +22,7 @@ Download the blank review template directly from the repository:
 
 To download: click the link above, then on GitHub click the **Download raw file** button (the down-arrow icon near the top-right of the file view).
 
-> The canonical question reference — with full guidance text and weights — is in [metric/airbds_metric_v0.4.csv](../../metric/airbds_metric_v0.4.csv).
+> The canonical question reference — with full guidance text and weights — is in [metric/airbds_metric_v0.4.yaml](../../metric/airbds_metric_v0.4.yaml).
 
 ---
 
@@ -147,7 +147,7 @@ Look up your critical, important, and optional pass rates in this table:
 | Silver | ⚪ | = 1.0 (all) | ≥ 0.5 | any |
 | Gold | 🟡 | = 1.0 (all) | = 1.0 (all) | ≥ 0.5 |
 
-What the grades mean is explained in [reviews/GUIDANCE.md](../GUIDANCE.md); the thresholds are in the metric (`airbds_metric_v0.4.csv` / `.yaml`).
+What the grades mean is explained in [reviews/GUIDANCE.md](../GUIDANCE.md); the thresholds are in the metric (`airbds_metric_v0.4.yaml`).
 
 ---
 

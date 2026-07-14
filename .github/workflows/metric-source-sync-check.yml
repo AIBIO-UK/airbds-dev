@@ -29,4 +29,4 @@ jobs:
         run: pip install openpyxl pyyaml
 
       - name: Verify metric YAML/CSV are in sync with the source spreadsheet
-        run: python3 metric/src/scripts/build_metric_yaml_and_csv_from_spreadsheet_v0.3.py --check
+        run: python3 metric/src/scripts/build_metric_yaml_from_spreadsheet_v0.3.py --check

@@ -1,5 +1,5 @@
-# v0.4 metric YAML/CSV generation flow — AIRBDS
-# Tooling: metric/src/scripts/build_metric_yaml_and_csv_from_google_sheet_v0.4.py
+# v0.4 metric YAML generation flow — AIRBDS
+# Tooling: metric/src/scripts/build_metric_yaml_from_google_sheet_v0.4.py
 #          metric/src/scripts/sheet_source.py
 # Render:  scripts/render-diagrams.sh   (CI also re-renders on push via render-diagrams.yml)
 direction: down
@@ -15,21 +15,18 @@ upstream: Upstream source {
   sheet -> lookups
 }
 
-gen: build_metric_yaml_and_csv_from_google_sheet_v0.4.py {
+gen: build_metric_yaml_from_google_sheet_v0.4.py {
   style.fill: "#f6f8fa"
   fetch: "fetch_named_tabs\ndiscover gids → export?format=csv (no auth) → classify tabs by content"
   adapt: "CsvWorksheet adapter\nopenpyxl-like view, numeric coercion"
   read: "read_questions · read_grade_points · read_grading"
   validate: "validate()"
-  render: "render_yaml + render_csv\n+ sha256(source tabs) = content 'revision'"
+  render: "render_yaml\n+ sha256(source tabs) = content 'revision'"
   fetch -> adapt -> read -> validate -> render
 }
 
 out: metric/ outputs {
   yaml: "airbds_metric_v0.4.yaml\n# Source breadcrumb: sheet url + sha256" {
-    style.fill: "#e6ffed"
-  }
-  csv: airbds_metric_v0.4.csv {
     style.fill: "#e6ffed"
   }
   sidecar: "airbds_metric_v0.4.upstream.json\nsheet id/url · content_sha256 · generated_at" {
@@ -41,7 +38,6 @@ upstream.scoring -> gen.fetch
 upstream.lookups -> gen.fetch
 
 gen.render -> out.yaml: write
-gen.render -> out.csv: write
 gen.render -> out.sidecar: write
 
 check: "--check (no write)\nregenerate & byte-compare" {
@@ -50,7 +46,6 @@ check: "--check (no write)\nregenerate & byte-compare" {
 }
 gen.render -> check: "--check" {style.stroke-dash: 4}
 out.yaml -> check {style.stroke-dash: 4}
-out.csv -> check {style.stroke-dash: 4}
 
 drift: "DRIFT — exit 1\nmetric-upstream-drift-check.yml opens an issue" {
   style.fill: "#ffeef0"
