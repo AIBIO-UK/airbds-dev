@@ -199,7 +199,10 @@ git commit -m "review: add review for E-MTAB-1234 (CH)"
 git push -u origin review/add-E-MTAB-1234
 ```
 
-3. Open a pull request on GitHub against the `main` branch of [AIBIO-UK/airbds-metric](https://github.com/AIBIO-UK/airbds-metric).
+3. Open a pull request on GitHub against the `main` branch of [AIBIO-UK/airbds-dev](https://github.com/AIBIO-UK/airbds-dev).
+
+> Remember that scoring on pull request is **not live** — score the file yourself
+> first (see the dormancy notice at the top of this tutorial).
 
 For full contribution guidelines, including naming conventions and inter-rater reliability recommendations, see [CONTRIBUTING.md](../../CONTRIBUTING.md).
 

@@ -3,7 +3,12 @@
 # This YAML lists answer slots by question id; see airbds_metric_v0.4.yaml (or
 # review_template.csv) for the full question text and guidance.
 # See reviews/GUIDANCE.md and the metric YAML's grading block for grading details.
-# Submit completed file as a PR to https://github.com/AIBIO-UK/airbds-metric
+#
+# Scoring is NOT automated: automated scoring on pull request is disabled. Score
+# the completed file yourself with:
+#   python3 reviews/src/scripts/review_processor.py --files <file-list>
+# This validates the review, fills in the result block, and renames the file.
+# To submit, open a PR at https://github.com/AIBIO-UK/airbds-dev
 
 schema_version: "0.4"
 

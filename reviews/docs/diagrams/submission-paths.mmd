@@ -42,21 +42,25 @@ flowchart TD
     end
 
     %% ---------- Path A: GitHub review process (defined last → renders on the left) ----------
-    subgraph gh["Path A · GitHub review process — airbds-metric repo"]
+    %% DORMANT: the manual review process is not live. review-check.yml is disabled,
+    %% so scoring is no longer performed by CI — the assessor runs review_processor.py
+    %% themselves before opening the PR.
+    subgraph gh["Path A · GitHub review process — airbds-dev repo (DORMANT — not live)"]
         direction TB
+        score["Score locally (manual)<br/>review_processor.py<br/>validate · score · grade<br/>generate companion format · rename"]
         pr["Open pull request<br/>add file under reviews/"]
-        ci["GitHub Actions: review-check.yml<br/>validate · score · grade<br/>generate companion format · rename"]
         merge["Maintainer review and merge"]
         repo[("Published in reviews/<br/>versioned in Git")]
-        pr --> ci --> merge --> repo
+        score --> pr --> merge --> repo
     end
 
-    download -->|"Submit via GitHub"| pr
+    download -->|"Submit via GitHub (dormant)"| score
     download -->|"Upload in browser"| upload
 
     %% ---------- Styling ----------
     classDef startNode fill:#1f2937,stroke:#111827,color:#ffffff;
     classDef artifact fill:#fef3c7,stroke:#d97706,color:#000000;
     style create fill:#eef2ff,stroke:#6366f1,color:#1e1b4b;
-    style gh fill:#ecfdf5,stroke:#10b981,color:#064e3b;
+    %% Path A is greyed out rather than green: it is dormant, not a live route.
+    style gh fill:#f3f4f6,stroke:#9ca3af,color:#374151;
     style web fill:#eff6ff,stroke:#3b82f6,color:#1e3a8a;
