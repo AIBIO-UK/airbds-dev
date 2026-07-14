@@ -161,6 +161,29 @@ the `review:` commit prefix.
 
 ---
 
+## Which repository should a link point at?
+
+There are two repositories, and the distinction is deliberate — please don't
+"fix" one into the other:
+
+| Kind of link | Repository | Examples |
+|---|---|---|
+| **Identity / attribution** — how the metric is cited and credited | [`airbds-metric`](https://github.com/AIBIO-UK/airbds-metric) (publication) | `CITATION.cff` `repository-code`, the suggested-citation blocks in `LICENSE.md` and `README.md`, the `repository:` field in the generated metric YAMLs, tutorial footers |
+| **Actual use** — anything a reader clicks to *do* something | [`airbds-dev`](https://github.com/AIBIO-UK/airbds-dev) (this repo) | `git clone`, opening a PR, downloading a skill, the skills' update manifest and `skill_update_url`, `/plugin marketplace add` |
+
+The canonical identity of the metric is the publication repository. But the
+working material lives here, so anything actionable must resolve here for now.
+
+> The `repository:` field in the metric YAMLs is **generated** — it comes from the
+> `CONFIG` block in the build scripts under `metric/src/scripts/`. Change it there
+> and regenerate; never hand-edit the YAML.
+
+> The skills' update URLs are a special case: the URL is baked into each published
+> skill zip, so repointing it strands every already-installed skill. See
+> [`skills/docs/MAINTENANCE.md`](skills/docs/MAINTENANCE.md) before changing them.
+
+---
+
 ## File Structure & YAML Format
 
 ```

@@ -34,6 +34,6 @@ Full legal text: <https://creativecommons.org/licenses/by/4.0/legalcode>
 If you use this metric, please cite it using the metadata in
 [`CITATION.cff`](CITATION.cff). A suggested citation format:
 
-> AIRBDS Working Group, AIBIO-UK. (2025). *AIRBDS AI-Readiness Dataset
-> Scoring Metric* (v0.3). GitHub.
+> AIRBDS Working Group, AIBIO-UK. (2026). *AIRBDS AI-Readiness Dataset
+> Scoring Metric* (v0.4). GitHub.
 > <https://github.com/AIBIO-UK/airbds-metric>

@@ -156,6 +156,7 @@ For any **MINOR** change (question additions, deletions, or rewordings) or **MAJ
 | `README.md` | Version badge, question table, download links, and processor command examples all reference the old version |
 | `CHANGELOG.md` | No record of the change; violates the project's versioning contract with users |
 | `CITATION.cff` | `version` and `date-released` fields are stale; published citations will reference the wrong version |
+| `LICENSE.md` | Its suggested-citation block names a version and year; if not updated it contradicts `CITATION.cff` and `README.md` |
 | `skills/GF/GF-airbds-assessment-skill/SKILL.md` | Embedded question table, YAML templates, `schema_version` value, and file paths all reference old version |
 | `skills/testing/airbds-assessment-skill/SKILL.md` | Template filename reference (update only if the XLSX is also regenerated) |
 | `reviews/docs/tutorial-yaml.md` | File path references to `v0.3` in instructions become broken |
@@ -201,6 +202,7 @@ Use this as a checklist when implementing any metric change.
 - `README.md` — version badge, question table, download links, processor command examples
 - `CHANGELOG.md` — add a new entry at the top referencing the originating Issue
 - `CITATION.cff` — update `version:` and `date-released:` fields
+- `LICENSE.md` — update the version and year in the suggested-citation block (not the copyright year, which is the year of first publication). Keep it consistent with `CITATION.cff` and the Citation section of `README.md`
 - The review processor needs **no update** — it auto-selects `metric/airbds_metric_v<schema_version>.yaml` per review. Its workflows need none either, and neither runs automatically now: `review-check.yml` is disabled (the manual review process is not live) and `review-test.yml` is `workflow_dispatch`-only.
 - `skills/GF/GF-airbds-assessment-skill/SKILL.md` — update embedded templates, question table, file paths, skill version
 - `skills/testing/airbds-assessment-skill/SKILL.md` — update template filename **only if the XLSX is also regenerated**
