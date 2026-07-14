@@ -1,5 +1,11 @@
 # Reviewer guidance — understanding AIRBDS scores
 
+> **⚠️ Dormant — the manual review process is not live.** Nobody is currently
+> running the human reviewer workflow this page supports, and the CI that scored
+> submitted reviews is disabled. The scoring *concepts* below remain accurate
+> (they describe the metric itself), but the surrounding process does not run.
+> See [`reviews/README.md`](README.md) for what in this directory is still live.
+
 Background on how the metric turns a review into a score and grade, to help
 interpret a result. The **authoritative, machine-readable** definitions live in
 the metric YAML (`metric/airbds_metric_v<version>.yaml`): `grade_points` (the

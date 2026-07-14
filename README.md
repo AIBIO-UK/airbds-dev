@@ -3,7 +3,6 @@
 [![License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
 [![Version](https://img.shields.io/badge/metric%20version-v0.4-blue)](CHANGELOG.md)
 [![AIBIO-UK](https://img.shields.io/badge/AIBIO--UK-AIRBDS%20Working%20Group-green)](https://aibio.ac.uk/about/working-groups/airbds/)
-[![Review Check](https://github.com/AIBIO-UK/airbds-metric/actions/workflows/review-check.yml/badge.svg)](https://github.com/AIBIO-UK/airbds-metric/actions/workflows/review-check.yml)
 
 A versioned, machine-readable scoring metric for evaluating the **AI-readiness
 of bioscience datasets**. Developed by the
@@ -182,9 +181,22 @@ opening a PR. All contributors must abide by our [Code of Conduct](CODE_OF_CONDU
 
 ## Automated Review Processing
 
-When a pull request or push adds or modifies a file under `reviews/testing/`, a
+> **⚠️ Disabled — this no longer runs.** The manual review process is not live,
+> so the `Review Check & Score` workflow has had its automatic triggers removed.
+> Adding a file under `reviews/testing/` does **not** validate, score, or commit
+> anything back. The steps below are retained as a record of how the process
+> worked and what reviving it would restore; see
+> [`reviews/README.md`](reviews/README.md) for what in that directory is still
+> live. To score a review by hand:
+>
+> ```bash
+> pip install pyyaml
+> python3 reviews/src/scripts/review_processor.py --files <your-review-file>
+> ```
+
+When a pull request or push added or modified a file under `reviews/testing/`, a
 GitHub Actions workflow ([`.github/workflows/review-check.yml`](.github/workflows/review-check.yml))
-runs automatically to:
+ran automatically to:
 
 1. **Validate the filename** — checks it follows `<accession>_<INITIALS>_<n>.yaml` convention
 2. **Validate all required fields** — checks `reviewer`, `dataset`, and `answers` blocks are complete and correctly formatted

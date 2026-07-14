@@ -1,5 +1,9 @@
 # Archived review templates
 
+> **⚠️ Dormant — manual-process material.** The human reviewer workflow these
+> templates serve is not live, and the CI that scored submitted reviews is
+> disabled. Kept for reference. See [`reviews/README.md`](../README.md).
+
 Previous-version blank review templates, kept for reference and for reviewing a
 dataset against an older metric version.
 

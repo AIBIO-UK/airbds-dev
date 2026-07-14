@@ -26,6 +26,21 @@ This project adheres to
   (`reviews/review_template.{yaml,csv}`) is unaffected and keeps both formats.
 
 ### Changed
+- Disabled the `Review Check & Score` workflow (`.github/workflows/review-check.yml`):
+  its `push`/`pull_request` triggers on `reviews/testing/**` are removed, leaving
+  it `workflow_dispatch`-only. The manual review process is not live, and a
+  passing check implied reviews were being validated and scored as part of a
+  working pipeline. The workflow is retained, not deleted, so the process can be
+  revived by restoring the triggers. Reviews can still be scored by running
+  `reviews/src/scripts/review_processor.py` directly.
+- Marked the dormant manual-review material in `reviews/` — `GUIDANCE.md`, the
+  `docs/` tutorials, `examples/`, and `archived_templates/` — with notices, and
+  gave `reviews/README.md` a header distinguishing what is dormant from what is
+  still live in that directory: `src/google-sheet-converter/` (published as the
+  npm package `@airbds/converter-tools` and consumed by auto-airbds, resolving
+  the metric YAML by relative path) and `review_template.yaml` (the schema
+  contract the converter emits against). `reviews/` is therefore kept in the live
+  tree rather than archived wholesale as in PR #14.
 - Reworded ACM-2, ACM-3, ACM-5, ACM-6, and ACM-7 to the canonical AIRBDS
   question set (e.g. ACM-2 now covers metadata colocation, ACM-3 dataset
   integrity, ACM-6 FAIR-compliant archives).

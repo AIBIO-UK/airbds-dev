@@ -48,19 +48,26 @@ AIRBDS metric.
    questions (ABC-24 to ABC-27), if the dataset contains no human or animal
    subject data record the answer as `"Yes"` and set `not_applicable: true`
    with a brief comment.
-4. **Leave the `result:` block empty** — the automated workflow calculates your
-   weighted score and grade when you open a pull request. You do not need to
-   fill in `weighted_score` or `grade` manually.
+4. **Fill in the `result:` block yourself** — scoring is no longer automated (see
+   the notice below), so calculate `weighted_score` and `grade` by running the
+   review processor locally.
 5. **Submit a PR** — see [Pull Requests](#pull-requests).
 
-Once your PR is open, the [Review Check workflow](.github/workflows/review-check.yml) will:
-- Validate your filename and all required fields
-- Calculate your score and grade
-- Generate the companion format (YAML ↔ CSV)
-- Rename the file to include the score and grade (e.g. `E-MTAB-1234_CH_1_595_Silver.yaml`)
-- Commit the changes back to your branch
-
-If validation fails, the **Actions** tab of your PR shows a full error report.
+> **⚠️ The manual review process is not live.** The `Review Check & Score`
+> workflow that used to run on every PR — validating the filename and fields,
+> calculating the score and grade, generating the companion YAML/CSV, renaming
+> the file, and committing the result back to your branch — has had its
+> automatic triggers removed. **None of that happens now.** Run the processor
+> yourself instead:
+>
+> ```bash
+> pip install pyyaml
+> python3 reviews/src/scripts/review_processor.py --files reviews/testing/<your-review-file>
+> ```
+>
+> It performs the same validation and scoring locally and reports errors the same
+> way. See [`reviews/README.md`](reviews/README.md) for what in that directory is
+> still live.
 
 Inter-rater reliability is important. Where possible, datasets should be
 reviewed independently by at least two members before the review is merged.

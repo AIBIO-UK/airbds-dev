@@ -1,5 +1,10 @@
 # Review Examples
 
+> **⚠️ Dormant — manual-process material.** These examples supported the human
+> reviewer workflow, which is not live. They are still exercised by the
+> `Review Processor Test` workflow (`workflow_dispatch` only), so keep them
+> valid if you change the review schema. See [`reviews/README.md`](../README.md).
+
 This directory contains example review files for testing and reference.
 
 | File | Format | Compliant? | Purpose |

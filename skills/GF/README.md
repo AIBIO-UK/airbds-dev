@@ -3,7 +3,7 @@
 This directory contains personal/experimental skill variants authored by Gavin Farrell (GF),
 maintained in parallel with the team's `testing/` skills for individual experimentation.
 
-This variant collects reviewer metadata (name, initials, ORCID, affiliation, review number) before the assessment, then writes the completed review to `reviews/testing/<accession>_<INITIALS>_<n>.yaml` — ready for automated scoring by the `review-check` workflow.
+This variant collects reviewer metadata (name, initials, ORCID, affiliation, review number) before the assessment, then writes the completed review to `reviews/testing/<accession>_<INITIALS>_<n>.yaml`. Note that the `review-check` workflow that used to score such files automatically is **disabled** — the review must now be scored by running `reviews/src/scripts/review_processor.py` by hand.
 
 **These skills are not production-ready and have not been agreed with the team.**
 They exist for personal testing and as a proof-of-concept for improvements to discuss.

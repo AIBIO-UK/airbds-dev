@@ -1,5 +1,11 @@
 # How to Score a Dataset with the AIRBDS Metric
 
+> **⚠️ Dormant — the submission process in this tutorial does not run.** The
+> manual review workflow is not live: the CI that validated, scored, and
+> committed back submitted review files is disabled. You can still follow the
+> tutorial to *fill in* a review, but the steps describing what happens after you
+> open a pull request will not happen. See [`reviews/README.md`](../README.md).
+
 **Format: YAML · Intermediate · Requires a text editor and basic command-line familiarity**
 
 > **Full interactive version:** [airbds-metric-tutorial](https://aibio-uk.github.io/airbds-metric-tutorial/chapters/chapter_03_yaml/) — rendered lesson site with navigation, tips, and format chooser.

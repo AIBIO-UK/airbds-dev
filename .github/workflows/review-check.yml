@@ -1,12 +1,27 @@
-name: Review Check & Score
+name: Review Check & Score (disabled)
 
+# DISABLED — the manual review process is not live, so this workflow no longer
+# runs automatically. The push/pull_request triggers on 'reviews/testing/**' were
+# removed: a green check here implied reviews were being validated and scored as
+# part of a working pipeline, which is not the case.
+#
+# It is retained, not deleted, so the process can be revived: restore the triggers
+# below to bring it back. Commit-back is also inert while dormant — the step is
+# gated on a `push` event, which can no longer occur.
+#
+#   on:
+#     push:
+#       paths:
+#         - 'reviews/testing/**'
+#     pull_request:
+#       paths:
+#         - 'reviews/testing/**'
+#
+# Manual dispatch still validates and scores changed review files (without
+# committing anything back). To score a review locally instead:
+#   python3 reviews/src/scripts/review_processor.py --files <your-review-file>
 on:
-  push:
-    paths:
-      - 'reviews/testing/**'
-  pull_request:
-    paths:
-      - 'reviews/testing/**'
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -33,14 +48,16 @@ jobs:
         id: changed
         run: |
           # Determine comparison base:
-          # - Push: use event.before SHA (pre-push state); fall back to HEAD~1 if zero SHA
           # - PR: compare against base branch SHA
+          # - Push: use event.before SHA (pre-push state); fall back to HEAD~1 if zero SHA
+          # - Manual dispatch: no event.before exists, so compare against HEAD~1
+          BEFORE="${{ github.event.before }}"
           if [ "${{ github.event_name }}" = "pull_request" ]; then
             BASE="${{ github.event.pull_request.base.sha }}"
-          elif [ "${{ github.event.before }}" = "0000000000000000000000000000000000000000" ]; then
+          elif [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ]; then
             BASE="HEAD~1"
           else
-            BASE="${{ github.event.before }}"
+            BASE="$BEFORE"
           fi
 
           echo "Comparing against base: $BASE"

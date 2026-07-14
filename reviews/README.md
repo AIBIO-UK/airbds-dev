@@ -1,5 +1,26 @@
 # Reviews
 
+> ## ⚠️ The manual review process is not live
+>
+> **Nobody is running the human reviewer workflow described below**, and the CI
+> that used to score submitted reviews is switched off. Opening a pull request
+> with a review file will *not* validate it, score it, or commit anything back.
+> Do not follow the tutorials or the submission steps in this README expecting
+> them to work end-to-end — they document a dormant process.
+>
+> **This directory is not dormant, though.** Parts of it are live code that the
+> automated pipeline depends on:
+>
+> | Path | Status | Why it's live |
+> |------|--------|---------------|
+> | [`src/google-sheet-converter/`](src/google-sheet-converter/) | **Live** | Published as the npm package `@airbds/converter-tools` and consumed by the [`auto-airbds`](../../auto-airbds) website's server-side import route. It reads `metric/airbds_metric_v0.{3,4}.yaml` by relative path, so its location in the tree is load-bearing. |
+> | [`review_template.yaml`](review_template.yaml) | **Live** | Not just a reviewer download — it is the **schema contract the converter emits against**. Changing it changes the converter's output spec. |
+> | [`src/scripts/`](src/scripts/), [`testing/`](testing/), [`examples/`](examples/), [`docs/`](docs/), [`GUIDANCE.md`](GUIDANCE.md), [`archived_templates/`](archived_templates/) | Dormant | Manual-process material. Retained for reference and in case the process resumes. |
+>
+> So: don't delete or relocate this directory on the assumption that it's all
+> archived. Treat the manual-process pieces as reference, and the converter and
+> template as production dependencies.
+
 This directory holds the blank review template, the completed reviews (under
 [`testing/`](testing/) for now — nothing is in production yet), reference
 [`examples/`](examples/), and the tooling that produces and scores them
@@ -23,6 +44,17 @@ Example: `E-MTAB-1234_CH_1.yaml`
 ---
 
 ## What happens after you submit
+
+> **Dormant — this no longer happens.** The `Review Check & Score` workflow that
+> performed the steps below is disabled (it no longer runs on push or pull
+> request; see `.github/workflows/review-check.yml`). The description is kept as
+> a record of how the process worked, and of what would need re-enabling to
+> revive it. To score a review today, run the processor by hand:
+>
+> ```bash
+> pip install pyyaml
+> python3 reviews/src/scripts/review_processor.py --files <your-review-file>
+> ```
 
 When you open a pull request containing a review file, an automated workflow runs and:
 
