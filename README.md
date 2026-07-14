@@ -109,7 +109,10 @@ For the spreadsheet workflow, see the [Beginner CSV Tutorial](reviews/docs/tutor
    python3 reviews/src/scripts/review_processor.py --files /tmp/files.txt
    ```
 
-How scores and grades work is explained in [`reviews/GUIDANCE.md`](reviews/GUIDANCE.md); the authoritative numbers live in the metric YAML's `grade_points` / `grading`.
+How scores and grades work is explained in "Part 1 — The Metric & Scoring" in
+[`metric/README.md`](metric/README.md), with further rationale in
+[`reviews/GUIDANCE.md`](reviews/GUIDANCE.md); the authoritative numbers live in
+the metric YAML's `grade_points` / `grading`.
 
 ---
 
