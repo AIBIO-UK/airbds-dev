@@ -218,8 +218,10 @@ result:
 
 **e. After writing, tell the user:**
 > "Your review has been saved as `reviews/testing/<filename>.yaml`.
-> The automation will validate, score, and rename it when pushed to the repository.
-> To submit: open a pull request at https://github.com/AIBIO-UK/airbds-metric
+> Automated scoring on pull request is currently disabled, so score it yourself by
+> running `python3 reviews/src/scripts/review_processor.py --files <file-list>` —
+> this validates the review, fills in the score and grade, and renames the file.
+> To submit: open a pull request at https://github.com/AIBIO-UK/airbds-dev
 > or commit the file directly if you have write access."
 
 ---

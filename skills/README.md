@@ -45,7 +45,7 @@ You need **Code execution and file creation** turned on:
 
 ### Install the skill
 
-1. [Download the skill](https://github.com/AIBIO-UK/airbds-metric/releases/download/assessment-skill-testing/airbds-assessment-skill.zip)
+1. [Download the skill](https://github.com/AIBIO-UK/airbds-dev/releases/download/assessment-skill-testing/airbds-assessment-skill.zip)
 2. Go to [Customize → Skills](https://claude.ai/customize/skills).
 3. Click the **+** button, then **Create skill → Upload a skill**.
 4. Upload the skill.
@@ -59,9 +59,13 @@ Anthropic's full guide: <https://support.claude.com/en/articles/12512180-use-ski
 ## Claude Code
 
 ```
-/plugin marketplace add AIBIO-UK/airbds-metric
-/plugin install airbds-assessment@airbds-metric
+/plugin marketplace add AIBIO-UK/airbds-dev
+/plugin install airbds-assessment@airbds-marketplace
 ```
+
+The marketplace is defined in [`.claude-plugin/marketplace.json`](../.claude-plugin/marketplace.json);
+`airbds-marketplace` is its `name`, which is what `/plugin install` matches on — not the
+repository name.
 
 ---
 

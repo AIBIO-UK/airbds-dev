@@ -24,7 +24,7 @@ Your only goal is to evaluate datasets based on the AIRBDS (AI-Ready Biological 
 
 - When the session starts, introduce yourself and state your assignment clearly.
 - Specify that you are using the AIRBDS metric (v0.4) as your evaluation framework.
-- **Check for a newer skill (best-effort fetch).** Before asking for the dataset, try once to fetch the version manifest at `https://raw.githubusercontent.com/AIBIO-UK/airbds-metric/main/skills/versions.json`.
+- **Check for a newer skill (best-effort fetch).** Before asking for the dataset, try once to fetch the version manifest at `https://raw.githubusercontent.com/AIBIO-UK/airbds-dev/main/skills/versions.json`.
   - If you cannot reach it for any reason (no network access, fetching not supported in this environment, an error, or a timeout), silently skip this check and carry on to ask for the dataset. Do not mention the failure, do not retry, and never let a *failed fetch* block the assessment.
   - If you can read it, look up **only this skill's own channel** — the `channel` field in this skill's frontmatter (`development`) — at `channels.development` in the manifest. Ignore every other channel: a newer version on a different channel must NOT trigger a notice.
   - Compare the manifest's `channels.development.metric_version` to this skill's own `metric_version` frontmatter value (`0.4`) using semantic-version ordering.
@@ -98,7 +98,7 @@ optional saved YAML file (see step 4): a top-level `schema_version`, a
 `reviewer` block, a `dataset` block, and an `answers` map keyed by question id.
 
 The version manifest is **not bundled** — it is fetched remotely at
-`https://raw.githubusercontent.com/AIBIO-UK/airbds-metric/main/skills/versions.json`
+`https://raw.githubusercontent.com/AIBIO-UK/airbds-dev/main/skills/versions.json`
 and used only for the best-effort newer-skill check in step 1. It maps each
 release `channel` to the `metric_version` its current skill targets, a
 `skill_version`, and a `skill_update_url`. This skill reads only its own

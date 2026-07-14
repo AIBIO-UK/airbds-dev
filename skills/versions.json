@@ -1,17 +1,18 @@
 {
   "_comment": "Source of truth for the CURRENT AIRBDS assessment-skill release on each channel. The assessment skill fetches this at runtime to tell a user when a newer skill — one that assesses against a newer AIRBDS metric version — is available for THEIR OWN channel. A skill compares only against its own channel: a 'testing' skill is never nudged because 'development' has moved ahead. Update this file whenever a channel's released skill starts targeting a new metric version (see skills/README.md).",
+  "_comment_urls": "These URLs point at airbds-dev because the 'testing' and 'development' channels are development artifacts: the build workflows in this repo publish their zips as releases HERE. A future released channel is expected to be served from the publication repo (AIBIO-UK/airbds-metric) instead — do not repoint these until that repo actually hosts the manifest and releases, or the update check will 404 again.",
   "manifest_version": 1,
-  "raw_url": "https://raw.githubusercontent.com/AIBIO-UK/airbds-metric/main/skills/versions.json",
+  "raw_url": "https://raw.githubusercontent.com/AIBIO-UK/airbds-dev/main/skills/versions.json",
   "channels": {
     "testing": {
       "metric_version": "0.4",
       "skill_version": "0.3.1",
-      "skill_update_url": "https://github.com/AIBIO-UK/airbds-metric/releases/download/assessment-skill-testing/airbds-assessment-skill.zip"
+      "skill_update_url": "https://github.com/AIBIO-UK/airbds-dev/releases/download/assessment-skill-testing/airbds-assessment-skill.zip"
     },
     "development": {
       "metric_version": "0.4",
       "skill_version": "0.3.1",
-      "skill_update_url": "https://github.com/AIBIO-UK/airbds-metric/releases/download/assessment-skill-development/airbds-assessment-skill-dev.zip"
+      "skill_update_url": "https://github.com/AIBIO-UK/airbds-dev/releases/download/assessment-skill-development/airbds-assessment-skill-dev.zip"
     }
   }
 }

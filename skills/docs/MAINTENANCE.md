@@ -17,7 +17,21 @@ may sit on an older AIRBDS metric version while `development` has moved ahead.
 
 `skills/versions.json` is the source of truth for the **current** assessment
 skill on each channel. It is served over GitHub raw at
-<https://raw.githubusercontent.com/AIBIO-UK/airbds-metric/main/skills/versions.json>.
+<https://raw.githubusercontent.com/AIBIO-UK/airbds-dev/main/skills/versions.json>.
+
+> **Why `airbds-dev` and not `airbds-metric`?** The `testing` and `development`
+> channels are development artifacts: the build workflows in this repo publish
+> their zips as releases *here*, so the manifest and the `skill_update_url`s must
+> point here too. These URLs previously pointed at `airbds-metric`, which worked
+> only while that was this repo's name — creating a new repo at the old name
+> removed the rename redirect and left the update check returning 404.
+>
+> A future *released* channel is expected to be served from the publication repo
+> (`AIBIO-UK/airbds-metric`). **Do not repoint these URLs until that repo actually
+> hosts a `versions.json` and the corresponding releases**, or the update check
+> breaks again. Note that the URL is baked into each published skill zip, so a
+> stranded skill cannot be repaired retroactively — only reinstallation picks up
+> a new URL.
 
 Each entry under `channels` records, for that channel's current skill:
 
