@@ -1,9 +1,19 @@
-# AIRBDS AI-Readiness Dataset Scoring Metric
+# AIRBDS Metric — Development Repository
 
 [![License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
 [![Version](https://img.shields.io/badge/metric%20version-v0.4-blue)](CHANGELOG.md)
 [![AIBIO-UK](https://img.shields.io/badge/AIBIO--UK-AIRBDS%20Working%20Group-green)](https://aibio.ac.uk/about/working-groups/airbds/)
 [![Metric Upstream Drift Check](https://github.com/AIBIO-UK/airbds-dev/actions/workflows/metric-upstream-drift-check.yml/badge.svg)](https://github.com/AIBIO-UK/airbds-dev/actions/workflows/metric-upstream-drift-check.yml)
+
+> ### 🚧 This is the AIRBDS **development** repository
+>
+> It holds the in-progress metric, the assessment skills, and the tooling that
+> builds them. Content here is work in flight: versions may be unreleased, and
+> breaking changes land without notice.
+>
+> **For the canonical AIRBDS metric YAML and assessment skills, use the
+> publication repository — [AIBIO-UK/airbds-metric](https://github.com/AIBIO-UK/airbds-metric).**
+> Work here only if you intend to contribute to the metric's development.
 
 A versioned, machine-readable scoring metric for evaluating the **AI-readiness
 of bioscience datasets**. Developed by the

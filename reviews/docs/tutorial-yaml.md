@@ -33,8 +33,8 @@ Copy the YAML review template, fill in your answers to 27 Yes/No questions, vali
 Clone the repository to your local machine:
 
 ```bash
-git clone https://github.com/AIBIO-UK/airbds-metric.git
-cd airbds-metric
+git clone https://github.com/AIBIO-UK/airbds-dev.git
+cd airbds-dev
 ```
 
 Or, if you plan to submit your review, fork the repository on GitHub first, then clone your fork.

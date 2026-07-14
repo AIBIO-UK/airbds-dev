@@ -164,7 +164,7 @@ the `review:` commit prefix.
 ## File Structure & YAML Format
 
 ```
-airbds-metric/
+airbds-dev/
 ├── metric/
 │   └── airbds_metric_v0.4.yaml   # Canonical metric (questions, weights, grading rules)
 ├── reviews/                      # Reviews + review tooling
