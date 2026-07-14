@@ -1,16 +1,12 @@
 # `google-sheet-converter/`
 
-> **This whole package is archived** (moved from `reviews/src/` to
-> `archive/deactivated/reviews/src/` during a repo cleanup) — not deleted, just
-> no longer live at the repo's `reviews/` folder. Reactivate by moving it back.
-
 The reusable AIRBDS review-converter library — turns an assessment spreadsheet
-into a review YAML conforming to the review template schema
-([`review_template.yaml`](../../review_template.yaml)).
-It is the shared, metric-version-agnostic core used by the CLI
+into a review YAML conforming to
+[`review_template.yaml`](../../review_template.yaml). It is the
+shared, metric-version-agnostic core used by the CLI
 (`../scripts/convert_review_google_sheet_to_yaml.mts`, which reads the metric
 version from the sheet) and by the
-[`auto-airbds`](../../../../../../../auto-airbds) website's server-side import route, which
+[`auto-airbds`](../../../../../auto-airbds) website's server-side import route, which
 depends on it as the published npm package **`@airbds/converter-tools`**.
 
 This is its own npm package — `package.json`, dependencies, and `tsconfig.json`
@@ -26,7 +22,7 @@ usage).
 
 ## Develop
 
-Run from this directory (`archive/deactivated/reviews/src/google-sheet-converter`):
+Run from this directory (`reviews/src/google-sheet-converter`):
 
 ```bash
 bun install       # one-time

@@ -1,109 +1,87 @@
 # metric/ — AIRBDS Metric Files
 
-This README has two clearly separated parts: **Part 1** explains the metric
-itself and how scoring works (for anyone assessing a dataset); **Part 2** is
-the contributor/maintainer guide for updating the metric files in this folder.
+> **Before editing any file in this folder, read this document.**
+
+The `metric/` folder is the **single source of truth** for the AIRBDS scoring metric — the versioned question set plus the `grade_points`/`grading` scoring rules, in two machine-readable formats. The blank review template and completed dataset reviews live in `reviews/`, not here — but the template stays version-locked to the metric (see Group B below).
+
+Changes to this folder have a disproportionate downstream impact. Multiple files across the repository — scripts, GitHub Actions workflows, skills, tutorials, and documentation — all reference the exact metric version and file paths. A partial update (e.g. editing the YAML without regenerating the CSV, or bumping the version without updating the workflow paths) creates silent failures that corrupt inter-rater reliability or break the CI/CD pipeline.
 
 ---
 
-## Part 1 — The Metric & Scoring
+## Files in This Folder
 
-### What the Metric Is
+| Filename | Format | Purpose | Paired With |
+|----------|--------|---------|-------------|
+| `airbds_metric_v0.4.yaml` | YAML | **Canonical — current.** 27-question metric: question text, grades, guidance, scopes, and the `grade_points`/`grading` scoring rules | `airbds_metric_v0.4.csv` |
+| `airbds_metric_v0.4.csv` | CSV | Identical content to the YAML metric; used by the spreadsheet workflow | `airbds_metric_v0.4.yaml` |
+| `airbds_metric_v0.4.upstream.json` | JSON | v0.4 provenance: source sheet id/url + `content_sha256` "revision" + generation timestamp | — |
+| `airbds_metric_v0.3.yaml` | YAML | **Previous version — retained.** 28-question metric; reviews carrying `schema_version: "0.3"` still score against it | `airbds_metric_v0.3.csv` |
+| `airbds_metric_v0.3.csv` | CSV | Identical content to the v0.3 YAML metric | `airbds_metric_v0.3.yaml` |
+| `README.md` | Markdown | This file — contributor guide for the metric folder | — |
+| `skills/SKILL.md` | Markdown | AI agent skill for propagating metric changes across the repo | — |
 
-The AIRBDS metric is a versioned, machine-readable checklist for assessing
-how suitable a bioscience dataset is for AI/ML use. It's a **27-question**
-set, grouped into scopes (Infrastructure, Metadata, Content, Ethics) and
-three weight tiers (Critical, Important, Optional), plus the `grade_points`
-and `grading` rules that turn a set of Yes/No answers into a weighted score
-and a grade. `metric/airbds_metric_v0.4.yaml` is the single **source of
-truth** for all of this — the exact question text, guidance, scopes, and
-scoring rules.
+> **v0.4 is the current version.** `airbds_metric_v0.4.*` is generated from the working group's Google Sheet (see [How the v0.4 metric files are generated](#how-the-v04-metric-files-are-generated) and the `[0.4]` entry in [CHANGELOG.md](../CHANGELOG.md)). **v0.3 is retained** for reference and for re-scoring older reviews — the review processor auto-selects the metric matching each review's `schema_version`.
 
-### Use the Metric
+> **Note on versioning:** the **current** `review_template` pair (under `reviews/`) is **not** versioned in its filename — `reviews/review_template.{yaml,csv}` always tracks the current metric (now v0.4), so non-technical reviewers always download the right file. It carries a `schema_version` field that must match the current metric version, so it is updated on every bump. On a bump, the outgoing pair is first copied to `reviews/archived_templates/review_template_v<old>.{yaml,csv}` (e.g. `review_template_v0.3.{yaml,csv}`) before the unversioned pair is overwritten — so previous versions stay retrievable as files, not just in git history.
 
-Two ways to use v0.4 directly:
-
-- **[Open the Google Sheet](https://docs.google.com/spreadsheets/d/1eriM8bXAoNXsIR9l8OpI1XYEp8FbtBWt05CTIP9cVeg/edit)** — the live source of truth, with built-in formulas that calculate the weighted score and grade automatically as you fill in answers. **Recommended for scoring a dataset today.**
-- **[`airbds_metric_v0.4.yaml`](airbds_metric_v0.4.yaml)** — the generated YAML, for anything programmatic. There's no tool yet that takes a filled-in YAML review and scores it for you — automated YAML-based scoring is planned infrastructure, not yet built (see [How the v0.4 metric file is generated](#how-the-v04-metric-file-is-generated) for the one piece of automation that does exist: the Sheet → YAML sync).
-
-To score a dataset against the metric, see the **[interactive tutorial site](https://aibio-uk.github.io/airbds-metric-tutorial/)** for a step-by-step walkthrough.
-
-### How Scoring Works
-
-Each question is graded into one of three tiers, worth different points when
-answered `Yes` (a `No` always scores 0):
-
-| Tier | Points | Why |
-|------|--------|-----|
-| **Critical** | 80 | Failing a Critical question indicates a fundamental problem that severely limits the dataset's suitability for AI/ML use. |
-| **Important** | 5 | Important questions represent best practices affecting reproducibility, interoperability, or usability. |
-| **Optional** | 2 | Optional questions capture desirable but non-essential characteristics. |
-
-A dataset's weighted score is the sum of points for its `Yes` answers. These
-point values are the human-readable rationale — the **authoritative,
-machine-readable** numbers live in the metric YAML's `grade_points` block.
-
-### Grades
-
-A dataset earns the **highest** grade for which it meets *both* the per-tier
-pass-rate criteria *and* that grade's minimum total score (`min_score`). The
-exact `min_score` and pass-rate values are in the metric YAML's `grading`
-block and can differ between metric versions.
-
-| Grade | Badge colour | Means |
-|-------|--------------|-------|
-| 🟡 **Gold** | `#ffc107` | Passes all Critical and Important questions, plus ≥ 50% of Optional. |
-| ⚪ **Silver** | `#c0c0c0` | Passes all Critical, plus ≥ 50% of Important. |
-| 🟤 **Bronze** | `#cd7f32` | Passes most Critical questions. |
-| 🔴 **Caution** | `#dc3545` | May have serious issues — fails one or more Critical criteria. |
-
-The badge colours are a presentation reference only — no tool reads them
-from the repo.
-
-### Ethics Questions
-
-Ethics-scope questions (ABC-24 – ABC-27) default to `"Yes"` for datasets
-that contain **no human or animal subject data** — set `not_applicable:
-true` and note it in the comments. In the metric these questions carry
-`not_applicable_default: "Yes"`.
+> **Note on new metric versions:** A version bump creates new files (e.g. `airbds_metric_v0.4.yaml` + `.csv`). Old versions are **retained** for archival — reviews carry `schema_version` to record which version they were scored against.
 
 ---
 
-## Part 2 — Updating & Maintaining the Metric
+## How the v0.3 metric files are generated
 
-> **Before editing any file in this folder, read this section.**
+`airbds_metric_v0.3.yaml` and `airbds_metric_v0.3.csv` are **generated, not hand-edited.** Both are produced from a single source — the scoring spreadsheet (`AIRBDS Core Metric scoring v0.3 - _initials_-_#_ TEMPLATE.xlsx` in `metric/upstream/`) — by one script:
 
-Changes to this folder have a disproportionate downstream impact. `README.md`, `CHANGELOG.md`, and `CITATION.cff` all reference the exact metric version. A partial update (e.g. bumping the version without updating the README) creates silent inconsistencies.
+```
+metric/src/scripts/build_metric_yaml_and_csv_from_spreadsheet_v0.3.py
+```
 
-### Files in This Folder
+Because that one script writes **both** formats from the same question data, the Group A pair can never drift apart.
 
-| Filename | Format | Purpose |
-|----------|--------|---------|
-| `airbds_metric_v0.4.yaml` | YAML | **Canonical — current.** 27-question metric: question text, grades, guidance, scopes, and the `grade_points`/`grading` scoring rules |
-| `CHANGELOG.md` | Markdown | Full version history of the metric |
-| `README.md` | Markdown | This file — contributor guide for the metric folder |
+- **To change metric content** (questions, themes, grades, mapped-from references): edit the `Scoring` and `Lookups` sheets of the spreadsheet, then regenerate:
+  ```
+  python3 metric/src/scripts/build_metric_yaml_and_csv_from_spreadsheet_v0.3.py
+  ```
+- **Document-level metadata not held in the spreadsheet** (licence, repository, contact, the prose description, scope descriptions) lives in a `CONFIG` block at the top of the script — edit it there.
+- **To verify** the committed files are in sync with the spreadsheet (suitable for CI):
+  ```
+  python3 metric/src/scripts/build_metric_yaml_and_csv_from_spreadsheet_v0.3.py --check
+  ```
+  This exits non-zero if either file is out of date.
 
-The generator script, its provenance sidecar (`airbds_metric_v0.4.upstream.json`), and the drift-check workflow live in [`admin/`](../admin/) — see [How the v0.4 metric file is generated](#how-the-v04-metric-file-is-generated).
+> The YAML carries a **GENERATED FILE — DO NOT EDIT BY HAND** banner. Edit the spreadsheet (or the script's `CONFIG`) and regenerate rather than editing the YAML/CSV directly. CSV has no comment syntax, so it carries no banner — but it is regenerated by the same command.
 
-Metric output is YAML-only.
+## How the v0.4 metric files are generated
 
-### How the v0.4 metric file is generated
+From v0.4 the metric is authored in the working group's **public Google Sheet** rather than a committed `.xlsx`. `metric/src/scripts/build_metric_yaml_and_csv_from_google_sheet_v0.4.py` pulls the Scoring and Lookups tabs and regenerates `airbds_metric_v0.4.{yaml,csv}`, recording which sheet and a content-hash "revision" in `airbds_metric_v0.4.upstream.json` plus a `# Source:` breadcrumb in the YAML. See [`metric/src/README.md`](src/README.md) for the commands, the `--check` drift check, and offline use. The v0.3 `.xlsx` chain stays in place unchanged.
 
-The metric is authored in the working group's **public Google Sheet**. [`admin/scripts/build_metric_yaml_and_csv_from_google_sheet_v0.4.py`](../admin/scripts/build_metric_yaml_and_csv_from_google_sheet_v0.4.py) pulls the Scoring and Lookups tabs and regenerates `airbds_metric_v0.4.yaml`, recording which sheet and a content-hash "revision" in [`admin/airbds_metric_v0.4.upstream.json`](../admin/airbds_metric_v0.4.upstream.json) plus a `# Source:` breadcrumb in the YAML. See [`admin/README.md`](../admin/README.md) for the commands, the `--check` drift check, and offline use. A weekly check (`.github/workflows/metric-upstream-drift-check.yml`) confirms the committed YAML still matches the Google Sheet.
+---
 
-### Why Downstream Files Must Change Together
+## Why ALL Files Must Change Together
+
+### The YAML ↔ CSV pairs must always be identical in content
+
+YAML and CSV files are **not** derived from each other at read time — both are independent files that are read directly. The automated review processor (`reviews/src/scripts/review_processor.py`) loads whichever format was changed; the human spreadsheet workflow reads the CSV. If the YAML is updated but the CSV is not, a researcher using the spreadsheet workflow scores against a different version of the metric than one using the YAML workflow. This is **silent**, produces no error, and **invalidates inter-rater reliability**.
+
+### The downstream impact chain
 
 For any **MINOR** change (question additions, deletions, or rewordings) or **MAJOR** change (weight or grade threshold changes), the following files outside `metric/` must also be updated in the same commit or PR:
 
 | File | What breaks if not updated |
 |------|---------------------------|
-| `README.md` | Version badge and question table reference the old version |
-| `metric/CHANGELOG.md` | No record of the change; violates the project's versioning contract with users |
+| `README.md` | Version badge, question table, download links, and processor command examples all reference the old version |
+| `CHANGELOG.md` | No record of the change; violates the project's versioning contract with users |
 | `CITATION.cff` | `version` and `date-released` fields are stale; published citations will reference the wrong version |
+| `skills/GF/GF-airbds-assessment-skill/SKILL.md` | Embedded question table, YAML templates, `schema_version` value, and file paths all reference old version |
+| `skills/testing/airbds-assessment-skill/SKILL.md` | Template filename reference (update only if the XLSX is also regenerated) |
+| `reviews/docs/tutorial-yaml.md` | File path references to `v0.3` in instructions become broken |
+| `reviews/docs/tutorial-csv.md` | Same as above for spreadsheet tutorial |
 
-**PATCH** changes (guidance text only — no change to question meaning, weight, or ID) are lighter: update only the metric YAML. Downstream files are not required unless they quote guidance text verbatim.
+**PATCH** changes (guidance text only — no change to question meaning, weight, or ID) are lighter: update only the YAML/CSV pairs. Downstream files are not required unless they quote guidance text verbatim.
 
-### Recommended Workflow for Proposing Changes
+---
+
+## Recommended Workflow for Proposing Changes
 
 1. **Check existing Issues** at [github.com/AIBIO-UK/airbds-metric/issues](https://github.com/AIBIO-UK/airbds-metric/issues) before opening a new one — the change may already be under discussion.
 
@@ -111,40 +89,77 @@ For any **MINOR** change (question additions, deletions, or rewordings) or **MAJ
    - Which question(s) are affected (e.g. ABC-12, ABC-16)
    - The rationale for the change
    - Whether this is a guidance-only change (**PATCH**), a question rewording/addition/deletion (**MINOR**), or a weight/threshold change (**MAJOR**)
-
+   
    See [CONTRIBUTING.md](../CONTRIBUTING.md) for the full versioning policy.
 
 3. **Discuss on the Issue** until working-group consensus is reached. A maintainer will label the issue `metric-change-pending`.
 
 4. **Fork the repository** and create a branch named `metric/<issue-number>-brief-description` (e.g. `metric/42-add-acm-29-reproducibility`).
 
-5. **Update ALL coupled files** as described in the Coupled File Groups manifest below. This is **not optional** — review carefully before merging, there is no automated check for it.
+5. **Update ALL coupled files** as described in the Coupled File Groups manifest below. This is **not optional** — the automated alignment check will flag partial updates and create a GitHub Issue.
 
-6. **Open a pull request** referencing the original Issue (e.g. `Closes #42`).
+6. **Open a pull request** referencing the original Issue (e.g. `Closes #42`). The `metric-alignment-check` workflow runs automatically on your PR. If it flags any files as out of sync, fix them before requesting review.
 
 7. **Working-group review** and merge by a maintainer.
 
-### Coupled File Groups Manifest
+---
+
+## Coupled File Groups Manifest
 
 Use this as a checklist when implementing any metric change.
 
-**Group A — Core metric file**
+### Group A — Core metric pair *(always change together)*
 - `metric/airbds_metric_vX.Y.yaml`
+- `metric/airbds_metric_vX.Y.csv`
 
-> Never hand-edit. For v0.4 (current) it is generated from the working group's Google Sheet by `admin/scripts/build_metric_yaml_and_csv_from_google_sheet_v0.4.py`. See [How the v0.4 metric file is generated](#how-the-v04-metric-file-is-generated).
+> Both are generated together — never hand-edit either file. For v0.4 (current) they are generated from the working group's Google Sheet by `metric/src/scripts/build_metric_yaml_and_csv_from_google_sheet_v0.4.py`; for v0.3 by `metric/src/scripts/build_metric_yaml_and_csv_from_spreadsheet_v0.3.py`. See [How the v0.4 metric files are generated](#how-the-v04-metric-files-are-generated).
 
-**Group B — Downstream version-carrying files** *(MINOR or MAJOR changes only)*
-- `README.md` — version badge, question table
-- `metric/CHANGELOG.md` — add a new entry at the top referencing the originating Issue
+### Group B — Review template pair *(always change together)*
+- `reviews/review_template.yaml`
+- `reviews/review_template.csv`
+
+### Group C — Downstream version-carrying files *(MINOR or MAJOR changes only)*
+- `README.md` — version badge, question table, download links, processor command examples
+- `CHANGELOG.md` — add a new entry at the top referencing the originating Issue
 - `CITATION.cff` — update `version:` and `date-released:` fields
+- The review processor and its workflows (`review-check.yml`, `review-test.yml`) need **no update** — the processor auto-selects `metric/airbds_metric_v<schema_version>.yaml` per review.
+- `skills/GF/GF-airbds-assessment-skill/SKILL.md` — update embedded templates, question table, file paths, skill version
+- `skills/testing/airbds-assessment-skill/SKILL.md` — update template filename **only if the XLSX is also regenerated**
+- `skills/versions.json` — per-channel update manifest the assessment skills read at runtime; bump a channel's `metric_version` only when that channel's skill is actually repointed to the new metric (leave channels intentionally kept on the old metric untouched). Validate with `scripts/validate-skills-versions.py`
+- `reviews/docs/tutorial-yaml.md` — update all `vX.Y` path references
+- `reviews/docs/tutorial-csv.md` — update all `vX.Y` path references
 
-### Versioning Quick Reference
+> `metric/README.md` and `metric/skills/SKILL.md` are documentation files. They do not have YAML/CSV counterparts and are excluded from the automated pair-checking. Update their version references when implementing MINOR or MAJOR changes.
+
+---
+
+## Automated Alignment Check
+
+Every push or pull request that touches a file under `metric/` — or the `review_template` pair under `reviews/` — triggers the `.github/workflows/metric-alignment-check.yml` workflow. It performs the following checks automatically:
+
+**1. YAML ↔ CSV pair check.** For every versioned metric YAML changed, it verifies the matching CSV was also changed in the same commit range, and vice versa. The same check applies to the `review_template` pair.
+
+**2. New-version downstream check.** If a new versioned metric YAML is detected as _Added_ (e.g. `airbds_metric_v0.4.yaml` appears for the first time), the workflow also checks whether `CHANGELOG.md` and `README.md` were updated in the same commit range.
+
+**On misalignment (push events):** The workflow creates a GitHub Issue in this repository titled `[metric-alignment] Out-of-sync metric files detected`, tagged with the `metric-alignment` label. The issue body lists the exact files that are missing and provides remediation instructions.
+
+**On misalignment (pull request events):** In addition to the Issue, the workflow posts a comment directly on the PR listing the files that need to be added before the PR can be merged.
+
+**Deduplication:** If an open `metric-alignment` issue already exists for the same PR or commit SHA, the workflow adds a comment to the existing issue rather than creating a duplicate.
+
+**On alignment restored:** When a subsequent push resolves the misalignment, the workflow closes any open `metric-alignment` issue it finds for that PR/SHA.
+
+**Using the agent skill to fix misalignment:** If you are using Claude Code in this repository, invoke the `metric/skills/SKILL.md` skill to propagate changes automatically. The skill will read the changed file(s), determine the change type, and update all coupled files with a summary of what was modified.
+
+---
+
+## Versioning Quick Reference
 
 | Change type | Description | Version bump | Files to update |
 |-------------|-------------|-------------|-----------------|
-| **PATCH** | Guidance text clarification only — no change to question meaning, weights, or IDs | `0.4` → `0.4.1` | Group A |
-| **MINOR** | Question added, removed, or reworded | `0.4` → `0.5` | Groups A, B |
-| **MAJOR** | Weight point value or grade threshold changed | `0.4` → `1.0` | Groups A, B |
+| **PATCH** | Guidance text clarification only — no change to question meaning, weights, or IDs | `0.4` → `0.4.1` | Groups A, B |
+| **MINOR** | Question added, removed, or reworded | `0.4` → `0.5` | Groups A, B, C |
+| **MAJOR** | Weight point value or grade threshold changed | `0.4` → `1.0` | Groups A, B, C |
 
 The canonical versioning policy is defined in [CONTRIBUTING.md](../CONTRIBUTING.md).
 

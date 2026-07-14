@@ -4,5 +4,5 @@
   "sheet_id": "1eriM8bXAoNXsIR9l8OpI1XYEp8FbtBWt05CTIP9cVeg",
   "content_sha256": "e8e257f6b8c66f7b40b8ce40d6c942fad9615d9e7fad07f1edc8dfcaa11402be",
   "generated_at": "2026-06-17T15:07:37Z",
-  "generator": "admin/scripts/build_metric_yaml_and_csv_from_google_sheet_v0.4.py"
+  "generator": "metric/src/scripts/build_metric_yaml_and_csv_from_google_sheet_v0.4.py"
 }

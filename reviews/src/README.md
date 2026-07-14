@@ -1,9 +1,4 @@
-# `reviews/src/` — review tooling (archived)
-
-> **This whole folder is archived** under `archive/deactivated/reviews/src/` —
-> not deleted, just no longer live at the repo's `reviews/` folder (which is
-> now just a simple deposit-and-format README). Reactivate by moving the
-> relevant pieces back to `reviews/`.
+# `reviews/src/` — review tooling
 
 The tooling that turns assessments into review files and validates/scores them.
 The design rationale lives in [`docs/DESIGN.md`](docs/DESIGN.md).
@@ -28,7 +23,7 @@ loads the matching metric automatically, so one command handles any version.
 curl -fsSL https://bun.sh/install | bash
 
 # 2. Install dependencies (one-time — they live in the converter package)
-cd archive/deactivated/reviews/src/google-sheet-converter
+cd reviews/src/google-sheet-converter
 bun install
 
 # 3. Convert a sheet → review YAML (run the CLI from reviews/src/scripts)
@@ -57,8 +52,8 @@ Notes:
   left blank for you to fill in (warnings flag them). Warnings also list any
   unanswered questions — the file is a draft until every question is `Yes`/`No`.
 - After converting, name the file per
-  [`CONTRIBUTING.md`](../../../../CONTRIBUTING.md) (`<accession>_<INITIALS>_<n>.yaml`) and
-  submit it. CI-based scoring is currently archived (see the banner above); scoring is a manual step for now.
+  [`CONTRIBUTING.md`](../../CONTRIBUTING.md) (`<accession>_<INITIALS>_<n>.yaml`) and
+  submit it; CI scores it on the way in.
 
 ## Python
 

@@ -2,13 +2,6 @@
 
 **Format: CSV · Beginner · No coding required · Works in Excel or Google Sheets**
 
-> **⚠️ Archived.** This file moved from `reviews/docs/` to `archive/deactivated/reviews/docs/`
-> along with the rest of the review-submission subsystem — not deleted, just no longer
-> live at the repo's `reviews/` folder (which is now a simple drop folder; see
-> [`reviews/README.md`](../../../../reviews/README.md)). Automated scoring on PR
-> (Step 9 below) is currently paused — see [CONTRIBUTING.md](../../../../CONTRIBUTING.md).
-> Note the **metric itself** dropped its CSV format — see Step 1 below.
-
 > **Full interactive version:** [airbds-metric-tutorial](https://aibio-uk.github.io/airbds-metric-tutorial/chapters/chapter_02_csv/) — rendered lesson site with navigation, tips, and format chooser.
 
 This tutorial walks you through scoring a bioscience dataset for AI-readiness using a spreadsheet. No programming knowledge is needed — you only need Excel, Google Sheets, or any equivalent tool.
@@ -29,9 +22,7 @@ Download the blank review template directly from the repository:
 
 To download: click the link above, then on GitHub click the **Download raw file** button (the down-arrow icon near the top-right of the file view).
 
-> The canonical question reference — with full guidance text and weights — is in
-> [metric/airbds_metric_v0.4.yaml](../../../../metric/airbds_metric_v0.4.yaml). The metric
-> itself is YAML-only; only the *review* template (this file) still offers a CSV format.
+> The canonical question reference — with full guidance text and weights — is in [metric/airbds_metric_v0.4.csv](../../metric/airbds_metric_v0.4.csv).
 
 ---
 
@@ -156,7 +147,7 @@ Look up your critical, important, and optional pass rates in this table:
 | Silver | ⚪ | = 1.0 (all) | ≥ 0.5 | any |
 | Gold | 🟡 | = 1.0 (all) | = 1.0 (all) | ≥ 0.5 |
 
-What the grades mean is explained in [reviews/GUIDANCE.md](../GUIDANCE.md); the thresholds are in the metric YAML's `grading` block.
+What the grades mean is explained in [reviews/GUIDANCE.md](../GUIDANCE.md); the thresholds are in the metric (`airbds_metric_v0.4.csv` / `.yaml`).
 
 ---
 
@@ -178,14 +169,12 @@ If there is no accession number, use a short descriptive name for the dataset.
 
 ## Step 9 — Share your review
 
-Previously-completed reviews are archived in [`reviews/testing/`](../testing/) here. **New**
-reviews now go straight into the `reviews/` folder at the repo root (flat, no `testing/`
-subfolder) — see [`reviews/README.md`](../../../../reviews/README.md).
+Completed reviews are collected in the [`reviews/testing/`](../testing/) folder of this repository.
 
-See [CONTRIBUTING.md](../../../../CONTRIBUTING.md) for full submission instructions. The short version:
+See [CONTRIBUTING.md](../../CONTRIBUTING.md) for full submission instructions. The short version:
 
 1. Fork the repository on GitHub.
-2. Add your CSV to the `reviews/` folder.
+2. Add your CSV to the `reviews/testing/` folder.
 3. Open a pull request against `main`.
 
 If you are not familiar with GitHub pull requests, you can also email your completed CSV to the working group — contact details are at [aibio.ac.uk/about/working-groups/airbds/](https://aibio.ac.uk/about/working-groups/airbds/).
