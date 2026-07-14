@@ -13,7 +13,7 @@
 >
 > | Path | Status | Why it's live |
 > |------|--------|---------------|
-> | [`src/google-sheet-converter/`](src/google-sheet-converter/) | **Live** | Published as the npm package `@airbds/converter-tools` and consumed by the [`auto-airbds`](../../auto-airbds) website's server-side import route. It reads `metric/airbds_metric_v0.{3,4}.yaml` by relative path, so its location in the tree is load-bearing. |
+> | [`src/google-sheet-converter/`](src/google-sheet-converter/) | **Live** | Published as the npm package `@airbds/converter-tools` and consumed by the **auto-airbds** website's server-side import route (separate repository). It reads `metric/airbds_metric_v0.{3,4}.yaml` by relative path, so its location in the tree is load-bearing. |
 > | [`review_template.yaml`](review_template.yaml) | **Live** | Not just a reviewer download — it is the **schema contract the converter emits against**. Changing it changes the converter's output spec. |
 > | [`src/scripts/`](src/scripts/), [`testing/`](testing/), [`examples/`](examples/), [`docs/`](docs/), [`GUIDANCE.md`](GUIDANCE.md), [`archived_templates/`](archived_templates/) | Dormant | Manual-process material. Retained for reference and in case the process resumes. |
 >

@@ -32,5 +32,6 @@ echo "Exit code: $?"
 ```
 
 > **Note:** Files in this directory are excluded from the automated CI workflow.
-> See the [workflow](.github/workflows/review-check.yml) for details.
-> To trigger a full end-to-end test, see the [test workflow](.github/workflows/review-test.yml).
+> See the [workflow](../../.github/workflows/review-check.yml) for details (now disabled).
+> To trigger a full end-to-end test, see the [test workflow](../../.github/workflows/review-test.yml)
+> (`workflow_dispatch` only).

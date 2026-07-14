@@ -110,9 +110,13 @@ If you find an error, broken link, or inconsistency anywhere in the repository:
 
 ### Pull Requests
 
+The example below is a metric change — the most common contribution now that the
+manual review process is dormant. For a review, substitute the review file and
+the `review:` commit prefix.
+
 1. **Fork the repository** and create a new branch:
    ```bash
-   git checkout -b feat/add-review-E-MTAB-1234
+   git checkout -b metric/42-add-abc-29-reproducibility
    ```
 2. **Make your changes** following the YAML formats described below.
 3. **Validate your YAML** — ensure it is valid YAML:
@@ -121,17 +125,17 @@ If you find an error, broken link, or inconsistency anywhere in the repository:
    ```
 4. **Commit your changes** using the [convention below](#commit-message-convention):
    ```bash
-   git add reviews/testing/E-MTAB-1234_CH_1.yaml
-   git commit -m "review: add review for E-MTAB-1234 (CH)"
+   git add metric/airbds_metric_v0.4.yaml CHANGELOG.md
+   git commit -m "metric: add ABC-29 reproducibility question"
    ```
 5. **Push to your fork:**
    ```bash
-   git push origin feat/add-review-E-MTAB-1234
+   git push origin metric/42-add-abc-29-reproducibility
    ```
 6. **Open a PR** against the `main` branch. Provide:
    - A clear title and description
+   - A summary of the proposed change and the originating Issue
    - The dataset name and accession (for review PRs)
-   - A summary of any metric changes proposed (for metric PRs)
 
 ---
 
