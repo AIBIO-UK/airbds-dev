@@ -16,7 +16,6 @@ Changes to this folder have a disproportionate downstream impact. Multiple files
 | `airbds_metric_v0.4.upstream.json` | JSON | v0.4 provenance: source sheet id/url + `content_sha256` "revision" + generation timestamp | — |
 | `airbds_metric_v0.3.yaml` | YAML | **Previous version — retained.** 28-question metric; reviews carrying `schema_version: "0.3"` still score against it | — |
 | `README.md` | Markdown | This file — contributor guide for the metric folder | — |
-| `skills/SKILL.md` | Markdown | AI agent skill for propagating metric changes across the repo | — |
 
 > **v0.4 is the current version.** `airbds_metric_v0.4.*` is generated from the working group's Google Sheet (see [How the v0.4 metric files are generated](#how-the-v04-metric-files-are-generated) and the `[0.4]` entry in [CHANGELOG.md](../CHANGELOG.md)). **v0.3 is retained** for reference and for re-scoring older reviews — the review processor auto-selects the metric matching each review's `schema_version`.
 
@@ -92,9 +91,9 @@ For any **MINOR** change (question additions, deletions, or rewordings) or **MAJ
 
 4. **Fork the repository** and create a branch named `metric/<issue-number>-brief-description` (e.g. `metric/42-add-acm-29-reproducibility`).
 
-5. **Update ALL coupled files** as described in the Coupled File Groups manifest below. This is **not optional** — the automated alignment check will flag partial updates and create a GitHub Issue.
+5. **Update ALL coupled files** as described in the Coupled File Groups manifest below. This is **not optional** — a partial update silently corrupts inter-rater reliability.
 
-6. **Open a pull request** referencing the original Issue (e.g. `Closes #42`). The `metric-alignment-check` workflow runs automatically on your PR. If it flags any files as out of sync, fix them before requesting review.
+6. **Open a pull request** referencing the original Issue (e.g. `Closes #42`).
 
 7. **Working-group review** and merge by a maintainer.
 
@@ -124,27 +123,7 @@ Use this as a checklist when implementing any metric change.
 - `reviews/docs/tutorial-yaml.md` — update all `vX.Y` path references
 - `reviews/docs/tutorial-csv.md` — update all `vX.Y` path references
 
-> `metric/README.md` and `metric/skills/SKILL.md` are documentation files. They do not have YAML/CSV counterparts and are excluded from the automated pair-checking. Update their version references when implementing MINOR or MAJOR changes.
-
----
-
-## Automated Alignment Check
-
-Every push or pull request that touches a file under `metric/` — or the `review_template` pair under `reviews/` — triggers the `.github/workflows/metric-alignment-check.yml` workflow. It performs the following checks automatically:
-
-**1. YAML ↔ CSV pair check.** For every versioned metric YAML changed, it verifies the matching CSV was also changed in the same commit range, and vice versa. The same check applies to the `review_template` pair.
-
-**2. New-version downstream check.** If a new versioned metric YAML is detected as _Added_ (e.g. `airbds_metric_v0.4.yaml` appears for the first time), the workflow also checks whether `CHANGELOG.md` and `README.md` were updated in the same commit range.
-
-**On misalignment (push events):** The workflow creates a GitHub Issue in this repository titled `[metric-alignment] Out-of-sync metric files detected`, tagged with the `metric-alignment` label. The issue body lists the exact files that are missing and provides remediation instructions.
-
-**On misalignment (pull request events):** In addition to the Issue, the workflow posts a comment directly on the PR listing the files that need to be added before the PR can be merged.
-
-**Deduplication:** If an open `metric-alignment` issue already exists for the same PR or commit SHA, the workflow adds a comment to the existing issue rather than creating a duplicate.
-
-**On alignment restored:** When a subsequent push resolves the misalignment, the workflow closes any open `metric-alignment` issue it finds for that PR/SHA.
-
-**Using the agent skill to fix misalignment:** If you are using Claude Code in this repository, invoke the `metric/skills/SKILL.md` skill to propagate changes automatically. The skill will read the changed file(s), determine the change type, and update all coupled files with a summary of what was modified.
+> `metric/README.md` is a documentation file. Update its version references when implementing MINOR or MAJOR changes.
 
 ---
 

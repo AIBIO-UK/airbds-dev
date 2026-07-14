@@ -12,6 +12,10 @@ This project adheres to
 ## [Unreleased]
 
 ### Removed
+- The `metric-update-propagation` agent skill (`metric/skills/SKILL.md`) and
+  the `metric-alignment-check` workflow. The skill duplicated the Coupled File
+  Groups manifest in `metric/README.md` and went stale quickly; the manifest
+  is now the single source of truth for propagating metric changes.
 - The metric CSV distribution format (`metric/airbds_metric_v0.3.csv` and
   `metric/airbds_metric_v0.4.csv`): the metric is now YAML-only. The CSV was
   development-only and had no meaningful consumers — auto-airbds reads the

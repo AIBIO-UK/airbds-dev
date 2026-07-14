@@ -51,11 +51,9 @@ Leave a channel untouched if it intentionally stays on the older metric. A stale
 entry will either suppress a needed update prompt or nag users who are already
 current.
 
-When a metric version bump is the trigger, the
-[`metric-update-propagation` skill](../../metric/skills/SKILL.md) walks through
-updating `versions.json` alongside every other coupled file; `versions.json`
-is also listed in the Coupled File Groups manifest in
-[`metric/README.md`](../../metric/README.md).
+When a metric version bump is the trigger, follow the Coupled File Groups
+manifest in [`metric/README.md`](../../metric/README.md), which lists
+`versions.json` alongside every other coupled file.
 
 ## Release builds (GitHub Actions)
 
