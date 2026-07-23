@@ -1,7 +1,7 @@
 ---
 name: airbds-assessment-skill
 description: Use this skill whenever a user wants to assess, score, or evaluate a life science dataset against the AIRBDS (AI-Ready Biological Data Sets) criteria. Triggers include any mention of "AIRBDS", "AI-ready dataset", "dataset scoring", or requests to grade a biological/biomedical dataset's AI-readiness. Activate when the user provides a dataset URL and asks for an assessment, audit, or readiness check. Do NOT use for general data quality reviews unrelated to AIRBDS or for non-life-science datasets.
-version: 0.4.0
+version: 0.4.1
 channel: development
 metadata:
   hermes:
@@ -39,7 +39,7 @@ Your only goal is to evaluate datasets based on the AIRBDS (AI-Ready Biological 
 2. **Assessment Process**
 
 - Analyze the provided dataset against the questions defined under `questions` in the AIRBDS metric file. Each question's `guidance` explains how it should be answered.
-- While reviewing the landing page, determine the dataset's name/title from the page itself (no need to ask the user). Keep it — it is useful if you later contribute the assessment to the results site.
+- While reviewing the landing page, determine the dataset's name/title from the page itself (no need to ask the user). Keep it — it is useful for naming the saved YAML file and its `dataset.name` field (see step 4).
 - For each question, determine if the answer is 'Yes' or 'No' regarding its AI-readiness. You must answer all the questions and only the questions defined in the metric file. Be thorough in your assessment, looking through other pages on the website if necessary, particularly if the answer appears to be "No".
 - For every question, provide an answer, the score for that answer, and the justification. The justification shouldn't be more than two sentences. The score for a question is its full points when the answer is "Yes" and 0 when the answer is "No". A question's full points are given by `grade_points` keyed by that question's `grade` (Critical = 80, Important = 5, Optional = 2).
 
@@ -57,7 +57,7 @@ Your only goal is to evaluate datasets based on the AIRBDS (AI-Ready Biological 
 - After presenting the report, offer to save the assessment as a YAML file the user can download and keep. Only proceed if the user wants it; otherwise stop here.
 - If the user agrees, build a YAML document in the shape of `assets/review_template.yaml` (bundled with this skill), filled in from the assessment you just produced:
   - `schema_version`: the metric version — copy the `schema_version` value from `assets/airbds_metric.yaml`.
-  - `reviewer.name`: your own model identifier (e.g. `claude-opus-4-8`) — the model that performed the assessment. Leave `reviewer.initials`, `reviewer.orcid`, and `reviewer.affiliation` blank. Tell the user they can edit these to record their own name/ORCID before submitting it anywhere that expects a named reviewer.
+  - `reviewer.name`: your own model identifier (e.g. `claude-opus-4-8`) — the model that performed the assessment. Leave `reviewer.initials`, `reviewer.orcid`, and `reviewer.affiliation` blank. Tell the user they can edit these to record their own name/ORCID before using it anywhere that expects a named reviewer.
   - `reviewer.review_date`: the current date and time in ISO 8601, including a timezone (e.g. `2026-06-03T14:32:05Z`).
   - `dataset.name`: the dataset's name/title you determined during the assessment.
   - `dataset.url`: the URL the user provided.
@@ -65,12 +65,6 @@ Your only goal is to evaluate datasets based on the AIRBDS (AI-Ready Biological 
   - `answers.<id>`: for **every** question ID defined under `questions` in the metric file, set `answer` to exactly `"Yes"` or `"No"` and `comments` to that question's justification. Include all questions.
   - You may fill in the `result` block (`weighted_score`, `grade`) for the user's reference.
 - Make the file available to the user: create a downloadable file if your environment supports it (named after the dataset and date, e.g. `airbds-assessment-<dataset-slug>-<date>.yaml`); otherwise output the complete YAML in a single code block they can copy and save. Do **not** upload or send the file anywhere yourself.
-- Briefly let the user know what they can do with it:
-  - keep it for their own records;
-  - optionally contribute it to the public AIRBDS results site at
-    https://auto-airbds.pages.dev. Note this is a **test site that is still
-    under construction**: any submission is **purely for test purposes**. It is
-    not a permanent or official record and may be deleted in the course of site development.
 
 ## Overall Tone:
 

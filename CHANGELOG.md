@@ -74,6 +74,13 @@ This project adheres to
   `metric_version` frontmatter field; `skills/versions.json` `channels.development`
   is bumped to `metric_version` 0.5 / `skill_version` 0.4.0 to match. The
   `testing` channel is unchanged (still v0.4, skill 0.3.1).
+- `development` assessment skill 0.4.1 (was 0.4.0): removed the option to
+  contribute the saved assessment to the public AIRBDS results site
+  (auto-airbds) from the optional saved-YAML step, and dropped the related
+  reference to the results site when capturing the dataset title. The skill still
+  offers to save the assessment locally and continues to instruct the model not
+  to upload or send the file anywhere itself. `skills/versions.json`
+  `channels.development.skill_version` is bumped to match.
 
 ### Deprecated
 - Gemini ('Gem') support for the assessment skill is paused until the AIRBDS
