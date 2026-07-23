@@ -58,5 +58,14 @@ Notes:
 ## Python
 
 - `scripts/review_processor.py` — validates, scores, and converts review files (CI + local).
+- `scripts/build_review_template.py` — generates the blank template pair
+  ([`review_template.yaml`](../review_template.yaml) /
+  [`review_template.csv`](../review_template.csv)) from the metric YAML, so the
+  two formats always agree. Regenerate on a metric bump; `--check` for drift:
+
+  ```bash
+  python3 reviews/src/scripts/build_review_template.py --version 0.5          # regenerate
+  python3 reviews/src/scripts/build_review_template.py --version 0.5 --check  # verify in sync
+  ```
 
 Needs Python 3 with `pyyaml`.

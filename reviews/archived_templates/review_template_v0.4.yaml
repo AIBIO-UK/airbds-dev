@@ -1,8 +1,7 @@
-# Review template — AIRBDS AI-Readiness Dataset Scoring Metric v0.5
+# Review template — AIRBDS AI-Readiness Dataset Scoring Metric v0.4
 # Fill in all fields. For each question, set answer to "Yes" or "No".
-# This YAML lists answer slots by question id; see airbds_metric_v0.5.yaml (or
-# review_template.csv) for the full question text and guidance. Generic
-# reviewer instructions are in that metric's `instructions:` block.
+# This YAML lists answer slots by question id; see airbds_metric_v0.4.yaml (or
+# review_template.csv) for the full question text and guidance.
 # See reviews/GUIDANCE.md and the metric YAML's grading block for grading details.
 #
 # Scoring is NOT automated: automated scoring on pull request is disabled. Score
@@ -11,7 +10,7 @@
 # This validates the review, fills in the result block, and renames the file.
 # To submit, open a PR at https://github.com/AIBIO-UK/airbds-dev
 
-schema_version: "0.5"
+schema_version: "0.4"
 
 reviewer:
   name: ""            # Full name
@@ -52,10 +51,12 @@ answers:
   ABC-20: { answer: "", comments: "" }
   ABC-21: { answer: "", comments: "" }
   ABC-22: { answer: "", comments: "" }
+  ABC-23: { answer: "", comments: "" }
   # Ethics questions — answer "Yes" if dataset has no human/animal subjects
-  ABC-23: { answer: "", comments: "", not_applicable: false }
   ABC-24: { answer: "", comments: "", not_applicable: false }
   ABC-25: { answer: "", comments: "", not_applicable: false }
+  ABC-26: { answer: "", comments: "", not_applicable: false }
+  ABC-27: { answer: "", comments: "", not_applicable: false }
 
 # Calculated fields — complete after scoring
 result:

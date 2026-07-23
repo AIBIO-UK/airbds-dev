@@ -9,7 +9,7 @@ dataset against an older metric version.
 
 **For new reviews, use the current template in the parent directory**
 ([`reviews/review_template.yaml`](../review_template.yaml) /
-[`review_template.csv`](../review_template.csv) — currently v0.4). You only need a
+[`review_template.csv`](../review_template.csv) — currently v0.5). You only need a
 file from here if you specifically want to review against an earlier metric.
 
 Each review carries a `schema_version` field; the review processor scores it
@@ -19,7 +19,10 @@ reviews remain scorable.
 | File | Metric version |
 |------|----------------|
 | `review_template_v0.3.yaml` / `.csv` | v0.3 — 28 questions, `ACM-1…28` |
+| `review_template_v0.4.yaml` / `.csv` | v0.4 — 27 questions, `ABC-01…27` |
 
 When a new metric version becomes current, the outgoing
 `reviews/review_template.{yaml,csv}` pair is copied here as
-`review_template_v<old>.{yaml,csv}` before the live pair is overwritten.
+`review_template_v<old>.{yaml,csv}` before the live pair is overwritten. The
+current pair is generated from the metric YAML by
+[`reviews/src/scripts/build_review_template.py`](../src/scripts/build_review_template.py).
