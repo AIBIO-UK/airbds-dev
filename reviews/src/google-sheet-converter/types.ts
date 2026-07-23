@@ -42,7 +42,8 @@ export interface Review {
  * ordered question ids, and which of them are Ethics-scope (carry a
  * not_applicable flag). Parsed from the single source of truth — the versioned
  * metric/airbds_metric_v*.yaml — never hardcoded or copied here, so a new metric
- * version (e.g. v0.3's ACM-1…28 vs v0.4's ABC-01…27) flows through automatically.
+ * version (e.g. v0.3's ACM-1…28 → v0.4's ABC-01…27 → v0.5's ABC-01…25) flows
+ * through automatically.
  */
 export interface Metric {
   schemaVersion: string;

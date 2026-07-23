@@ -9,8 +9,8 @@ const QUESTION_ID = /^[A-Za-z]+-(\d+)$/;
  * set (the Ethics questions) from the canonical metric YAML — the versioned
  * metric/airbds_metric_v*.yaml. The metric is the single source of truth: the
  * converter never hardcodes the ids, the schema version, or which questions are
- * Ethics, so a new metric version (v0.3 ACM-1…28 → v0.4 ABC-01…27) flows through
- * with no converter edits.
+ * Ethics, so a new metric version (v0.3 ACM-1…28 → v0.4 ABC-01…27 → v0.5
+ * ABC-01…25) flows through with no converter edits.
  */
 export function parseMetric(metricYaml: string): Metric {
   const data = parseYaml(metricYaml) as

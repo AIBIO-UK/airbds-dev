@@ -29,8 +29,8 @@ export function buildReview(
     "Reviewer initials are blank (not in the sheet) — add them before submitting.",
   );
 
-  // v0.4 sheets carry a review date; v0.3 sheets do not. Read it when present,
-  // and only warn when it is actually blank.
+  // v0.4 and later sheets carry a review date; v0.3 sheets do not. Read it when
+  // present, and only warn when it is actually blank.
   const reviewDate = pick(info, "review date");
   if (!reviewDate) {
     warnings.push(
