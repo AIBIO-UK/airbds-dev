@@ -70,7 +70,6 @@ DEFAULT_OUTPUT = REPO_ROOT / "metric" / "airbds_metric_v0.5.yaml"
 METADATA = {
     "schema_version": VERSION,
     "metric_name": "AIRBDS AI-Readiness Dataset Scoring Metric",
-    "short_name": "AIRBDS Metric",
     "release_date": "2026",
     "license": "CC-BY-4.0",
     "repository": "https://github.com/AIBIO-UK/airbds-metric",
