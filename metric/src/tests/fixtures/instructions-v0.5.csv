@@ -1,0 +1,23 @@
+Instructions,,AIRBDS Dataset Metric v0.5
+,,"The AIRBDS metric is designed to assess the AI-readiness of a dataset. It consists of a series of binary questions, organised into four Scopes for convenience of assessment. Answer each question 'Yes' or 'No'. Questions are weighted, with three categories: Critical, Important, or Optional. When all questions are answered, the dataset will be given a final grade: Gold, Silver, Bronze, or Caution. Critical questions are the main determinant of the overall grade.
+
+The metric is designed to be agnostic to domain, modality, and application. The general philosophy is that a dataset should be accompanied by enough information to allow a researcher to assess whether and how they could use it for their own purposes. In some cases, domain-specific knowledge will be helpful in making assessments – for example, in determining domain appropriateness.
+
+Metadata must be collocated with the data – visible on the same repository page or packaged with the download. Ideally, it should be formatted and structured for clarity and efficiency. A journal article or supplementary file hosted elsewhere does not count as metadata for any question.
+
+Datasets behind an access-controlled approval process, or held in a trusted research environment, are out of scope for this metric, due to the difficulty of producing accurate ratings.
+
+Review the Notes field for guidance and examples for specific questions. "
+,,
+,,
+Review informaton,,
+,Reviewer name:,
+,Review date:,
+,Dataset name:,
+,Dataset link:,
+,Resource name:,
+,Accession number:,
+,Dataset comments:,
+,Process comments:,
+,Score,0
+,Grade,In progress

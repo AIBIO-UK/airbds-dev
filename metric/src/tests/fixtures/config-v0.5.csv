@@ -1,0 +1,22 @@
+,,,,,,,
+Scores,Default,,,,,,
+1,Yes,,,,,,
+0,No,,,,,,
+,,,,,,,
+Question counts,,,,,,,
+,,,,,,,
+COUNTA of Grade,Scope,,,,,,
+Grade,Infrastructure,Metadata,Content,Ethics,Grand Total,Points per Question,Points available
+Critical,2,3,1,3,9,80,720
+Important,5,2,3,,10,5,50
+Optional,3,1,2,,6,2,12
+Grand Total,10,6,6,3,25,,62
+,,,,,,,
+Scoring thresholds,,,,,,,
+,,,,,,,
+Required proportions,,,,,,,
+Optional,Important,Critical,Threshold,Grade,Description,,
+0,0,0,0,Caution ,May have serious issues,,
+0,0,0.8888888889,640,Bronze,Passes most Critical questions (all but one),,
+0,0.5,1,745,Silver,Passes all Critical plus at least 50% of Important questions (or equivalent),,
+0.5,1,1,776,Gold,"Passes all Critical and Important questions, plus at least 50% Optional",,

@@ -1,13 +1,19 @@
 name: Metric Upstream Drift Check
 
-# Polls the public AIRBDS Google Sheet (the v0.4 source of truth) on a schedule
-# and opens/updates a single GitHub issue when it has drifted from the committed
-# metric/airbds_metric_v0.4.yaml. It re-runs the generator's --check against
-# the live sheet — read-only; it never writes the repo. The run stays green; the
-# issue is the signal. Manually runnable via "Run workflow".
+# Polls the public AIRBDS Google Sheet(s) (the source of truth for each live
+# metric version) on a schedule and opens/updates a per-version GitHub issue
+# when a sheet has drifted from its committed metric/airbds_metric_vX.Y.yaml.
+# It re-runs the generator's --check against the live sheet — read-only; it never
+# writes the repo. The run stays green; the issue is the signal. Manually
+# runnable via "Run workflow".
 #
-# NOTE: only meaningful once metric/airbds_metric_v0.4.yaml is committed —
-# until then there is no baseline and every run reports drift.
+# One matrix entry per committed metric version; add a version here when a new
+# metric version is committed. Each version fetches its own sheet (the default
+# baked into that version's build script) and manages its own drift issue via a
+# version-scoped label.
+#
+# NOTE: a version is only meaningful once its metric/airbds_metric_vX.Y.yaml is
+# committed — until then there is no baseline and every run reports drift.
 on:
   schedule:
     - cron: '17 6 * * 1'   # 06:17 UTC every Monday
@@ -20,6 +26,10 @@ permissions:
 jobs:
   check-upstream-drift:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        version: ['0.4', '0.5']
     steps:
       - uses: actions/checkout@v4
 
@@ -29,11 +39,11 @@ jobs:
 
       - run: pip install pyyaml
 
-      - name: Compare the live sheet against the committed v0.4 metric
+      - name: Compare the live sheet against the committed v${{ matrix.version }} metric
         id: drift
         run: |
           set +e
-          OUT=$(python3 metric/src/scripts/build_metric_yaml_from_google_sheet_v0.4.py --check 2>&1)
+          OUT=$(python3 metric/src/scripts/build_metric_yaml_from_google_sheet_v${{ matrix.version }}.py --check 2>&1)
           CODE=$?
           echo "$OUT"
           echo "exit_code=$CODE" >> "$GITHUB_OUTPUT"
@@ -49,19 +59,21 @@ jobs:
         uses: actions/github-script@v7
         env:
           REPORT: ${{ steps.drift.outputs.report }}
+          VERSION: ${{ matrix.version }}
         with:
           script: |
-            const label = 'metric-upstream-drift';
-            const title = 'Upstream metric sheet has drifted from the committed metric';
+            const version = process.env.VERSION;
+            const label = `metric-upstream-drift-v${version}`;
+            const title = `Upstream metric sheet has drifted from the committed v${version} metric`;
             const body = [
               'The scheduled drift check found that the canonical Google Sheet no longer',
-              'matches the committed `metric/airbds_metric_v0.4.yaml`.',
+              `matches the committed \`metric/airbds_metric_v${version}.yaml\`.`,
               '',
               'When you are ready to take the change, regenerate and review the diff:',
               '',
               '```bash',
-              'python3 metric/src/scripts/build_metric_yaml_from_google_sheet_v0.4.py',
-              'git diff metric/airbds_metric_v0.4.yaml',
+              `python3 metric/src/scripts/build_metric_yaml_from_google_sheet_v${version}.py`,
+              `git diff metric/airbds_metric_v${version}.yaml`,
               '```',
               '',
               '<details><summary>check output</summary>',
@@ -91,9 +103,11 @@ jobs:
       - name: Close the drift issue when back in sync
         if: steps.drift.outputs.exit_code == '0'
         uses: actions/github-script@v7
+        env:
+          VERSION: ${{ matrix.version }}
         with:
           script: |
-            const label = 'metric-upstream-drift';
+            const label = `metric-upstream-drift-v${process.env.VERSION}`;
             const { owner, repo } = context.repo;
             const open = await github.rest.issues.listForRepo({ owner, repo, state: 'open', labels: label });
             for (const issue of open.data) {
