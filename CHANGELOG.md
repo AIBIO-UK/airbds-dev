@@ -81,6 +81,13 @@ This project adheres to
   offers to save the assessment locally and continues to instruct the model not
   to upload or send the file anywhere itself. `skills/versions.json`
   `channels.development.skill_version` is bumped to match.
+- Promoted the `development` assessment skill to the `testing` channel: the
+  `testing` skill now assesses against AIRBDS metric v0.5 (was v0.4) at skill
+  version 0.4.1 (was 0.3.1). It adopts the metric-version-agnostic form — the
+  bundled assets are version-less symlinks (`assets/airbds_metric.yaml` →
+  v0.5, `assets/review_template.yaml`), the metric version is read from the
+  bundled `schema_version` at runtime, and the `metric_version` frontmatter
+  field is dropped. `skills/versions.json` `channels.testing` is bumped to match.
 
 ### Deprecated
 - Gemini ('Gem') support for the assessment skill is paused until the AIRBDS

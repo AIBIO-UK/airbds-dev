@@ -57,12 +57,9 @@ metric YAML (`assets/airbds_metric.yaml`):
 For this to work, each skill declares its `channel` in its `SKILL.md`
 frontmatter and bundles the metric YAML whose `schema_version` is the version it
 assesses against. Keep the manifest's `metric_version` for a channel in step
-with that bundled `schema_version`.
-
-> **Note:** the `development` skill derives its metric version this way (from the
-> bundled `schema_version`) and no longer carries a `metric_version` frontmatter
-> field. The `testing` skill still declares `metric_version` in its frontmatter
-> and will move to the bundled-`schema_version` scheme when it is next promoted.
+with that bundled `schema_version`. Neither channel's skill carries a
+`metric_version` frontmatter field any more — both derive their metric version
+from the bundled `schema_version`.
 
 ## Keeping the manifest in step
 
