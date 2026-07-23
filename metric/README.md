@@ -201,7 +201,7 @@ Use this as a checklist when implementing any metric change.
 
 #### Group C — Downstream version-carrying files *(MINOR or MAJOR changes only)*
 - `README.md` — version badge, question table, download links, processor command examples
-- `CHANGELOG.md` — add a new entry at the top referencing the originating Issue
+- `CHANGELOG.md` — add a new entry at the top of the **Metric** section, referencing the originating Issue
 - `CITATION.cff` — update `version:` and `date-released:` fields
 - `LICENSE.md` — update the version and year in the suggested-citation block (not the copyright year, which is the year of first publication). Keep it consistent with `CITATION.cff` and the Citation section of `README.md`
 - The review processor needs **no update** — it auto-selects `metric/airbds_metric_v<schema_version>.yaml` per review. Its workflows need none either, and neither runs automatically now: `review-check.yml` is disabled (the manual review process is not live) and `review-test.yml` is `workflow_dispatch`-only.

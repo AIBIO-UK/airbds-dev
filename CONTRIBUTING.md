@@ -226,9 +226,13 @@ The canonical metric file is versioned in its filename
 (e.g. `airbds_metric_v0.5.yaml`). When a new version is released:
 1. The new YAML file is added (e.g. `airbds_metric_v1.0.yaml`)
 2. The old file is kept for archival purposes
-3. `CHANGELOG.md` is updated
-4. A GitHub Release is tagged (e.g. `v1.0.0`)
-5. `CITATION.cff` is updated with the new version
+3. The **Metric** section of `CHANGELOG.md` is updated
+4. `CITATION.cff` is updated with the new version
+
+Metric versions are not tagged as GitHub Releases for now — the version lives
+in the filename and in each review's `schema_version`. (The only release tags in
+this repository are the assessment skill build tags,
+`assessment-skill-development` and `assessment-skill-testing`.)
 
 Existing dataset reviews reference the metric version they were scored against
 via the `schema_version` field.

@@ -74,6 +74,12 @@ When a metric version bump is the trigger, follow the Coupled File Groups
 manifest in [`metric/README.md`](../../metric/README.md), which lists
 `versions.json` alongside every other coupled file.
 
+Record every skill version bump — and every channel promotion — under the
+**Assessment skill** section of [`CHANGELOG.md`](../../CHANGELOG.md), with a
+heading naming the version and the channel(s) it applies to. Skill versions are
+tracked separately from metric versions there, because the two move
+independently.
+
 ## Release builds (GitHub Actions)
 
 Each channel's downloadable skill zip is built and published by a GitHub Actions

@@ -204,8 +204,9 @@ Completed reviews reference the metric version they were scored with via the
 > **v0.5 is the current version.** The metric, the review templates, and the
 > sheet→YAML converter target v0.5. v0.4 and v0.3 are retained — the version-aware
 > review processor scores each review against the metric matching its
-> `schema_version`. The `development` assessment skill targets v0.5; the `testing`
-> skill remains on v0.4. See the `[0.5]` entry in [CHANGELOG.md](CHANGELOG.md).
+> `schema_version`. Both assessment skill channels — `development` and `testing`
+> — target v0.5. See the `[0.5]` entry under **Metric** in
+> [CHANGELOG.md](CHANGELOG.md#metric).
 
 ---
 
