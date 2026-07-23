@@ -26,8 +26,8 @@
 # Source: https://docs.google.com/spreadsheets/d/13w-MiUQc2sLzRFqRQD_YT6BisE3Orv5Oj3i0YBw7r_M/edit
 # Source content sha256: 1cb615afa206ef140d56eeb744087995663adacf8b8431de1bf6744dd8a65a62
 
-schema_version: "0.5"
 metric_name: "AIRBDS AI-Readiness Dataset Scoring Metric"
+schema_version: "0.5"
 release_date: "2026"
 license: "CC-BY-4.0"
 repository: "https://github.com/AIBIO-UK/airbds-metric"
