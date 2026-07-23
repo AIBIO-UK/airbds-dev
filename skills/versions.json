@@ -10,8 +10,8 @@
       "skill_update_url": "https://github.com/AIBIO-UK/airbds-dev/releases/download/assessment-skill-testing/airbds-assessment-skill.zip"
     },
     "development": {
-      "metric_version": "0.4",
-      "skill_version": "0.3.1",
+      "metric_version": "0.5",
+      "skill_version": "0.4.0",
       "skill_update_url": "https://github.com/AIBIO-UK/airbds-dev/releases/download/assessment-skill-development/airbds-assessment-skill-dev.zip"
     }
   }

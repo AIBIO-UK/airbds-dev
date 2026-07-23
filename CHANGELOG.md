@@ -65,6 +65,15 @@ This project adheres to
   version 0.3.0 (was 0.2.1), bundling the metric and review template under
   `assets/` (was `templates/`). `skills/versions.json` `channels.testing` is
   bumped to match.
+- `development` assessment skill 0.4.0 (was 0.3.1): made the skill
+  metric-version-agnostic and repointed it at AIRBDS metric v0.5 (was v0.4). The
+  bundled assets are now version-less symlinks (`assets/airbds_metric.yaml`,
+  `assets/review_template.yaml`), and `SKILL.md` reads the metric version from
+  the bundled metric's `schema_version` at runtime rather than hard-coding it —
+  so a future metric bump only repoints the symlink. Dropped the
+  `metric_version` frontmatter field; `skills/versions.json` `channels.development`
+  is bumped to `metric_version` 0.5 / `skill_version` 0.4.0 to match. The
+  `testing` channel is unchanged (still v0.4, skill 0.3.1).
 
 ### Deprecated
 - Gemini ('Gem') support for the assessment skill is paused until the AIRBDS

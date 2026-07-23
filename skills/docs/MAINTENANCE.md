@@ -43,7 +43,8 @@ Each entry under `channels` records, for that channel's current skill:
 
 At start-up an assessment skill makes a **best-effort** fetch of this manifest
 and compares the manifest's `metric_version` for **its own channel only**
-against the `metric_version` declared in its own frontmatter:
+against its own metric version — the `schema_version` field of its bundled
+metric YAML (`assets/airbds_metric.yaml`):
 
 - If the manifest is **strictly newer**, the skill pauses and **asks the user**
   whether to proceed with the older bundled metric or stop and update to the
@@ -53,17 +54,24 @@ against the `metric_version` declared in its own frontmatter:
 - A skill never looks at other channels, so a `testing` skill is **not** nudged
   when `development` moves ahead.
 
-For this to work, each skill declares `metric_version` and `channel` in its
-`SKILL.md` frontmatter. Keep those in step with the manifest.
+For this to work, each skill declares its `channel` in its `SKILL.md`
+frontmatter and bundles the metric YAML whose `schema_version` is the version it
+assesses against. Keep the manifest's `metric_version` for a channel in step
+with that bundled `schema_version`.
+
+> **Note:** the `development` skill derives its metric version this way (from the
+> bundled `schema_version`) and no longer carries a `metric_version` frontmatter
+> field. The `testing` skill still declares `metric_version` in its frontmatter
+> and will move to the bundled-`schema_version` scheme when it is next promoted.
 
 ## Keeping the manifest in step
 
 Bump a channel's `metric_version` in `versions.json` **only when that channel's
-skill is actually repointed to a new metric** — i.e. when you update the skill's
-bundled `templates/airbds_metric_v*.yaml` and its `metric_version` frontmatter.
-Leave a channel untouched if it intentionally stays on the older metric. A stale
-entry will either suppress a needed update prompt or nag users who are already
-current.
+skill is actually repointed to a new metric** — i.e. when you repoint the skill's
+bundled `assets/airbds_metric.yaml` symlink at a new `metric/airbds_metric_v*.yaml`
+(so its `schema_version` changes). Leave a channel untouched if it intentionally
+stays on the older metric. A stale entry will either suppress a needed update
+prompt or nag users who are already current.
 
 When a metric version bump is the trigger, follow the Coupled File Groups
 manifest in [`metric/README.md`](../../metric/README.md), which lists
