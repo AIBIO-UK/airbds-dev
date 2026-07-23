@@ -16,7 +16,7 @@ This tutorial walks you through scoring a bioscience dataset for AI-readiness us
 
 ## What you will do
 
-You will open a CSV template, fill in your answers to 27 Yes/No questions about a dataset, and calculate a grade (Caution / Bronze / Silver / Gold) that summarises its AI-readiness.
+You will open a CSV template, fill in your answers to 25 Yes/No questions about a dataset, and calculate a grade (Caution / Bronze / Silver / Gold) that summarises its AI-readiness.
 
 ---
 
@@ -28,7 +28,7 @@ Download the blank review template directly from the repository:
 
 To download: click the link above, then on GitHub click the **Download raw file** button (the down-arrow icon near the top-right of the file view).
 
-> The canonical question reference — with full guidance text and weights — is in [metric/airbds_metric_v0.4.yaml](../../metric/airbds_metric_v0.4.yaml).
+> The canonical question reference — with full guidance text and weights — is in [metric/airbds_metric_v0.5.yaml](../../metric/airbds_metric_v0.5.yaml).
 
 ---
 
@@ -44,7 +44,7 @@ You will see two sections in the spreadsheet:
 | 1–12 | **Section A** — Reviewer and dataset information (fill in the `value` column) |
 | 13 | Blank separator row |
 | 14 | Column headers for the answer table |
-| 15–41 | **Section B** — 27 questions (fill in the `answer` and `comments` columns) |
+| 15–39 | **Section B** — 25 questions (fill in the `answer` and `comments` columns) |
 
 ---
 
@@ -54,7 +54,7 @@ Click in the **`value`** cell next to each field and type your information:
 
 | Field | What to enter |
 |---|---|
-| `schema_version` | Leave as `0.4` |
+| `schema_version` | Leave as `0.5` |
 | `reviewer_name` | Your full name |
 | `reviewer_initials` | Your initials (e.g. `CH`) |
 | `reviewer_orcid` | Your ORCID (e.g. `0000-0000-0000-0000`), or leave blank |
@@ -68,13 +68,13 @@ Click in the **`value`** cell next to each field and type your information:
 
 ---
 
-## Step 4 — Answer the 27 questions (Section B)
+## Step 4 — Answer the 25 questions (Section B)
 
 Scroll down to row 15. You will see the answer table with these columns:
 
 | Column | Purpose |
 |---|---|
-| `question_id` | Question identifier (ABC-01 through ABC-27) — do not edit |
+| `question_id` | Question identifier (ABC-01 through ABC-25) — do not edit |
 | `scope` | Topic area — do not edit |
 | `weight` | Critical / Important / Optional — do not edit |
 | `question` | The question text — do not edit |
@@ -83,24 +83,24 @@ Scroll down to row 15. You will see the answer table with these columns:
 | **`not_applicable`** | **See Step 5** |
 | **`comments`** | **Optional notes about your answer** |
 
-For each of the 27 rows, read the `question` and `guidance` columns, then type **`Yes`** or **`No`** in the `answer` column.
+For each of the 25 rows, read the `question` and `guidance` columns, then type **`Yes`** or **`No`** in the `answer` column.
 
 > **Tip:** You can hide the `guidance` column once you have read it to make the table easier to navigate. Right-click the column header and choose "Hide column".
 
 ---
 
-## Step 5 — Handle Ethics questions (ABC-24 to ABC-27)
+## Step 5 — Handle Ethics questions (ABC-23 to ABC-25)
 
-The last four questions (ABC-24 to ABC-27) apply only to datasets that contain **human or animal subject data**.
+The last three questions (ABC-23 to ABC-25) apply only to datasets that contain **human or animal subject data**.
 
-- **If your dataset contains no human or animal subjects:** type **`Yes`** in the `answer` column and **`TRUE`** in the `not_applicable` column for each of ABC-24 to ABC-27.
+- **If your dataset contains no human or animal subjects:** type **`Yes`** in the `answer` column and **`TRUE`** in the `not_applicable` column for each of ABC-23 to ABC-25.
 - **If your dataset does contain human or animal subjects:** answer each question normally (`Yes` or `No`) and leave `not_applicable` as `FALSE`.
 
 ---
 
 ## Step 6 — Calculate your weighted score
 
-The score is the sum of (answer × weight points) across all 27 questions.
+The score is the sum of (answer × weight points) across all 25 questions.
 
 - Yes = 1, No = 0
 - Critical = 80 pts, Important = 5 pts, Optional = 2 pts
@@ -148,12 +148,12 @@ Look up your critical, important, and optional pass rates in this table:
 
 | Grade | Emoji | Critical pass rate | Important pass rate | Optional pass rate |
 |---|---|---|---|---|
-| Caution | 🔴 | < 7/8 (0.875) | any | any |
-| Bronze | 🟤 | ≥ 7/8 (0.875) | any | any |
+| Caution | 🔴 | < 8/9 (0.889) | any | any |
+| Bronze | 🟤 | ≥ 8/9 (0.889) | any | any |
 | Silver | ⚪ | = 1.0 (all) | ≥ 0.5 | any |
 | Gold | 🟡 | = 1.0 (all) | = 1.0 (all) | ≥ 0.5 |
 
-What the grades mean is explained in [reviews/GUIDANCE.md](../GUIDANCE.md); the thresholds are in the metric (`airbds_metric_v0.4.yaml`).
+What the grades mean is explained in [reviews/GUIDANCE.md](../GUIDANCE.md); the thresholds are in the metric (`airbds_metric_v0.5.yaml`).
 
 ---
 

@@ -90,7 +90,46 @@ This project adheres to
 
 ---
 
-## [0.4] — current
+## [0.5] — current
+
+> **v0.5 is now the current version.** The metric, the review template
+> (`reviews/review_template.{yaml,csv}`), and the sheet→YAML converter target
+> v0.5. The version-aware review processor scores each review against the metric
+> matching its `schema_version`, so v0.4 and v0.3 reviews still score correctly;
+> those metrics and their archived review templates are retained. The
+> `development` assessment skill targets v0.5; the `testing` skill remains on v0.4.
+
+### Added
+- `instructions:` — a new top-level block in the metric YAML, captured verbatim
+  from the source sheet's Instructions tab, so downstream reviewers (human and
+  AI) read the same generic guidance.
+- `metric/src/scripts/build_metric_yaml_from_google_sheet_v0.5.py` — generates
+  `airbds_metric_v0.5.yaml` from the v0.5 Google Sheet (Scoring, Lookups, and
+  Instructions tabs), recording provenance in `airbds_metric_v0.5.upstream.json`.
+- `reviews/src/scripts/build_review_template.py` — generates the
+  `review_template.{yaml,csv}` pair from the metric YAML so the two formats can
+  never drift.
+- v0.5 regression coverage for the sheet→YAML converter (no converter code
+  change needed — it is metric-version-agnostic).
+
+### Changed
+- **25 questions (was 27).** Ethics drops to 3 (`ABC-23`–`ABC-25`, all Critical);
+  Metadata and Content are 6 each; Infrastructure 10. Questions reworded and
+  regrouped throughout.
+- Grade distribution is 9 Critical / 10 Important / 6 Optional, giving a
+  **maximum score of 782** (was 711). Weight tiers unchanged (Critical 80,
+  Important 5, Optional 2). Grade thresholds: Gold 776, Silver 745, Bronze 640,
+  Caution 0.
+- Metric metadata trimmed: dropped the redundant top-level `version` field (it
+  duplicated `schema_version`, which remains the pairing key) and the unused
+  `short_name` field (v0.5 only); reordered to lead with `metric_name`.
+- The outgoing v0.4 review-template pair was archived to
+  `reviews/archived_templates/review_template_v0.4.{yaml,csv}` before the live
+  pair was regenerated to v0.5.
+
+---
+
+## [0.4]
 
 > **v0.4 is now the current version.** The review templates
 > (`reviews/review_template.{yaml,csv}`), the sheet→YAML converter, and

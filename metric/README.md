@@ -11,24 +11,24 @@ the contributor/maintainer guide for updating the metric files in this folder.
 ### What the Metric Is
 
 The AIRBDS metric is a versioned, machine-readable checklist for assessing how
-suitable a bioscience dataset is for AI/ML use. The current version (v0.4) is a
-**27-question** set, grouped into scopes (Infrastructure, Metadata, Content,
+suitable a bioscience dataset is for AI/ML use. The current version (v0.5) is a
+**25-question** set, grouped into scopes (Infrastructure, Metadata, Content,
 Ethics) and three weight tiers (Critical, Important, Optional), plus the
 `grade_points` and `grading` rules that turn a set of Yes/No answers into a
 weighted score and a grade.
 
 The working group's **Google Sheet** is where the metric is authored — the
-upstream source of truth. `metric/airbds_metric_v0.4.yaml` is generated from it
+upstream source of truth. `metric/airbds_metric_v0.5.yaml` is generated from it
 and is the canonical machine-readable artifact that everything in this
 repository (and downstream consumers) reads: the exact question text, guidance,
 scopes, and scoring rules.
 
 ### Use the Metric
 
-Two ways to use v0.4 directly:
+Two ways to use v0.5 directly:
 
-- **[Open the Google Sheet](https://docs.google.com/spreadsheets/d/1eriM8bXAoNXsIR9l8OpI1XYEp8FbtBWt05CTIP9cVeg/edit)** — the live source of truth, with built-in formulas that calculate the weighted score and grade automatically as you fill in answers. **Recommended for scoring a dataset today.**
-- **[`airbds_metric_v0.4.yaml`](airbds_metric_v0.4.yaml)** — the generated YAML, for anything programmatic.
+- **[Open the Google Sheet](https://docs.google.com/spreadsheets/d/13w-MiUQc2sLzRFqRQD_YT6BisE3Orv5Oj3i0YBw7r_M/edit)** — the live source of truth, with built-in formulas that calculate the weighted score and grade automatically as you fill in answers. **Recommended for scoring a dataset today.**
+- **[`airbds_metric_v0.5.yaml`](airbds_metric_v0.5.yaml)** — the generated YAML, for anything programmatic.
 
 To score a **filled-in YAML or CSV review** rather than the Sheet, use the review
 processor, which validates the file, computes the weighted score and grade, and
@@ -59,9 +59,9 @@ answered `Yes` (a `No` always scores 0):
 | **Important** | 5 | Important questions represent best practices affecting reproducibility, interoperability, or usability. |
 | **Optional** | 2 | Optional questions capture desirable but non-essential characteristics. |
 
-A dataset's weighted score is the sum of points for its `Yes` answers. In v0.4
-the 27 questions split into 8 Critical, 11 Important, and 8 Optional, giving a
-maximum score of **711**. These point values are the human-readable rationale —
+A dataset's weighted score is the sum of points for its `Yes` answers. In v0.5
+the 25 questions split into 9 Critical, 10 Important, and 6 Optional, giving a
+maximum score of **782**. These point values are the human-readable rationale —
 the **authoritative, machine-readable** numbers live in the metric YAML's
 `grade_points` block.
 
@@ -70,13 +70,13 @@ the **authoritative, machine-readable** numbers live in the metric YAML's
 A dataset earns the **highest** grade for which it meets *both* the per-tier
 pass-rate criteria *and* that grade's minimum total score (`min_score`). The
 exact `min_score` and pass-rate values live in the metric YAML's `grading` block
-and can differ between metric versions — the summaries below are v0.4.
+and can differ between metric versions — the summaries below are v0.5.
 
 | Grade | Badge colour | Means |
 |-------|--------------|-------|
 | 🟡 **Gold** | `#ffc107` | Passes all Critical and Important questions, plus ≥ 50% of Optional. |
 | ⚪ **Silver** | `#c0c0c0` | Passes all Critical, plus ≥ 50% of Important. |
-| 🟤 **Bronze** | `#cd7f32` | Passes most Critical questions (≥ 87.5%). |
+| 🟤 **Bronze** | `#cd7f32` | Passes most Critical questions (≥ 88.9%). |
 | 🔴 **Caution** | `#dc3545` | May have serious issues — fails one or more Critical criteria. |
 
 The badge colours are a presentation reference only — no tool reads them from
@@ -85,7 +85,7 @@ the repo. Further rationale for the weighting and grades is in
 
 ### Ethics Questions
 
-Ethics-scope questions (ABC-24 – ABC-27) default to `"Yes"` for datasets that
+Ethics-scope questions (ABC-23 – ABC-25) default to `"Yes"` for datasets that
 contain **no human or animal subject data** — set `not_applicable: true` and note
 it in the comments. In the metric these questions carry
 `not_applicable_default: "Yes"`.
@@ -102,19 +102,20 @@ Changes to this folder have a disproportionate downstream impact. Multiple files
 
 | Filename | Format | Purpose |
 |----------|--------|---------|
-| `airbds_metric_v0.4.yaml` | YAML | **Canonical — current.** 27-question metric: question text, grades, guidance, scopes, and the `grade_points`/`grading` scoring rules |
-| `airbds_metric_v0.4.upstream.json` | JSON | v0.4 provenance: source sheet id/url + `content_sha256` "revision" + generation timestamp |
+| `airbds_metric_v0.5.yaml` | YAML | **Canonical — current.** 25-question metric: question text, grades, guidance, scopes, `instructions`, and the `grade_points`/`grading` scoring rules |
+| `airbds_metric_v0.5.upstream.json` | JSON | v0.5 provenance: source sheet id/url + `content_sha256` "revision" + generation timestamp |
+| `airbds_metric_v0.4.yaml` | YAML | **Previous version — retained.** 27-question metric; reviews carrying `schema_version: "0.4"` still score against it |
 | `airbds_metric_v0.3.yaml` | YAML | **Previous version — retained.** 28-question metric; reviews carrying `schema_version: "0.3"` still score against it |
 | `README.md` | Markdown | This file — contributor guide for the metric folder |
 
 Metric output is **YAML-only**. (The *review template* under `reviews/` still
 ships in both YAML and CSV — that is a separate file, see Group B below.)
 
-> **v0.4 is the current version.** `airbds_metric_v0.4.*` is generated from the working group's Google Sheet (see [How the v0.4 metric files are generated](#how-the-v04-metric-files-are-generated) and the `[0.4]` entry in [CHANGELOG.md](../CHANGELOG.md)). **v0.3 is retained** for reference and for re-scoring older reviews — the review processor auto-selects the metric matching each review's `schema_version`.
+> **v0.5 is the current version.** `airbds_metric_v0.5.*` is generated from the working group's Google Sheet (see [How the v0.5 metric files are generated](#how-the-v05-metric-files-are-generated) and the `[0.5]` entry in [CHANGELOG.md](../CHANGELOG.md)). **v0.4 and v0.3 are retained** for reference and for re-scoring older reviews — the review processor auto-selects the metric matching each review's `schema_version`.
 
-> **Note on versioning:** the **current** `review_template` pair (under `reviews/`) is **not** versioned in its filename — `reviews/review_template.{yaml,csv}` always tracks the current metric (now v0.4), so non-technical reviewers always download the right file. It carries a `schema_version` field that must match the current metric version, so it is updated on every bump. On a bump, the outgoing pair is first copied to `reviews/archived_templates/review_template_v<old>.{yaml,csv}` (e.g. `review_template_v0.3.{yaml,csv}`) before the unversioned pair is overwritten — so previous versions stay retrievable as files, not just in git history.
+> **Note on versioning:** the **current** `review_template` pair (under `reviews/`) is **not** versioned in its filename — `reviews/review_template.{yaml,csv}` always tracks the current metric (now v0.5), so non-technical reviewers always download the right file. It carries a `schema_version` field that must match the current metric version, so it is updated on every bump. On a bump, the outgoing pair is first copied to `reviews/archived_templates/review_template_v<old>.{yaml,csv}` (e.g. `review_template_v0.4.{yaml,csv}`) before the unversioned pair is overwritten — so previous versions stay retrievable as files, not just in git history.
 
-> **Note on new metric versions:** A version bump creates a new file (e.g. `airbds_metric_v0.4.yaml`). Old versions are **retained** for archival — reviews carry `schema_version` to record which version they were scored against.
+> **Note on new metric versions:** A version bump creates a new file (e.g. `airbds_metric_v0.5.yaml`). Old versions are **retained** for archival — reviews carry `schema_version` to record which version they were scored against.
 
 ### How the v0.3 metric files are generated
 
@@ -137,9 +138,9 @@ metric/src/scripts/build_metric_yaml_from_spreadsheet_v0.3.py
 
 > The YAML carries a **GENERATED FILE — DO NOT EDIT BY HAND** banner. Edit the spreadsheet (or the script's `CONFIG`) and regenerate rather than editing the YAML directly.
 
-### How the v0.4 metric files are generated
+### How the v0.5 metric files are generated
 
-From v0.4 the metric is authored in the working group's **public Google Sheet** rather than a committed `.xlsx`. `metric/src/scripts/build_metric_yaml_from_google_sheet_v0.4.py` pulls the Scoring and Lookups tabs and regenerates `airbds_metric_v0.4.yaml`, recording which sheet and a content-hash "revision" in `airbds_metric_v0.4.upstream.json` plus a `# Source:` breadcrumb in the YAML. See [`metric/src/README.md`](src/README.md) for the commands, the `--check` drift check, and offline use. A weekly workflow (`.github/workflows/metric-upstream-drift-check.yml`) confirms the committed YAML still matches the Sheet, opening an issue if it has drifted. The v0.3 `.xlsx` chain stays in place unchanged.
+From v0.4 the metric is authored in the working group's **public Google Sheet** rather than a committed `.xlsx`. `metric/src/scripts/build_metric_yaml_from_google_sheet_v0.5.py` pulls the Scoring, Lookups, and Instructions tabs and regenerates `airbds_metric_v0.5.yaml`, recording which sheet and a content-hash "revision" in `airbds_metric_v0.5.upstream.json` plus a `# Source:` breadcrumb in the YAML. (v0.5 also captures the sheet's Instructions tab into a top-level `instructions:` block.) See [`metric/src/README.md`](src/README.md) for the commands, the `--check` drift check, and offline use. A weekly workflow (`.github/workflows/metric-upstream-drift-check.yml`) confirms each committed YAML still matches its Sheet, opening an issue if it has drifted. Each committed version keeps its own generator (`…_v0.4.py`, `…_v0.5.py`); the v0.3 `.xlsx` chain stays in place unchanged.
 
 ### Why ALL Files Must Change Together
 
@@ -192,7 +193,7 @@ Use this as a checklist when implementing any metric change.
 #### Group A — Core metric *(generated, never hand-edited)*
 - `metric/airbds_metric_vX.Y.yaml`
 
-> Never hand-edit these files. v0.4 (current) is generated from the working group's Google Sheet by `metric/src/scripts/build_metric_yaml_from_google_sheet_v0.4.py`; v0.3 by `metric/src/scripts/build_metric_yaml_from_spreadsheet_v0.3.py`. See [How the v0.4 metric files are generated](#how-the-v04-metric-files-are-generated).
+> Never hand-edit these files. v0.5 (current) is generated from the working group's Google Sheet by `metric/src/scripts/build_metric_yaml_from_google_sheet_v0.5.py` (v0.4 by the `…_v0.4.py` script); v0.3 by `metric/src/scripts/build_metric_yaml_from_spreadsheet_v0.3.py`. See [How the v0.5 metric files are generated](#how-the-v05-metric-files-are-generated).
 
 #### Group B — Review template pair *(always change together)*
 - `reviews/review_template.yaml`
@@ -216,9 +217,9 @@ Use this as a checklist when implementing any metric change.
 
 | Change type | Description | Version bump | Files to update |
 |-------------|-------------|-------------|-----------------|
-| **PATCH** | Guidance text clarification only — no change to question meaning, weights, or IDs | `0.4` → `0.4.1` | Groups A, B |
-| **MINOR** | Question added, removed, or reworded | `0.4` → `0.5` | Groups A, B, C |
-| **MAJOR** | Weight point value or grade threshold changed | `0.4` → `1.0` | Groups A, B, C |
+| **PATCH** | Guidance text clarification only — no change to question meaning, weights, or IDs | `0.5` → `0.5.1` | Groups A, B |
+| **MINOR** | Question added, removed, or reworded | `0.5` → `0.6` | Groups A, B, C |
+| **MAJOR** | Weight point value or grade threshold changed | `0.5` → `1.0` | Groups A, B, C |
 
 The canonical versioning policy is defined in [CONTRIBUTING.md](../CONTRIBUTING.md).
 

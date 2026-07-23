@@ -35,5 +35,5 @@ If you use this metric, please cite it using the metadata in
 [`CITATION.cff`](CITATION.cff). A suggested citation format:
 
 > AIRBDS Working Group, AIBIO-UK. (2026). *AIRBDS AI-Readiness Dataset
-> Scoring Metric* (v0.4). GitHub.
+> Scoring Metric* (v0.5). GitHub.
 > <https://github.com/AIBIO-UK/airbds-metric>

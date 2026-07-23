@@ -44,8 +44,8 @@ AIRBDS metric.
    `reviews/testing/<dataset_accession>_<reviewer_initials>_<n>.yaml`  
    e.g. `reviews/testing/E-MTAB-1234_CH_1.yaml`  
    Initials must be **uppercase letters only** (A-Z, 2–6 characters).
-3. **Fill in all fields:** Answer all 27 questions (`"Yes"` or `"No"`, case-sensitive, quoted). For Ethics
-   questions (ABC-24 to ABC-27), if the dataset contains no human or animal
+3. **Fill in all fields:** Answer all 25 questions (`"Yes"` or `"No"`, case-sensitive, quoted). For Ethics
+   questions (ABC-23 to ABC-25), if the dataset contains no human or animal
    subject data record the answer as `"Yes"` and set `not_applicable: true`
    with a brief comment.
 4. **Fill in the `result:` block yourself** — scoring is no longer automated (see
@@ -125,7 +125,7 @@ the `review:` commit prefix.
    ```
 4. **Commit your changes** using the [convention below](#commit-message-convention):
    ```bash
-   git add metric/airbds_metric_v0.4.yaml CHANGELOG.md
+   git add metric/airbds_metric_v0.5.yaml CHANGELOG.md
    git commit -m "metric: add ABC-29 reproducibility question"
    ```
 5. **Push to your fork:**
@@ -189,7 +189,7 @@ working material lives here, so anything actionable must resolve here for now.
 ```
 airbds-dev/
 ├── metric/
-│   └── airbds_metric_v0.4.yaml   # Canonical metric (questions, weights, grading rules)
+│   └── airbds_metric_v0.5.yaml   # Canonical metric (questions, weights, grading rules)
 ├── reviews/                      # Reviews + review tooling
 │   ├── review_template.yaml      # Blank template for new reviews
 │   └── testing/                  # Completed dataset reviews (one file per review)
@@ -223,7 +223,7 @@ The metric follows [Semantic Versioning](https://semver.org/)
 | Changes to scoring weights or grade thresholds | MAJOR |
 
 The canonical metric file is versioned in its filename
-(e.g. `airbds_metric_v0.4.yaml`). When a new version is released:
+(e.g. `airbds_metric_v0.5.yaml`). When a new version is released:
 1. The new YAML file is added (e.g. `airbds_metric_v1.0.yaml`)
 2. The old file is kept for archival purposes
 3. `CHANGELOG.md` is updated

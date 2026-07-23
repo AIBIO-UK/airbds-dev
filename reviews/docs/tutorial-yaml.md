@@ -16,7 +16,7 @@ This tutorial walks you through scoring a bioscience dataset for AI-readiness us
 
 ## What you will do
 
-Copy the YAML review template, fill in your answers to 27 Yes/No questions, validate the file, calculate a grade, and submit your review via a pull request.
+Copy the YAML review template, fill in your answers to 25 Yes/No questions, validate the file, calculate a grade, and submit your review via a pull request.
 
 ---
 
@@ -77,7 +77,7 @@ dataset:
 
 ---
 
-## Step 4 — Answer the 27 questions
+## Step 4 — Answer the 25 questions
 
 Scroll to the `answers:` block. For each question, set the `answer` field to `"Yes"` or `"No"`:
 
@@ -92,7 +92,7 @@ answers:
   ABC-03:
     answer: "No"
     comments: "No checksum or integrity mechanism provided."
-  # ... continue for all 27 questions
+  # ... continue for all 25 questions
 ```
 
 Rules:
@@ -100,26 +100,26 @@ Rules:
 - `comments` is optional — leave as `""` if you have nothing to add.
 - Do not delete any question block, even if you answer `"No"`.
 
-The question text and guidance for each ID are in [`metric/airbds_metric_v0.4.yaml`](../../metric/airbds_metric_v0.4.yaml).
+The question text and guidance for each ID are in [`metric/airbds_metric_v0.5.yaml`](../../metric/airbds_metric_v0.5.yaml).
 
 ---
 
-## Step 5 — Handle Ethics questions (ABC-24 to ABC-27)
+## Step 5 — Handle Ethics questions (ABC-23 to ABC-25)
 
-These four questions apply only to datasets containing **human or animal subject data**.
+These three questions apply only to datasets containing **human or animal subject data**.
 
 If your dataset contains **no human or animal subjects**, set `not_applicable: true` and `answer: "Yes"` for each:
 
 ```yaml
-  ABC-24:
+  ABC-23:
     answer: "Yes"
     not_applicable: true
     comments: "No human or animal subject data."
-  ABC-25:
+  ABC-24:
     answer: "Yes"
     not_applicable: true
     comments: ""
-  # ... repeat for ABC-26, ABC-27
+  # ... and the same for ABC-25
 ```
 
 If the dataset **does contain** human or animal subjects, answer normally and leave `not_applicable: false`.
@@ -158,7 +158,7 @@ Important pass rate = (number of Important "Yes" answers) / 11
 Optional pass rate  = (number of Optional "Yes" answers) / 8
 ```
 
-See [`metric/airbds_metric_v0.4.yaml`](../../metric/airbds_metric_v0.4.yaml) for which questions belong to each tier.
+See [`metric/airbds_metric_v0.5.yaml`](../../metric/airbds_metric_v0.5.yaml) for which questions belong to each tier.
 
 ---
 
@@ -166,8 +166,8 @@ See [`metric/airbds_metric_v0.4.yaml`](../../metric/airbds_metric_v0.4.yaml) for
 
 | Grade | Critical pass rate | Important pass rate | Optional pass rate |
 |---|---|---|---|
-| 🔴 Caution | < 0.875 | any | any |
-| 🟤 Bronze | ≥ 0.875 | any | any |
+| 🔴 Caution | < 0.889 | any | any |
+| 🟤 Bronze | ≥ 0.889 | any | any |
 | ⚪ Silver | = 1.0 | ≥ 0.5 | any |
 | 🟡 Gold | = 1.0 | = 1.0 | ≥ 0.5 |
 
