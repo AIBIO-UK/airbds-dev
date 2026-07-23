@@ -71,7 +71,6 @@ METADATA = {
     "schema_version": VERSION,
     "metric_name": "AIRBDS AI-Readiness Dataset Scoring Metric",
     "short_name": "AIRBDS Metric",
-    "version": VERSION,
     "release_date": "2026",
     "license": "CC-BY-4.0",
     "repository": "https://github.com/AIBIO-UK/airbds-metric",

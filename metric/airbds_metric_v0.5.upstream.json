@@ -3,6 +3,6 @@
   "sheet_url": "https://docs.google.com/spreadsheets/d/13w-MiUQc2sLzRFqRQD_YT6BisE3Orv5Oj3i0YBw7r_M/edit",
   "sheet_id": "13w-MiUQc2sLzRFqRQD_YT6BisE3Orv5Oj3i0YBw7r_M",
   "content_sha256": "1cb615afa206ef140d56eeb744087995663adacf8b8431de1bf6744dd8a65a62",
-  "generated_at": "2026-07-23T12:29:11Z",
+  "generated_at": "2026-07-23T13:26:35Z",
   "generator": "metric/src/scripts/build_metric_yaml_from_google_sheet_v0.5.py"
 }
