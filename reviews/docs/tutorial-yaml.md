@@ -219,4 +219,4 @@ For full contribution guidelines, including naming conventions and inter-rater r
 
 ---
 
-*AIRBDS Working Group, AIBIO-UK · Licensed CC BY 4.0 · [github.com/AIBIO-UK/airbds-metric](https://github.com/AIBIO-UK/airbds-metric)*
+*AIRBDS Working Group, AIBIO-UK · Licensed CC BY 4.0 · [github.com/AIBIO-UK/airbds-core](https://github.com/AIBIO-UK/airbds-core)*

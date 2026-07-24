@@ -228,6 +228,29 @@ layout — that carry no version of their own. Recorded by month, newest first.
   version.
 
 ### Changed
+- The publication repository was renamed from `AIBIO-UK/airbds-metric` to
+  `AIBIO-UK/airbds-core`, and every identity/attribution reference here follows
+  it: `CITATION.cff` `repository-code`, the suggested-citation blocks in
+  `LICENSE.md` and `README.md`, the tutorial footers in `reviews/docs/`, the
+  repository table in `CONTRIBUTING.md`, and the `repository:` field of all three
+  metric YAMLs (changed in the `METADATA` block of the generator scripts and
+  regenerated, never hand-edited). Actionable links — clone URLs, PR targets, the
+  skills' update manifest and `skill_update_url`s — still point at `airbds-dev`
+  and are unaffected.
+- `airbds-metric` now 301s to `airbds-core`, so surviving old links resolve.
+  Freeing the `airbds-metric` name did **not** restore this repo's own original
+  rename redirect, which was verified still returning 404 immediately after the
+  rename; `skills/docs/MAINTENANCE.md` records this so nobody plans around a
+  redirect that does not exist.
+- The `airbds-metric-tutorial` repository and its GitHub Pages URLs were
+  deliberately left alone — renaming it is a separate migration with its own
+  broken-link cost, so all `aibio-uk.github.io/airbds-metric-tutorial/` links are
+  unchanged.
+- Regenerating v0.5 picked up a new source-content sha256 for its Google Sheet
+  (`1cb615af…` → `b831706c…`). The extracted YAML is otherwise byte-identical, so
+  the sheet was edited in a way that touches nothing the metric consumes; the v0.4
+  sheet hash is unchanged. Recorded here because the regeneration also updates the
+  drift baseline in `metric/airbds_metric_v0.5.upstream.json`.
 - Disabled the `Review Check & Score` workflow (`.github/workflows/review-check.yml`):
   its `push`/`pull_request` triggers on `reviews/testing/**` are removed, leaving
   it `workflow_dispatch`-only. The manual review process is not live, and a

@@ -168,7 +168,7 @@ There are two repositories, and the distinction is deliberate — please don't
 
 | Kind of link | Repository | Examples |
 |---|---|---|
-| **Identity / attribution** — how the metric is cited and credited | [`airbds-metric`](https://github.com/AIBIO-UK/airbds-metric) (publication) | `CITATION.cff` `repository-code`, the suggested-citation blocks in `LICENSE.md` and `README.md`, the `repository:` field in the generated metric YAMLs, tutorial footers |
+| **Identity / attribution** — how the metric is cited and credited | [`airbds-core`](https://github.com/AIBIO-UK/airbds-core) (publication) | `CITATION.cff` `repository-code`, the suggested-citation blocks in `LICENSE.md` and `README.md`, the `repository:` field in the generated metric YAMLs, tutorial footers |
 | **Actual use** — anything a reader clicks to *do* something | [`airbds-dev`](https://github.com/AIBIO-UK/airbds-dev) (this repo) | `git clone`, opening a PR, downloading a skill, the skills' update manifest and `skill_update_url`, `/plugin marketplace add` |
 
 The canonical identity of the metric is the publication repository. But the

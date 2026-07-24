@@ -197,4 +197,4 @@ If you are not familiar with GitHub pull requests, you can also email your compl
 
 ---
 
-*AIRBDS Working Group, AIBIO-UK · Licensed CC BY 4.0 · [github.com/AIBIO-UK/airbds-metric](https://github.com/AIBIO-UK/airbds-metric)*
+*AIRBDS Working Group, AIBIO-UK · Licensed CC BY 4.0 · [github.com/AIBIO-UK/airbds-core](https://github.com/AIBIO-UK/airbds-core)*

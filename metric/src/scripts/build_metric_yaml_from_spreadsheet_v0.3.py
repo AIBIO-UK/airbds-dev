@@ -63,7 +63,7 @@ METADATA = {
     "short_name": "AIRBDS Metric",
     "release_date": "2025",
     "license": "CC-BY-4.0",
-    "repository": "https://github.com/AIBIO-UK/airbds-metric",
+    "repository": "https://github.com/AIBIO-UK/airbds-core",
     "contact": "info@aibio.ac.uk",
 }
 

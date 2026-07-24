@@ -2,7 +2,7 @@
   "metric_version": "0.5",
   "sheet_url": "https://docs.google.com/spreadsheets/d/13w-MiUQc2sLzRFqRQD_YT6BisE3Orv5Oj3i0YBw7r_M/edit",
   "sheet_id": "13w-MiUQc2sLzRFqRQD_YT6BisE3Orv5Oj3i0YBw7r_M",
-  "content_sha256": "1cb615afa206ef140d56eeb744087995663adacf8b8431de1bf6744dd8a65a62",
-  "generated_at": "2026-07-23T13:35:26Z",
+  "content_sha256": "b831706c4a13ac8e11a5f6b7c47ff50b86bc5118ecfe9e53c04ed409098ade90",
+  "generated_at": "2026-07-24T15:14:11Z",
   "generator": "metric/src/scripts/build_metric_yaml_from_google_sheet_v0.5.py"
 }

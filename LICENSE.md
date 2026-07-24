@@ -36,4 +36,4 @@ If you use this metric, please cite it using the metadata in
 
 > AIRBDS Working Group, AIBIO-UK. (2026). *AIRBDS AI-Readiness Dataset
 > Scoring Metric* (v0.5). GitHub.
-> <https://github.com/AIBIO-UK/airbds-metric>
+> <https://github.com/AIBIO-UK/airbds-core>

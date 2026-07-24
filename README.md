@@ -12,7 +12,7 @@
 > breaking changes land without notice.
 >
 > **For the canonical AIRBDS metric YAML and assessment skills, use the
-> publication repository — [AIBIO-UK/airbds-metric](https://github.com/AIBIO-UK/airbds-metric).**
+> publication repository — [AIBIO-UK/airbds-core](https://github.com/AIBIO-UK/airbds-core).**
 > Work here only if you intend to contribute to the metric's development.
 
 A versioned, machine-readable scoring metric for evaluating the **AI-readiness
@@ -277,7 +277,7 @@ If you use this metric, please cite it as:
 
 > AIRBDS Working Group, AIBIO-UK. (2026). *AIRBDS AI-Readiness Dataset
 > Scoring Metric* (v0.5). GitHub.
-> <https://github.com/AIBIO-UK/airbds-metric>
+> <https://github.com/AIBIO-UK/airbds-core>
 
 Full citation metadata (including all working group members) is available in
 [`CITATION.cff`](CITATION.cff) and is automatically recognised by GitHub's
