@@ -217,6 +217,16 @@ layout — that carry no version of their own. Recorded by month, newest first.
 
 ## 2026-07
 
+### Added
+- `skills/docs/DESIGN.md` — how the assessment skill is put together: what
+  `SKILL.md`'s frontmatter and body each do, what the bundled `assets/` carry,
+  and why the metric is shipped as a symlinked data file rather than restated as
+  prose in the instructions. Complements `skills/docs/MAINTENANCE.md`, which
+  covers the operational side (channels, the version manifest, release builds).
+  Linked from `skills/README.md` and added to the Group C coupled-file list in
+  `metric/README.md`, since its bundle diagram names the symlink's metric
+  version.
+
 ### Changed
 - Disabled the `Review Check & Score` workflow (`.github/workflows/review-check.yml`):
   its `push`/`pull_request` triggers on `reviews/testing/**` are removed, leaving

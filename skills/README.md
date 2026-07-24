@@ -71,4 +71,6 @@ repository name.
 
 > **Maintaining the skills?** Release channels, the `versions.json` update
 > manifest, and how to propagate a metric version bump are documented in
-> [`docs/MAINTENANCE.md`](docs/MAINTENANCE.md).
+> [`docs/MAINTENANCE.md`](docs/MAINTENANCE.md). How a skill is put together —
+> what `SKILL.md` and the bundled `assets/` do, and why the metric is carried as
+> data rather than restated as prose — is in [`docs/DESIGN.md`](docs/DESIGN.md).
