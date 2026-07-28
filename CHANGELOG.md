@@ -163,6 +163,16 @@ Changes to the AIRBDS assessment skill (`skills/`). Each channel —
 below is scoped to the channel(s) named in its heading. See
 [`skills/docs/MAINTENANCE.md`](skills/docs/MAINTENANCE.md).
 
+## [0.5.0] — `testing` (2026-07-28)
+
+- Promoted the `development` assessment skill to the `testing` channel, so the
+  `testing` skill now carries the access-failure tracking and end-of-report
+  warning described under [0.5.0] — `development` below. Skill version 0.5.0 (was
+  0.4.1); copied from `development` with only the channel-specific references
+  swapped. The metric is unchanged — both channels were already on v0.5, so no
+  asset symlink was repointed and `channels.testing.metric_version` stays at 0.5.
+  `skills/versions.json` `channels.testing.skill_version` is bumped to match.
+
 ## [0.5.0] — `development` (2026-07-28)
 
 - The skill now reports when it could not see everything it needed. Assistants

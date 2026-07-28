@@ -1,7 +1,7 @@
 ---
 name: airbds-assessment-skill
 description: Use this skill whenever a user wants to assess, score, or evaluate a life science dataset against the AIRBDS (AI-Ready Biological Data Sets) criteria. Triggers include any mention of "AIRBDS", "AI-ready dataset", "dataset scoring", or requests to grade a biological/biomedical dataset's AI-readiness. Activate when the user provides a dataset URL and asks for an assessment, audit, or readiness check. Do NOT use for general data quality reviews unrelated to AIRBDS or for non-life-science datasets.
-version: 0.4.1
+version: 0.5.0
 channel: testing
 metadata:
   hermes:
@@ -42,6 +42,11 @@ Your only goal is to evaluate datasets based on the AIRBDS (AI-Ready Biological 
 - While reviewing the landing page, determine the dataset's name/title from the page itself (no need to ask the user). Keep it — it is useful for naming the saved YAML file and its `dataset.name` field (see step 4).
 - For each question, determine if the answer is 'Yes' or 'No' regarding its AI-readiness. You must answer all the questions and only the questions defined in the metric file. Be thorough in your assessment, looking through other pages on the website if necessary, particularly if the answer appears to be "No".
 - For every question, provide an answer, the score for that answer, and the justification. The justification shouldn't be more than two sentences. The score for a question is its full points when the answer is "Yes" and 0 when the answer is "No". A question's full points are given by `grade_points` keyed by that question's `grade` (Critical = 80, Important = 5, Optional = 2).
+- **Track any access failures.** Some environments restrict which sites you may retrieve from the Internet. This covers every kind of resource the assessment relies on, not just web pages: repository landing and documentation pages, API endpoints, direct file downloads, FTP/S3/cloud-container listings,
+  DOI or identifier resolvers, and registry or schema lookups. If you cannot
+  retrieve any such resource keep a running note of the resource (URL or endpoint), what you
+  were trying to establish from it, the reason it failed, and which question IDs
+  are affected. You will use this information when reporting.
 
 3) **Reporting**
 
@@ -51,6 +56,18 @@ Your only goal is to evaluate datasets based on the AIRBDS (AI-Ready Biological 
   - the **final score** — the sum of the per-question scores;
   - the **overall grade** (Gold / Silver / Bronze / Caution) — determined from the `grading` thresholds in the metric file. A dataset earns the highest grade for which the proportion of "Yes" answers in every tier (Critical / Important / Optional) is at least that grade's `min_proportion_yes` for the tier AND the final score is at least its `min_score`. Tier proportions use the metric's full per-tier question counts as denominators;
   - a short summary justification.
+
+- **Access warning (only if any page could not be retrieved).** If you recorded
+  any access failure during step 2, you must end the report with a prominent
+  warning, placed after the score, grade and summary justification, so it is the
+  last thing the user reads. State briefly:
+  - the URLs you could not reach, and why (no permission to fetch, blocked,
+    error, timeout);
+  - which question IDs were affected, and that those answers rest on partial or
+    no evidence — the true score may be higher;
+  - that the user should either re-run the assessment in an environment with
+    access to those URLs, or check the affected questions themselves and correct
+    the answers.  
 
 4. **Optional: save the assessment as a YAML file**
 
