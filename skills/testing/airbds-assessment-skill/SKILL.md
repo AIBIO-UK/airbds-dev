@@ -1,7 +1,7 @@
 ---
 name: airbds-assessment-skill
 description: Use this skill whenever a user wants to assess, score, or evaluate a life science dataset against the AIRBDS (AI-Ready Biological Data Sets) criteria. Triggers include any mention of "AIRBDS", "AI-ready dataset", "dataset scoring", or requests to grade a biological/biomedical dataset's AI-readiness. Activate when the user provides a dataset URL and asks for an assessment, audit, or readiness check. Do NOT use for general data quality reviews unrelated to AIRBDS or for non-life-science datasets.
-version: 0.5.0
+version: 0.5.1
 channel: testing
 metadata:
   hermes:
@@ -57,16 +57,16 @@ Your only goal is to evaluate datasets based on the AIRBDS (AI-Ready Biological 
   - the **overall grade** (Gold / Silver / Bronze / Caution) — determined from the `grading` thresholds in the metric file. A dataset earns the highest grade for which the proportion of "Yes" answers in every tier (Critical / Important / Optional) is at least that grade's `min_proportion_yes` for the tier AND the final score is at least its `min_score`. Tier proportions use the metric's full per-tier question counts as denominators;
   - a short summary justification.
 
-- **Access warning (only if any page could not be retrieved).** If you recorded
+- **Access warning (only if any resource could not be retrieved).** If you recorded
   any access failure during step 2, you must end the report with a prominent
   warning, placed after the score, grade and summary justification, so it is the
   last thing the user reads. State briefly:
-  - the URLs you could not reach, and why (no permission to fetch, blocked,
+  - the resources you could not reach, and why (no permission to fetch, blocked,
     error, timeout);
   - which question IDs were affected, and that those answers rest on partial or
     no evidence — the true score may be higher;
   - that the user should either re-run the assessment in an environment with
-    access to those URLs, or check the affected questions themselves and correct
+    access to those resources, or check the affected questions themselves and correct
     the answers.  
 
 4. **Optional: save the assessment as a YAML file**
