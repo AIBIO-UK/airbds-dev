@@ -10,6 +10,11 @@ reviews/src/google-sheet-converter/bun.lockb
 # Build output of the converter package (rebuilt on prepublishOnly)
 reviews/src/google-sheet-converter/dist/
 
+# Skill release zips built at the repo root — by the build workflows in CI, and
+# by the same zip step when run locally (directly or under act)
+/airbds-assessment-skill.zip
+/airbds-assessment-skill-dev.zip
+
 # Python bytecode cache (metric build tooling)
 __pycache__/
 *.pyc

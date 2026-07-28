@@ -163,6 +163,27 @@ Changes to the AIRBDS assessment skill (`skills/`). Each channel —
 below is scoped to the channel(s) named in its heading. See
 [`skills/docs/MAINTENANCE.md`](skills/docs/MAINTENANCE.md).
 
+## [0.5.0] — `development` (2026-07-28)
+
+- The skill now reports when it could not see everything it needed. Assistants
+  running in restricted environments are frequently unable to retrieve some of
+  what an assessment depends on — not only web pages, but API endpoints, direct
+  file downloads, FTP/S3/cloud-container listings, DOI resolvers, and registry or
+  schema lookups. Previously such a failure was invisible in the output: the
+  report presented a complete-looking table and a final score, with no signal
+  that some answers rested on evidence the model had never actually seen.
+- The assessment step now instructs the model to keep a running note of each
+  resource it could not retrieve — what it was trying to establish, why the
+  retrieval failed, and which question IDs are affected — and the reporting step
+  requires a prominent warning at the very end of the report, after the score,
+  grade and summary justification. The warning names the unreachable resources
+  and the reasons, identifies the affected question IDs as resting on partial or
+  no evidence (so the true score may be higher), and tells the user to re-run the
+  assessment somewhere with access or to check those questions themselves. It is
+  emitted only when a failure was actually recorded; a clean run is unchanged.
+- No metric change: `channels.development.metric_version` stays at 0.5.
+  `skills/versions.json` `channels.development.skill_version` is bumped to match.
+
 ## [0.4.1] — `testing` (2026-07-23)
 
 - Promoted the `development` assessment skill to the `testing` channel: the
