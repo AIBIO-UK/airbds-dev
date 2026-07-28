@@ -163,6 +163,19 @@ Changes to the AIRBDS assessment skill (`skills/`). Each channel —
 below is scoped to the channel(s) named in its heading. See
 [`skills/docs/MAINTENANCE.md`](skills/docs/MAINTENANCE.md).
 
+## [0.5.1] — `development` (2026-07-28)
+
+- Widened the access-warning wording in the reporting step to match the tracking
+  step, which already covered API endpoints, downloads, FTP/S3 listings and
+  resolver lookups as well as web pages. The warning's trigger condition read
+  "only if any *page* could not be retrieved", so a model blocked from an API but
+  able to read every page could satisfy step 2's tracking and still skip the
+  warning, silently restoring the pre-0.5.0 behaviour for exactly the
+  API-restricted case the warning was added for. "page" and "URLs" are now
+  "resource"/"resources" in all three places.
+  `skills/versions.json` `channels.development.skill_version` is bumped to match;
+  the metric is untouched. The `testing` channel stays at 0.5.0 until promoted.
+
 ## [0.5.0] — `testing` (2026-07-28)
 
 - Promoted the `development` assessment skill to the `testing` channel, so the
