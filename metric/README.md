@@ -140,7 +140,7 @@ metric/src/scripts/build_metric_yaml_from_spreadsheet_v0.3.py
 
 ### How the v0.5 metric files are generated
 
-From v0.4 the metric is authored in the working group's **public Google Sheet** rather than a committed `.xlsx`. `metric/src/scripts/build_metric_yaml_from_google_sheet_v0.5.py` pulls the Scoring, Lookups, and Instructions tabs and regenerates `airbds_metric_v0.5.yaml`, recording which sheet and a content-hash "revision" in `airbds_metric_v0.5.upstream.json` plus a `# Source:` breadcrumb in the YAML. (v0.5 also captures the sheet's Instructions tab into a top-level `instructions:` block.) See [`metric/src/README.md`](src/README.md) for the commands, the `--check` drift check, and offline use. A weekly workflow (`.github/workflows/metric-upstream-drift-check.yml`) confirms each committed YAML still matches its Sheet, opening an issue if it has drifted. Each committed version keeps its own generator (`…_v0.4.py`, `…_v0.5.py`); the v0.3 `.xlsx` chain stays in place unchanged.
+From v0.4 the metric is authored in the working group's **public Google Sheet** rather than a committed `.xlsx`. `metric/src/scripts/build_metric_from_google_sheet_v0.5.py` pulls the Scoring, Lookups, and Instructions tabs and regenerates `airbds_metric_v0.5.yaml`, recording which sheet and a content-hash "revision" in `airbds_metric_v0.5.upstream.json` plus a `# Source:` breadcrumb in the YAML. (v0.5 also captures the sheet's Instructions tab into a top-level `instructions:` block.) See [`metric/src/README.md`](src/README.md) for the commands, the `--check` drift check, and offline use. A weekly workflow (`.github/workflows/metric-upstream-drift-check.yml`) confirms each committed YAML still matches its Sheet, opening an issue if it has drifted. Each committed version keeps its own generator (`…_v0.4.py`, `…_v0.5.py`); the v0.3 `.xlsx` chain stays in place unchanged.
 
 ### Why ALL Files Must Change Together
 
@@ -192,8 +192,10 @@ Use this as a checklist when implementing any metric change.
 
 #### Group A — Core metric *(generated, never hand-edited)*
 - `metric/airbds_metric_vX.Y.yaml`
+- `metric/airbds_metric_vX.Y.json` *(v0.5 onwards — the same document as the
+  YAML, for consumers that cannot use a YAML parser; written by the same run)*
 
-> Never hand-edit these files. v0.5 (current) is generated from the working group's Google Sheet by `metric/src/scripts/build_metric_yaml_from_google_sheet_v0.5.py` (v0.4 by the `…_v0.4.py` script); v0.3 by `metric/src/scripts/build_metric_yaml_from_spreadsheet_v0.3.py`. See [How the v0.5 metric files are generated](#how-the-v05-metric-files-are-generated).
+> Never hand-edit these files. v0.5 (current) is generated from the working group's Google Sheet by `metric/src/scripts/build_metric_from_google_sheet_v0.5.py` (v0.4 by the `…_v0.4.py` script); v0.3 by `metric/src/scripts/build_metric_yaml_from_spreadsheet_v0.3.py`. See [How the v0.5 metric files are generated](#how-the-v05-metric-files-are-generated).
 
 #### Group B — Review template pair *(always change together)*
 - `reviews/review_template.yaml`

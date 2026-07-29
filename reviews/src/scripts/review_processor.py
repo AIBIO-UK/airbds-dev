@@ -30,14 +30,17 @@ from pathlib import Path
 
 import yaml
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from airbds_scoring import (  # noqa: E402  (sibling module, after sys.path tweak)
+    WEIGHT_POINTS,
+    score_review,
+)
+
 # ── Constants ──────────────────────────────────────────────────────────────────
 
 # Repo root is four levels up: <root>/reviews/src/scripts/<this file>.
 REPO_ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_METRIC_DIR = REPO_ROOT / "metric"
-
-# Fallback grade points, used only if a metric omits grade_points for a grade.
-WEIGHT_POINTS = {"Critical": 80, "Important": 5, "Optional": 2}
 
 # YAML 1.1 strings that are misread as booleans — must be quoted on output
 YAML11_BOOL_STRINGS = {
@@ -432,42 +435,9 @@ def _parse_csv_bool(value: str) -> bool:
 
 # ── Scoring ───────────────────────────────────────────────────────────────────
 
-def score_review(answers: dict, question_meta: dict, grading: list) -> tuple:
-    """Return (weighted_score: int, grade: str).
-
-    Grades identically to the auto-airbds frontend: the dataset earns the
-    highest grade for which the proportion of "Yes" answers in every grade tier
-    is at least the tier minimum AND the total weighted score is at least the
-    grade's min_score. Proportions use the metric's full per-tier question
-    counts as denominators, so a missing answer counts against the proportion.
-    """
-    total_by_tier: dict = {}
-    yes_by_tier: dict = {}
-    score = 0
-
-    for qid, qm in question_meta.items():
-        tier = qm["weight"]
-        total_by_tier[tier] = total_by_tier.get(tier, 0) + 1
-        if answers.get(qid, {}).get("answer") == "Yes":
-            yes_by_tier[tier] = yes_by_tier.get(tier, 0) + 1
-            score += qm.get("weight_points", 0)
-
-    def proportion(tier: str) -> float:
-        total = total_by_tier.get(tier, 0)
-        # A tier with no questions imposes no constraint.
-        return 1.0 if total == 0 else yes_by_tier.get(tier, 0) / total
-
-    grade = ""
-    for g in grading:
-        proportions_met = all(
-            proportion(tier) >= minimum
-            for tier, minimum in g["min_proportion_yes"].items()
-        )
-        if proportions_met and score >= g["min_score"]:
-            grade = g["name"]
-            break
-
-    return score, grade
+# Scoring itself lives in airbds_scoring.py (imported above), shared with the
+# assessment skill's bundled scorer so a review and a skill-produced assessment
+# cannot be graded by two different implementations.
 
 
 # ── File writing ──────────────────────────────────────────────────────────────

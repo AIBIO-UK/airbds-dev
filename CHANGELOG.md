@@ -26,7 +26,33 @@ pipeline that produces `metric/airbds_metric_vX.Y.yaml`.
 
 ## [Unreleased]
 
-Nothing yet.
+### Added
+- `metric/airbds_metric_v0.5.json` — a JSON rendering of the v0.5 metric,
+  written by the same build run as the YAML and covered by its `--check`. It
+  exists so consumers that cannot depend on a YAML parser (chiefly the
+  assessment skill's bundled scorer) can read the metric. Produced by parsing
+  the rendered YAML and re-serialising it, so the two are the same document; the
+  YAML remains canonical and is the version humans read.
+
+### Fixed
+- **`--check` now compares metric content, not raw bytes**, in both the v0.4 and
+  v0.5 generators. The `# Source content sha256:` breadcrumb is set aside for the
+  comparison: it hashes the raw source CSVs, so it moved whenever the sheet's
+  bytes moved — including for edits the generators never read (a cell in an
+  unread pivot column, a heading in the excluded data-entry block, trailing
+  whitespace). The v0.5 check had been failing for exactly this reason while
+  every extracted field was byte-identical, which also made the scheduled
+  `metric-upstream-drift-check.yml` open issues for a metric that had not
+  changed. A bare hash difference is now a passing `NOTE` naming both hashes; a
+  real content change still exits 1. `test_committed_yaml_regenerates_byte_for_byte`
+  was failing on this and now passes, with new coverage asserting that a genuine
+  content change is still caught and a hash-only change is not.
+
+### Changed
+- `build_metric_yaml_from_google_sheet_v0.{4,5}.py` renamed to
+  `build_metric_from_google_sheet_v0.{4,5}.py` — they no longer produce only
+  YAML. Both were renamed together because the drift-check workflow builds the
+  script name from its version matrix.
 
 ---
 
@@ -44,7 +70,7 @@ Nothing yet.
 - `instructions:` — a new top-level block in the metric YAML, captured verbatim
   from the source sheet's Instructions tab, so downstream reviewers (human and
   AI) read the same generic guidance.
-- `metric/src/scripts/build_metric_yaml_from_google_sheet_v0.5.py` — generates
+- `metric/src/scripts/build_metric_from_google_sheet_v0.5.py` — generates
   `airbds_metric_v0.5.yaml` from the v0.5 Google Sheet (Scoring, Lookups, and
   Instructions tabs), recording provenance in `airbds_metric_v0.5.upstream.json`.
 - `reviews/src/scripts/build_review_template.py` — generates the
@@ -162,6 +188,60 @@ Changes to the AIRBDS assessment skill (`skills/`). Each channel —
 `skills/versions.json` and is published by its own build workflow, so a version
 below is scoped to the channel(s) named in its heading. See
 [`skills/docs/MAINTENANCE.md`](skills/docs/MAINTENANCE.md).
+
+## [0.6.0] — `development` (2026-07-29)
+
+- **Scoring is now mechanical.** The skill bundles `scripts/score.py`, which takes
+  a flat `{question-id: "Yes"|"No"}` JSON document and returns the final score,
+  the overall grade, and the per-tier yes/total/proportion counts. The model
+  supplies only its own judgements; the tiers, weights and grading thresholds
+  come from the bundle. This removes the model from the one part of an assessment
+  with a single correct answer — in particular the grading rule, a conjunction
+  over three tier proportions plus a score floor that weaker models evaluate
+  unreliably. Minor rather than patch: the assessment's central calculation
+  changes hands, and the bundle gains two files.
+- The script is the **same code that scores submitted reviews** —
+  `scripts/score.py` symlinks to `reviews/src/scripts/airbds_scoring.py`, from
+  which `review_processor.py` now imports `score_review`. A skill-produced
+  assessment and a hand-written review can no longer be graded by two
+  implementations that have drifted apart.
+- It refuses to score an answer set with a missing question, an unknown id, or
+  an answer that is not exactly `"Yes"`/`"No"`, reporting the problems instead.
+  Transcribing 25 answers is where the residual risk now sits, so it fails
+  loudly rather than grading a partial set.
+- **The bundled metric is now JSON, and only JSON.** `assets/airbds_metric.yaml`
+  is replaced by `assets/airbds_metric.json`, symlinked to the new
+  `metric/airbds_metric_v0.5.json`. The scorer needs JSON so it can depend on
+  the standard library alone — PyYAML cannot be assumed in the environments a
+  skill runs in — and the model reads the same file, so the questions it answers
+  and the metric it is scored against are one document. Shipping both renderings
+  would have duplicated the metric inside the bundle for no gain: nothing the
+  skill reads from the metric lives in a YAML comment. The YAML remains
+  canonical in `metric/` for people to read.
+- The bundle gains a `scripts/` directory, following the agentskills.io layout —
+  data the skill reads in `assets/`, executables in `scripts/`.
+- **The script is an optimisation, never a precondition.** Where the bundle's
+  files are not unpacked, Python is unavailable, or execution is not permitted,
+  `SKILL.md` instructs the model to fall back to scoring by hand using the rules
+  it still states in full.
+- **The fallback is disclosed, but only when it happens.** The reporting step's
+  "Access warning" is broadened to a **Warnings** section carrying two
+  independent warnings: the existing access-failure one, and a new one stating
+  that the score and grade were calculated by the model rather than the script,
+  why the script could not be run, that the table's answers are unaffected, and
+  that re-running somewhere it can execute will calculate them mechanistically.
+  A score the script produced is reported with no commentary at all, and the
+  section is omitted entirely when neither warning applies — so the user can tell
+  which of two differently-trustworthy numbers they have without the successful
+  path adding noise that teaches them to skip warnings.
+- Both skill build workflows now list the symlink *targets* in their
+  `paths:` triggers. A GitHub path filter matches the committed path and never
+  follows a symlink, so a commit changing the metric or the scorer previously
+  left the published zip holding stale content without any signal. This was
+  already true of the metric before this release.
+- `skills/versions.json` `channels.development.skill_version` is bumped to
+  0.6.0; the metric is unchanged at v0.5. The `testing` channel stays at 0.5.1
+  until promoted, and does not yet bundle the scorer.
 
 ## [0.5.1] — `testing` (2026-07-28)
 
@@ -331,7 +411,7 @@ layout — that carry no version of their own. Recorded by month, newest first.
   development-only and had no meaningful consumers — auto-airbds reads the
   YAML. The generator scripts were renamed accordingly
   (`build_metric_yaml_from_spreadsheet_v0.3.py`,
-  `build_metric_yaml_from_google_sheet_v0.4.py`). Reintroduces the metric
+  `build_metric_from_google_sheet_v0.4.py`). Reintroduces the metric
   half of the slim-down from PR #14 in adapted form. The review template
   (`reviews/review_template.{yaml,csv}`) is unaffected and keeps both formats.
 

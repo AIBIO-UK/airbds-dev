@@ -21,42 +21,117 @@ given URL. Its body is the instructions the assistant follows once invoked.
 ```
 airbds-assessment-skill/
 ├── SKILL.md
-└── assets/
-    ├── airbds_metric.yaml     → ../../../../metric/airbds_metric_v0.5.yaml
-    └── review_template.yaml   → ../../../../reviews/review_template.yaml
+├── assets/
+│   ├── airbds_metric.json     → ../../../../metric/airbds_metric_v0.5.json
+│   └── review_template.yaml   → ../../../../reviews/review_template.yaml
+└── scripts/
+    └── score.py               → ../../../../reviews/src/scripts/airbds_scoring.py
 ```
+
+The split follows the [agentskills.io](https://agentskills.io) layout: data the
+skill reads lives in `assets/`, executables in `scripts/`. `score.py` therefore
+looks for its metric in `../assets/` rather than beside itself.
 
 Both channels currently point at v0.5; a channel may sit on an older metric, so
 read the symlink rather than this diagram if you need a channel's actual version.
+The JSON metric and `scripts/` are on the `development` channel only for now;
+`testing` still bundles the metric YAML.
 
-`assets/airbds_metric.yaml` is a complete description of the metric: every
+`assets/airbds_metric.json` is a complete description of the metric: every
 question, its scope and weighting, the reviewer guidance attached to it, and the
-grading rules that turn answers into a score and a grade.
+grading rules that turn answers into a score and a grade. **The bundle carries
+the JSON rendering only** — the model and `scripts/score.py` read the same file,
+so there is no way for the questions the model answers and the metric it is
+scored against to be different documents. The canonical YAML stays in `metric/`
+for people to read; nothing the skill needs from the metric lives in a YAML
+comment, so the bundle loses nothing by omitting it. See
+[Scoring is mechanical, not modelled](#scoring-is-mechanical-not-modelled).
 
 `assets/review_template.yaml` is the structure the assessment is recorded in —
 an answer slot and a free-text `comments` field for each question id, reviewer
 and dataset blocks, and a `result` block for the weighted score and grade.
 
-Both are **symlinks** into the canonical files elsewhere in this repository. The
-build workflows dereference them into real files when they package a skill zip,
-so a published skill is self-contained while the checked-in skill has no copy to
-drift out of date. Nothing under `skills/` is ever the source of truth for
-metric content.
+All three are **symlinks** into the canonical files elsewhere in this repository.
+The build workflows dereference them into real files when they package a skill
+zip, so a published skill is self-contained while the checked-in skill has no
+copy to drift out of date. Nothing under `skills/` is ever the source of truth
+for metric content.
+
+Because they are symlinks, the build workflows list the symlink *targets* in
+their `paths:` triggers as well as `assets/*` and `scripts/*`: a GitHub path
+filter matches the committed path and never follows a link, so without the
+targets a commit that changed the metric or the scorer would leave the published
+zip holding stale content. That list has to be kept in step with the symlinks.
 
 ## The metric is data, not prose
 
 The body of `SKILL.md` does not restate the questions. It instructs the
-assistant to read them from `assets/airbds_metric.yaml` and work through them,
+assistant to read them from `assets/airbds_metric.json` and work through them,
 which keeps a single definition of the metric across the skill, the review
 tooling, and the [auto-airbds](https://github.com/AIBIO-UK/auto-airbds) frontend.
 
 The version follows from the same choice. The skill reports the version it is
 assessing against by reading `schema_version` out of the bundled metric file;
 `SKILL.md` never hard-codes a version number. Pointing the symlink at a
-different `metric/airbds_metric_v*.yaml` is therefore the entire mechanism for
+different `metric/airbds_metric_v*` pair is therefore the entire mechanism for
 moving a skill to a new metric version — see
 [`MAINTENANCE.md`](MAINTENANCE.md) for the manifest bookkeeping that has to
 accompany it.
+
+## Scoring is mechanical, not modelled
+
+Turning answers into a grade is arithmetic plus a threshold rule, and asking a
+model to do it invites non-determinism in the one part of an assessment that has
+a single correct answer. The grading rule is the sharp edge: a dataset earns the
+highest grade for which *every* per-tier proportion clears a minimum **and** the
+total clears a score floor. That is a conjunction over three tiers plus a floor,
+evaluated highest-grade-first — much easier to get subtly wrong than a sum, and
+weaker models get it wrong more often.
+
+So the skill bundles `scripts/score.py`. The model supplies a flat
+`{question-id: "Yes"|"No"}` document — the judgements only it can make — and the
+script returns the score, the grade, and the per-tier counts. Everything fixed
+comes from the bundle; nothing that is already known is transcribed by the model.
+Handing the model the metric's tiers and thresholds to pass back in would have
+re-introduced exactly the transcription risk the script exists to remove, and a
+mistyped threshold would produce a wrong grade wearing the authority of having
+been "calculated".
+
+The script also refuses to score an answer set that is missing a question,
+carries an unknown id, or holds anything other than exactly `"Yes"` or `"No"`.
+Transcribing 25 answers is now where the residual risk lives, so that step fails
+loudly rather than scoring a partial set into a plausible-looking grade.
+
+Three consequences shaped the design:
+
+- **It is the same code that scores submitted reviews.** `score.py` is a symlink
+  to `reviews/src/scripts/airbds_scoring.py`, which `review_processor.py`
+  imports. A skill-produced assessment and a hand-written review cannot be
+  graded by two different implementations.
+- **The bundled metric is JSON.** The script must run wherever the user's
+  assistant runs, and PyYAML cannot be assumed there — so the metric is also
+  generated as `metric/airbds_metric_vX.Y.json` and the script depends on
+  nothing outside the standard library. The JSON is produced by parsing the YAML
+  the build script has just rendered and re-serialising it, so it is that
+  document rather than a second reading of the sheet. Since nothing the skill
+  reads from the metric lives in a YAML comment, the bundle ships the JSON alone
+  and the model reads it too — carrying both renderings would have duplicated
+  the metric inside the bundle to no end. The YAML remains canonical in
+  `metric/`, where its comments serve the people maintaining it.
+- **It is an optimisation, never a precondition.** Some environments will not
+  unpack the bundle's files, or cannot execute Python, or will not permit it.
+  `SKILL.md` therefore keeps the scoring rules in full and instructs the model to
+  fall back to working the score out itself. A skill that refused to assess where
+  it could not run a script would be worse than one that occasionally does the
+  arithmetic itself.
+
+  The fallback is **disclosed, but only when it happens.** A score the script
+  produced is reported with no commentary; a score the model calculated carries a
+  warning saying so, why the script could not be run, and that the user should
+  check it. The asymmetry is deliberate: the user cannot otherwise tell which of
+  two quite differently-trustworthy numbers they are looking at, and announcing
+  the mechanism on every successful run would be noise that trains them to skip
+  the warnings section — the place a genuine problem has to be noticed.
 
 ## The output is the shared review template
 

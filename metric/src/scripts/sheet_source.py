@@ -24,6 +24,32 @@ BASE = "https://docs.google.com/spreadsheets/d"
 _UA = "Mozilla/5.0 (X11; Linux x86_64) AIRBDS-metric-build"
 
 
+# The provenance breadcrumb each generator writes into its metric YAML. It
+# records the hash of the raw source tabs, so it moves whenever the sheet's CSV
+# bytes move — including for edits that change nothing the generators extract
+# (a cell in an unread column, a heading in the excluded data-entry block,
+# trailing whitespace). Drift is therefore decided on everything *except* this
+# line; see `strip_source_breadcrumb`.
+SOURCE_SHA_RE = re.compile(r"^# Source content sha256: *(\S*) *$", re.MULTILINE)
+
+_SHA_PLACEHOLDER = "# Source content sha256: <compared separately>"
+
+
+def strip_source_breadcrumb(text: str) -> str:
+    """Blank the source-hash line so two renderings compare on content alone.
+
+    Replaced rather than deleted so the comparison still notices if the line goes
+    missing or is duplicated — only the hash value itself is disregarded.
+    """
+    return SOURCE_SHA_RE.sub(_SHA_PLACEHOLDER, text)
+
+
+def recorded_source_sha(text: str) -> str | None:
+    """The source hash a committed metric records, or None if it has no breadcrumb."""
+    match = SOURCE_SHA_RE.search(text)
+    return match.group(1) if match else None
+
+
 def extract_spreadsheet_id(url_or_id: str) -> str:
     """Pull the spreadsheet id out of a full URL, or accept a bare id."""
     m = re.search(r"/spreadsheets/d/([A-Za-z0-9_-]+)", url_or_id)

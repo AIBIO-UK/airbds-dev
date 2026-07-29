@@ -58,6 +58,20 @@ Notes:
 ## Python
 
 - `scripts/review_processor.py` — validates, scores, and converts review files (CI + local).
+- `scripts/airbds_scoring.py` — the scoring itself: answers in, weighted score
+  and grade out. `review_processor.py` imports it, and the assessment skill
+  bundles it as `scripts/score.py` (see
+  [`skills/docs/DESIGN.md`](../../skills/docs/DESIGN.md)) so a skill-produced
+  assessment and a submitted review are graded by one implementation. Standard
+  library only — the skill runs wherever the user's assistant runs, so it reads
+  the metric JSON rather than the YAML:
+
+  ```bash
+  # {"ABC-01": "Yes", ...} for every question id in the metric
+  python3 reviews/src/scripts/airbds_scoring.py answers.json \
+      --metric metric/airbds_metric_v0.5.json
+  ```
+
 - `scripts/build_review_template.py` — generates the blank template pair
   ([`review_template.yaml`](../review_template.yaml) /
   [`review_template.csv`](../review_template.csv)) from the metric YAML, so the
@@ -68,4 +82,7 @@ Notes:
   python3 reviews/src/scripts/build_review_template.py --version 0.5 --check  # verify in sync
   ```
 
-Needs Python 3 with `pyyaml`.
+Needs Python 3 with `pyyaml`, except `airbds_scoring.py`, which deliberately
+needs nothing beyond the standard library.
+
+Tests: `pytest reviews/src/tests/`.

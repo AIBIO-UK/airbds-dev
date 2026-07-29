@@ -18,8 +18,9 @@ from pathlib import Path
 TESTS_DIR = Path(__file__).resolve().parent
 FIXTURES = TESTS_DIR / "fixtures"
 REPO_ROOT = TESTS_DIR.parent.parent.parent
-SCRIPT = REPO_ROOT / "metric" / "src" / "scripts" / "build_metric_yaml_from_google_sheet_v0.5.py"
+SCRIPT = REPO_ROOT / "metric" / "src" / "scripts" / "build_metric_from_google_sheet_v0.5.py"
 COMMITTED_YAML = REPO_ROOT / "metric" / "airbds_metric_v0.5.yaml"
+COMMITTED_JSON = REPO_ROOT / "metric" / "airbds_metric_v0.5.json"
 
 
 def _load_build_module():
@@ -31,6 +32,10 @@ def _load_build_module():
 
 
 bm = _load_build_module()
+
+# The build script puts its own directory on sys.path, so the shared source
+# helpers are importable once bm has loaded.
+import sheet_source as ss  # noqa: E402
 
 
 def _worksheets():
@@ -112,10 +117,72 @@ def test_committed_yaml_regenerates_byte_for_byte():
     assert doc["questions"]["ABC-23"]["not_applicable_default"] == "Yes"
 
     committed = COMMITTED_YAML.read_text(encoding="utf-8")
-    assert generated == committed, (
+    # Compared with the source-hash breadcrumb set aside, exactly as `--check`
+    # does. That line hashes the raw source CSVs, so it moves whenever the sheet's
+    # bytes move — including for edits nothing here reads (an unread pivot cell, a
+    # heading in the excluded data-entry block, trailing whitespace). Comparing it
+    # would fail this test for a metric that is byte-identical in every field.
+    assert ss.strip_source_breadcrumb(generated) == ss.strip_source_breadcrumb(committed), (
         "committed metric/airbds_metric_v0.5.yaml is out of sync with the fixtures; "
         "regenerate it from the sheet (or fixtures) and commit the result."
     )
+
+
+def test_a_real_content_change_is_still_caught():
+    """The breadcrumb exemption must not blind the comparison to actual drift."""
+    committed = COMMITTED_YAML.read_text(encoding="utf-8")
+    tampered = committed.replace(
+        "Can the dataset be accessed in its entirety?",
+        "Can the dataset be accessed in part?",
+    )
+    assert tampered != committed, "fixture question text changed; update this test"
+    assert ss.strip_source_breadcrumb(tampered) != ss.strip_source_breadcrumb(committed)
+
+
+def test_a_bare_source_hash_change_is_not_drift():
+    """A different recorded hash alone leaves the content comparison equal."""
+    committed = COMMITTED_YAML.read_text(encoding="utf-8")
+    rehashed = ss.SOURCE_SHA_RE.sub("# Source content sha256: " + "0" * 64, committed)
+    assert rehashed != committed
+    assert ss.strip_source_breadcrumb(rehashed) == ss.strip_source_breadcrumb(committed)
+    assert ss.recorded_source_sha(rehashed) == "0" * 64
+
+
+def test_committed_json_is_the_committed_yaml():
+    """The JSON rendering must carry exactly the YAML's content.
+
+    The assessment skill bundles the JSON and scores against it, while
+    review_processor.py scores submitted reviews against the YAML. If the two
+    ever diverged, a dataset could be graded one way by the skill and another on
+    submission — so this asserts they are the same document, comments aside.
+    """
+    import json
+    import yaml
+
+    committed_json = json.loads(COMMITTED_JSON.read_text(encoding="utf-8"))
+    committed_yaml = yaml.safe_load(COMMITTED_YAML.read_text(encoding="utf-8"))
+    assert committed_json == committed_yaml, (
+        "metric/airbds_metric_v0.5.json is out of sync with the YAML; "
+        f"regenerate both with: python3 {bm.SCRIPT_PATH}"
+    )
+
+    # The JSON is what score.py reads; these are the fields it depends on.
+    assert committed_json["schema_version"] == "0.5"
+    assert committed_json["grade_points"]
+    assert committed_json["grading"]
+    assert all(
+        "grade" in q for q in committed_json["questions"].values()
+    ), "every question needs a grade for the scorer to tier it"
+
+
+def test_committed_json_preserves_question_order():
+    """Report rows follow metric order, so the JSON must not be re-sorted."""
+    import json
+    import yaml
+
+    committed_json = json.loads(COMMITTED_JSON.read_text(encoding="utf-8"))
+    committed_yaml = yaml.safe_load(COMMITTED_YAML.read_text(encoding="utf-8"))
+    assert list(committed_json["questions"]) == list(committed_yaml["questions"])
 
 
 def _run_all():

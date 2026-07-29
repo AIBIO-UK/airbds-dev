@@ -1,30 +1,61 @@
 #!/usr/bin/env python3
-"""Build the canonical v0.4 metric YAML from the AIRBDS Google Sheet.
+"""Build the canonical v0.5 metric files from the AIRBDS Google Sheet.
 
-v0.4 is authored in a public Google Sheet (the working group's live doc) rather
-than the v0.3 source .xlsx. This script pulls the Scoring and Lookups tabs via
-the public CSV export (the sheet's own export format, not this script's output
-format) and regenerates the metric YAML from them.
+Like v0.4, v0.5 is authored in a public Google Sheet (the working group's live
+doc). This script pulls the Scoring, Lookups, and Instructions tabs via the
+public CSV export (the sheet's own export format, not this script's output
+format) and regenerates the metric files from them.
+
+Two renderings of the same metric are written:
+
+  * airbds_metric_v0.5.yaml — the canonical, human-readable form. Carries the
+    explanatory comments and is what people read and review.
+  * airbds_metric_v0.5.json — the same content for consumers that must run
+    without a YAML parser, notably the assessment skill's bundled scoring
+    script (see skills/docs/DESIGN.md). Produced by parsing the YAML this
+    script just rendered and re-serialising it, so the two cannot disagree:
+    the JSON is the YAML, minus the comments. Every field the skill reads
+    (schema_version, questions, grade_points, grading, instructions) survives;
+    only maintainer commentary is lost.
 
 Usage:
-    # Regenerate metric/airbds_metric_v0.4.yaml from the live sheet
-    python3 metric/src/scripts/build_metric_yaml_from_google_sheet_v0.4.py
+    # Regenerate metric/airbds_metric_v0.5.yaml from the live sheet
+    python3 metric/src/scripts/build_metric_from_google_sheet_v0.5.py
 
     # Verify the committed file still matches the live sheet (the drift check)
-    python3 metric/src/scripts/build_metric_yaml_from_google_sheet_v0.4.py --check
+    python3 metric/src/scripts/build_metric_from_google_sheet_v0.5.py --check
 
     # Work offline from exported CSVs instead of fetching
-    python3 metric/src/scripts/build_metric_yaml_from_google_sheet_v0.4.py \
-        --scoring-csv scoring.csv --lookups-csv lookups.csv
+    python3 metric/src/scripts/build_metric_from_google_sheet_v0.5.py \
+        --scoring-csv scoring.csv --lookups-csv lookups.csv \
+        --instructions-csv instructions.csv
 
-Schema note (v0.4 vs v0.3): question ids are ABC-NN; there is no `theme` or
-`mapped_from`; grade `min_score` thresholds are fractional. Document-level
-metadata (license, description, scope descriptions) is NOT in the sheet — it is
-held in the CONFIG block below; edit it there.
+Schema notes (v0.5 vs v0.4):
+  * The metric is 25 questions (was 27). Ids remain ABC-NN; scopes and grades
+    are unchanged (Infrastructure/Metadata/Content/Ethics; Critical/Important/
+    Optional).
+  * The Lookups tab was restructured: per-question points now live in a
+    'COUNTA of Grade' pivot's 'Points per Question' column (was a flat
+    'Grade / Points' table). The 'Required proportions' grading table is
+    unchanged.
+  * NEW: the sheet's Instructions tab is captured verbatim into a top-level
+    `instructions:` block, so downstream reviewers (human and AI) read the same
+    generic guidance the sheet shows. The per-review data-entry section on that
+    tab is excluded.
+  * Document-level metadata (license, description, scope descriptions) is NOT in
+    the sheet — it is held in the CONFIG block below; edit it there.
+
+`--check` compares *metric content*, not raw bytes: the YAML's
+`# Source content sha256:` breadcrumb is set aside, because it hashes the source
+CSVs and so moves whenever the sheet's bytes move — including for edits the
+generator never reads (an unread pivot cell, a heading in the excluded
+data-entry block, trailing whitespace). Those are reported as a NOTE and pass;
+only a real change to the extracted metric fails.
 
 Exit codes:
-    0 — wrote the files (default), or --check found both already in sync
-    1 — --check found a committed file differs from the sheet
+    0 — wrote the files (default), or --check found the metric content in sync
+        (possibly with a NOTE that the sheet moved outside the extracted regions)
+    1 — --check found a committed file's metric content differs from the sheet
     2 — the sheet failed a sanity check (e.g. an unexpected scope)
 """
 
@@ -43,6 +74,8 @@ from sheet_source import (  # noqa: E402  (sibling module, after sys.path tweak)
     CsvWorksheet,
     extract_spreadsheet_id,
     fetch_named_tabs,
+    recorded_source_sha,
+    strip_source_breadcrumb,
 )
 
 # Repo root is four levels up: <root>/metric/src/scripts/<this file>.
@@ -51,15 +84,14 @@ SCRIPT_PATH = f"metric/src/scripts/{Path(__file__).name}"
 
 # ── Editorial config (NOT in the sheet — edit here) ──────────────────────────
 
-VERSION = "0.4"
+VERSION = "0.5"
 
-DEFAULT_SHEET = "https://docs.google.com/spreadsheets/d/1eriM8bXAoNXsIR9l8OpI1XYEp8FbtBWt05CTIP9cVeg/edit"
-DEFAULT_OUTPUT = REPO_ROOT / "metric" / "airbds_metric_v0.4.yaml"
+DEFAULT_SHEET = "https://docs.google.com/spreadsheets/d/13w-MiUQc2sLzRFqRQD_YT6BisE3Orv5Oj3i0YBw7r_M/edit"
+DEFAULT_OUTPUT = REPO_ROOT / "metric" / "airbds_metric_v0.5.yaml"
 
 METADATA = {
-    "schema_version": VERSION,
     "metric_name": "AIRBDS AI-Readiness Dataset Scoring Metric",
-    "short_name": "AIRBDS Metric",
+    "schema_version": VERSION,
     "release_date": "2026",
     "license": "CC-BY-4.0",
     "repository": "https://github.com/AIBIO-UK/airbds-core",
@@ -111,6 +143,12 @@ HEADER_COMMENT = f"""\
 # `guidance` field explains how each question should be answered; it is guidance
 # for humans/LLMs."""
 
+INSTRUCTIONS_COMMENT = """\
+# Generic reviewer instructions, captured verbatim from the source sheet's
+# Instructions tab. This is guidance for whoever assesses a dataset (human or
+# AI agent) — how to interpret the metric and what is in/out of scope. It is
+# informational and does not affect scoring."""
+
 GRADE_POINTS_COMMENT = """\
 # Full points awarded for a question when its answer is "Yes", keyed by the
 # question's grade. A "No" answer always scores 0. A question's score is
@@ -143,7 +181,8 @@ def _first_cell(csv_text: str) -> str:
 
 CLASSIFIERS = {
     "scoring": lambda t: _first_cell(t) == "Q ID",
-    "lookups": lambda t: "Required proportions" in t and "Points" in t,
+    "lookups": lambda t: "Required proportions" in t and "Points per Question" in t,
+    "instructions": lambda t: _first_cell(t) == "Instructions",
 }
 
 
@@ -160,6 +199,37 @@ def norm(text) -> str:
     return " ".join(str(text or "").split())
 
 
+def normalize_newlines(text: str) -> str:
+    """Canonicalize line endings to LF.
+
+    A live fetch returns the sheet's CSV with CRLF, whereas an offline CSV read
+    through `Path.read_text` has already been normalized to LF. `source_sha256`
+    hashes this raw text, so without this the same sheet would hash differently
+    online vs offline (breaking both `--check` and the offline byte-for-byte
+    test). It also makes the hash independent of whether Google serves CRLF or
+    LF on a given day.
+    """
+    return text.replace("\r\n", "\n").replace("\r", "\n")
+
+
+def clean_multiline(text) -> str:
+    """Tidy a multi-paragraph cell: collapse intra-line whitespace but keep
+    paragraph breaks (blank lines). Runs of blank lines collapse to one, and
+    leading/trailing blank lines are dropped. Returns '' for an empty cell."""
+    if text is None:
+        return ""
+    lines = [" ".join(str(line).split()) for line in str(text).splitlines()]
+    out = []
+    for line in lines:
+        if line or (out and out[-1]):  # collapse runs of blank lines to one
+            out.append(line)
+    while out and not out[-1]:
+        out.pop()
+    while out and not out[0]:
+        out.pop(0)
+    return "\n".join(out)
+
+
 def fmt_prop(value) -> str:
     """Format a proportion the way the YAML does: 1.0, 0.5, 0.875, 0.0."""
     return str(float(value))
@@ -171,16 +241,21 @@ def fmt_score(value) -> str:
     return str(int(f)) if f.is_integer() else str(f)
 
 
-def source_sha256(scoring_csv: str, lookups_csv: str) -> str:
+def source_sha256(scoring_csv: str, lookups_csv: str, instructions_csv: str) -> str:
     """Content hash of the exact source tabs — the content-addressed "revision".
 
-    Deterministic given the source content, so it is safe to embed in the YAML
-    (the --check byte comparison stays valid) and serves as the drift baseline.
+    Deterministic given the source content, so it is safe to embed in the YAML.
+    Covers all three source tabs, so an edit to the Instructions tab is recorded
+    too. Note this hashes the *raw* CSV, so it also moves for edits that change
+    nothing the readers extract — which is why `--check` compares content with
+    this value set aside and reports a bare hash change as informational.
     """
     h = hashlib.sha256()
     h.update(scoring_csv.encode("utf-8"))
     h.update(b"\n--LOOKUPS--\n")
     h.update(lookups_csv.encode("utf-8"))
+    h.update(b"\n--INSTRUCTIONS--\n")
+    h.update(instructions_csv.encode("utf-8"))
     return h.hexdigest()
 
 
@@ -218,19 +293,29 @@ def _find_row(ws, predicate):
 
 
 def read_grade_points(ws) -> dict:
-    """Read {grade: points} from the Lookups 'Grade / Points' table."""
+    """Read {grade: points} from the Lookups 'COUNTA of Grade' pivot.
+
+    v0.5 restructured the Lookups tab: the flat 'Grade / Points' table became a
+    pivot whose header row is `Grade | <scopes…> | Grand Total |
+    Points per Question | Points available`. The per-question points live in the
+    'Points per Question' column; the following rows are the three grades and a
+    'Grand Total' row (which ends the table).
+    """
     hdr = _find_row(ws, lambda r: norm(ws.cell(r, 1).value) == "Grade"
-                    and norm(ws.cell(r, 2).value) == "Points")
+                    and any(norm(ws.cell(r, c).value) == "Points per Question"
+                            for c in range(1, ws.max_column + 1)))
     if hdr is None:
-        sys.exit("ERROR: could not locate the 'Grade / Points' table in Lookups")
+        sys.exit("ERROR: could not locate the 'Grade / Points per Question' table in Lookups")
+    points_col = next(c for c in range(1, ws.max_column + 1)
+                      if norm(ws.cell(hdr, c).value) == "Points per Question")
     points = {}
     for r in range(hdr + 1, ws.max_row + 1):
         name = norm(ws.cell(r, 1).value)
-        val = ws.cell(r, 2).value
+        val = ws.cell(r, points_col).value
         if name in {"Optional", "Important", "Critical"} and isinstance(val, (int, float)):
             points[name] = int(val)
         elif name or val is not None:
-            break
+            break  # 'Grand Total' row or the next table
     return points
 
 
@@ -254,10 +339,38 @@ def read_grading(ws) -> list[dict]:
                 "Important": float(ws.cell(r, 2).value or 0),
                 "Optional": float(ws.cell(r, 1).value or 0),
             },
-            "min_score": float(ws.cell(r, 4).value or 0),  # v0.4: may be fractional
+            "min_score": float(ws.cell(r, 4).value or 0),  # may be fractional
         })
     rows.sort(key=lambda g: g["min_score"], reverse=True)  # highest grade first
     return rows
+
+
+def read_instructions(ws) -> str:
+    """Read the generic reviewer instructions from the Instructions tab.
+
+    The tab opens with an 'Instructions' label in column 1 and the guidance
+    prose in a content column to its right; a per-review data-entry section
+    (headed e.g. 'Review informaton') follows below and is NOT part of the
+    generic instructions. Everything from the header row down to that next
+    labelled row is captured, with paragraph breaks preserved.
+    """
+    r0 = _find_row(ws, lambda r: norm(ws.cell(r, 1).value) == "Instructions")
+    if r0 is None:
+        sys.exit("ERROR: could not locate the 'Instructions' header in the Instructions tab")
+    # Content column: the rightmost non-empty cell in the header row.
+    content_col = max((c for c in range(1, ws.max_column + 1)
+                       if norm(ws.cell(r0, c).value)), default=1)
+    blocks = []
+    for r in range(r0, ws.max_row + 1):
+        if r > r0 and norm(ws.cell(r, 1).value):
+            break  # next labelled section (e.g. the review data-entry block)
+        text = clean_multiline(ws.cell(r, content_col).value)
+        if text:
+            blocks.append(text)
+    instructions = "\n\n".join(blocks)
+    if not instructions:
+        sys.exit("ERROR: the Instructions tab yielded no text")
+    return instructions
 
 
 # ── YAML / CSV rendering ─────────────────────────────────────────────────────
@@ -295,7 +408,8 @@ def render_footer(questions: list[dict], grade_points: dict) -> str:
     return "\n".join(lines)
 
 
-def render_yaml(questions, grade_points, grading, sheet_url, content_sha256) -> str:
+def render_yaml(questions, grade_points, grading, instructions,
+                sheet_url, content_sha256) -> str:
     out = [HEADER_COMMENT, ""]
     out.append(f"# Source: {sheet_url}")
     out.append(f"# Source content sha256: {content_sha256}")
@@ -307,6 +421,12 @@ def render_yaml(questions, grade_points, grading, sheet_url, content_sha256) -> 
 
     out.append("description: >")
     out.extend(f"  {line}" for line in DESCRIPTION_LINES)
+    out.append("")
+
+    out.append(INSTRUCTIONS_COMMENT)
+    out.append("instructions: |")
+    for line in instructions.split("\n"):
+        out.append(f"  {line}" if line else "")
     out.append("")
 
     out.append(GRADE_POINTS_COMMENT)
@@ -355,6 +475,29 @@ def render_yaml(questions, grade_points, grading, sheet_url, content_sha256) -> 
     return "\n".join(out) + "\n"
 
 
+def _read_text(path: Path) -> str:
+    """A committed file's text, or "" if it does not exist yet."""
+    return path.read_text(encoding="utf-8") if path.exists() else ""
+
+
+def json_path_for(yaml_path: Path) -> Path:
+    """The JSON rendering sits beside the YAML: <stem>.json."""
+    return yaml_path.parent / f"{yaml_path.stem}.json"
+
+
+def render_json(parsed_yaml: dict) -> str:
+    """Serialise the parsed metric YAML as JSON.
+
+    Takes the object `yaml.safe_load` produced from the YAML this run rendered,
+    so the JSON is a rendering of the *same* data rather than a second pass over
+    the sheet — there is no path by which the two files can drift apart.
+    `sort_keys=False` keeps the sheet's question order, which reviewers and the
+    report table both rely on.
+    """
+    return json.dumps(parsed_yaml, indent=2, ensure_ascii=False,
+                      sort_keys=False) + "\n"
+
+
 # ── Validation ───────────────────────────────────────────────────────────────
 
 def validate(questions, grade_points, grading) -> None:
@@ -375,35 +518,46 @@ def validate(questions, grade_points, grading) -> None:
 # ── Main ─────────────────────────────────────────────────────────────────────
 
 def load_worksheets(args) -> tuple:
-    """Return (scoring_ws, lookups_ws, src) from files or the live sheet.
+    """Return (scoring_ws, lookups_ws, instructions_ws, src) from files or the sheet.
 
     `src` carries the raw tab CSVs (for hashing) and provenance: the sheet id/url
     when fetched, or None/the files when working offline.
     """
-    if args.scoring_csv or args.lookups_csv:
-        if not (args.scoring_csv and args.lookups_csv):
-            sys.exit("ERROR: pass both --scoring-csv and --lookups-csv, or neither.")
-        scoring = args.scoring_csv.read_text(encoding="utf-8")
-        lookups = args.lookups_csv.read_text(encoding="utf-8")
+    offline = args.scoring_csv or args.lookups_csv or args.instructions_csv
+    if offline:
+        if not (args.scoring_csv and args.lookups_csv and args.instructions_csv):
+            sys.exit("ERROR: pass all of --scoring-csv, --lookups-csv, and "
+                     "--instructions-csv, or none.")
+        scoring = normalize_newlines(args.scoring_csv.read_text(encoding="utf-8"))
+        lookups = normalize_newlines(args.lookups_csv.read_text(encoding="utf-8"))
+        instructions = normalize_newlines(args.instructions_csv.read_text(encoding="utf-8"))
         src = {
-            "label": f"{args.scoring_csv.name} + {args.lookups_csv.name}",
+            "label": f"{args.scoring_csv.name} + {args.lookups_csv.name} "
+                     f"+ {args.instructions_csv.name}",
             "sheet_id": None,
             "sheet_url": args.sheet,
             "scoring_csv": scoring,
             "lookups_csv": lookups,
+            "instructions_csv": instructions,
         }
-        return CsvWorksheet(scoring), CsvWorksheet(lookups), src
+        return (CsvWorksheet(scoring), CsvWorksheet(lookups),
+                CsvWorksheet(instructions), src)
 
     sheet_id = extract_spreadsheet_id(args.sheet)
     tabs = fetch_named_tabs(sheet_id, CLASSIFIERS)
+    scoring = normalize_newlines(tabs["scoring"])
+    lookups = normalize_newlines(tabs["lookups"])
+    instructions = normalize_newlines(tabs["instructions"])
     src = {
         "label": f"Google Sheet {sheet_id}",
         "sheet_id": sheet_id,
         "sheet_url": args.sheet,
-        "scoring_csv": tabs["scoring"],
-        "lookups_csv": tabs["lookups"],
+        "scoring_csv": scoring,
+        "lookups_csv": lookups,
+        "instructions_csv": instructions,
     }
-    return CsvWorksheet(tabs["scoring"]), CsvWorksheet(tabs["lookups"]), src
+    return (CsvWorksheet(scoring), CsvWorksheet(lookups),
+            CsvWorksheet(instructions), src)
 
 
 def write_manifest(path: Path, src: dict, content_sha256: str, generated_at: str) -> None:
@@ -420,47 +574,85 @@ def write_manifest(path: Path, src: dict, content_sha256: str, generated_at: str
 
 
 def main() -> None:
-    ap = argparse.ArgumentParser(description="Build the v0.4 metric YAML from the Google Sheet.")
+    ap = argparse.ArgumentParser(description="Build the v0.5 metric YAML + JSON from the Google Sheet.")
     ap.add_argument("--sheet", default=DEFAULT_SHEET, help="sheet URL or id (default: the canonical sheet)")
-    ap.add_argument("--scoring-csv", type=Path, help="local Scoring tab CSV (offline; with --lookups-csv)")
-    ap.add_argument("--lookups-csv", type=Path, help="local Lookups tab CSV (offline; with --scoring-csv)")
-    ap.add_argument("--output", type=Path, default=DEFAULT_OUTPUT, help="path to write the metric YAML")
+    ap.add_argument("--scoring-csv", type=Path, help="local Scoring tab CSV (offline; with --lookups-csv/--instructions-csv)")
+    ap.add_argument("--lookups-csv", type=Path, help="local Lookups tab CSV (offline)")
+    ap.add_argument("--instructions-csv", type=Path, help="local Instructions tab CSV (offline)")
+    ap.add_argument("--output", type=Path, default=DEFAULT_OUTPUT, help="path to write the metric YAML (the JSON is written beside it)")
     ap.add_argument("--check", action="store_true",
                     help="do not write; exit 1 if the output differs from what the sheet produces")
     args = ap.parse_args()
 
-    scoring_ws, lookups_ws, src = load_worksheets(args)
+    scoring_ws, lookups_ws, instructions_ws, src = load_worksheets(args)
     questions = read_questions(scoring_ws)
     grade_points = read_grade_points(lookups_ws)
     grading = read_grading(lookups_ws)
+    instructions = read_instructions(instructions_ws)
     validate(questions, grade_points, grading)
 
-    content_sha256 = source_sha256(src["scoring_csv"], src["lookups_csv"])
-    generated_yaml = render_yaml(questions, grade_points, grading,
+    content_sha256 = source_sha256(src["scoring_csv"], src["lookups_csv"],
+                                   src["instructions_csv"])
+    generated_yaml = render_yaml(questions, grade_points, grading, instructions,
                                  src["sheet_url"], content_sha256)
-    yaml.safe_load(generated_yaml)  # confirm the YAML is valid before trusting it
+    # Confirms the YAML is valid before trusting it, and is the payload the JSON
+    # rendering is built from — one parse, two uses.
+    parsed_yaml = yaml.safe_load(generated_yaml)
+    generated_json = render_json(parsed_yaml)
+    json_output = json_path_for(args.output)
 
     if args.check:
-        # The source hash is embedded in the YAML breadcrumb, so a byte mismatch
-        # also catches any change to the upstream source content.
-        current = args.output.read_bytes() if args.output.exists() else b""
-        if current == generated_yaml.encode("utf-8"):
-            print(f"OK: {args.output.name} is in sync "
-                  f"with {src['label']} (sha256 {content_sha256[:12]}, {len(questions)} questions)")
-            sys.exit(0)
-        print(f"DRIFT: {args.output} differs from {src['label']}.", file=sys.stderr)
-        print(f"Regenerate with: python3 {SCRIPT_PATH}", file=sys.stderr)
-        sys.exit(1)
+        # Drift means the *metric* changed, not that the sheet's bytes moved. The
+        # YAML is compared with its source-hash breadcrumb set aside, because that
+        # line tracks the raw CSV and shifts for edits the generator never reads —
+        # an unread pivot cell, a heading in the excluded data-entry block,
+        # trailing whitespace. Comparing it would report drift for a metric that
+        # is unchanged, which is how this check came to be disbelieved.
+        #
+        # The JSON needs no such exemption: it carries no comments, so it is a
+        # pure content rendering and any difference in it is a real one. It is
+        # checked because it ships in the skill bundle, where a stale copy would
+        # score assessments against a superseded metric.
+        drifted = []
+        if strip_source_breadcrumb(_read_text(args.output)) != \
+                strip_source_breadcrumb(generated_yaml):
+            drifted.append(args.output)
+        if _read_text(json_output) != generated_json:
+            drifted.append(json_output)
+
+        if drifted:
+            for path in drifted:
+                print(f"DRIFT: {path} differs from {src['label']}.", file=sys.stderr)
+            print(f"Regenerate with: python3 {SCRIPT_PATH}", file=sys.stderr)
+            sys.exit(1)
+
+        print(f"OK: {args.output.name} and {json_output.name} are in sync "
+              f"with {src['label']} ({len(questions)} questions)")
+
+        # Informational, not a failure: the sheet has been edited somewhere the
+        # metric does not reach. Reported so it is visible and auditable, but the
+        # committed files are left alone rather than churning a commit whose only
+        # change is a hash line.
+        recorded = recorded_source_sha(_read_text(args.output))
+        if recorded and recorded != content_sha256:
+            print(f"NOTE: the sheet has been edited outside the regions the metric "
+                  f"extracts — recorded source sha256 {recorded[:12]}, live "
+                  f"{content_sha256[:12]}. No metric content changed, so nothing "
+                  f"needs regenerating.")
+        sys.exit(0)
 
     manifest_path = args.output.parent / f"{args.output.stem}.upstream.json"
     generated_at = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     write_manifest(manifest_path, src, content_sha256, generated_at)
 
     args.output.write_bytes(generated_yaml.encode("utf-8"))
+    json_output.write_bytes(generated_json.encode("utf-8"))
     print(f"Wrote: {args.output}\n"
+          f"Wrote: {json_output}\n"
           f"Wrote: {manifest_path}\n"
           f"{len(questions)} questions, "
-          f"{sum(q['scope'] in NA_DEFAULT_SCOPES for q in questions)} ethics\n"
+          f"{sum(q['scope'] in NA_DEFAULT_SCOPES for q in questions)} ethics, "
+          f"instructions captured ({len(instructions)} chars)\n"
           f"Source: {src['label']} (sha256 {content_sha256[:12]})")
 
 

@@ -9,6 +9,15 @@ on:
     paths:
       - 'skills/development/airbds-assessment-skill/SKILL.md'
       - 'skills/development/airbds-assessment-skill/assets/*'
+      - 'skills/development/airbds-assessment-skill/scripts/*'
+      # Everything under assets/ and scripts/ is a symlink, and a path filter
+      # matches the committed path — it never follows one. Without the targets
+      # listed here a commit that changes the metric or the scorer leaves the
+      # published zip holding the old content, silently. Keep this list in step
+      # with those symlinks.
+      - 'metric/airbds_metric_v0.5.json'
+      - 'reviews/review_template.yaml'
+      - 'reviews/src/scripts/airbds_scoring.py'
   workflow_dispatch:
 
 jobs:

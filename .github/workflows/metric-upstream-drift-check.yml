@@ -43,7 +43,7 @@ jobs:
         id: drift
         run: |
           set +e
-          OUT=$(python3 metric/src/scripts/build_metric_yaml_from_google_sheet_v${{ matrix.version }}.py --check 2>&1)
+          OUT=$(python3 metric/src/scripts/build_metric_from_google_sheet_v${{ matrix.version }}.py --check 2>&1)
           CODE=$?
           echo "$OUT"
           echo "exit_code=$CODE" >> "$GITHUB_OUTPUT"
@@ -72,7 +72,7 @@ jobs:
               'When you are ready to take the change, regenerate and review the diff:',
               '',
               '```bash',
-              `python3 metric/src/scripts/build_metric_yaml_from_google_sheet_v${version}.py`,
+              `python3 metric/src/scripts/build_metric_from_google_sheet_v${version}.py`,
               `git diff metric/airbds_metric_v${version}.yaml`,
               '```',
               '',
