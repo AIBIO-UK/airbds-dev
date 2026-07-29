@@ -1,7 +1,7 @@
 ---
 name: airbds-assessment-skill
 description: Use this skill whenever a user wants to assess, score, or evaluate a life science dataset against the AIRBDS (AI-Ready Biological Data Sets) criteria. Triggers include any mention of "AIRBDS", "AI-ready dataset", "dataset scoring", or requests to grade a biological/biomedical dataset's AI-readiness. Activate when the user provides a dataset URL and asks for an assessment, audit, or readiness check. Do NOT use for general data quality reviews unrelated to AIRBDS or for non-life-science datasets.
-version: 0.6.0
+version: 0.7.0
 channel: development
 metadata:
   hermes:
@@ -45,7 +45,7 @@ Your only goal is to evaluate datasets based on the AIRBDS (AI-Ready Biological 
 2. **Assessment Process**
 
 - Analyze the provided dataset against the questions defined under `questions` in the AIRBDS metric file. Each question's `guidance` explains how it should be answered.
-- While reviewing the landing page, determine the dataset's name/title from the page itself (no need to ask the user). Keep it — it is useful for naming the saved YAML file and its `dataset.name` field (see step 4).
+- While reviewing the landing page, determine the dataset's name/title from the page itself (no need to ask the user). Keep it — it is useful for naming the saved YAML file and its `dataset.name` field (see step 5).
 - For each question, determine if the answer is 'Yes' or 'No' regarding its AI-readiness. You must answer all the questions and only the questions defined in the metric file. Be thorough in your assessment, looking through other pages on the website if necessary, particularly if the answer appears to be "No".
 - For every question, provide an answer, the score for that answer, and the justification. The justification shouldn't be more than two sentences. The score for a question is its full points when the answer is "Yes" and 0 when the answer is "No". A question's full points are given by `grade_points` keyed by that question's `grade` (Critical = 80, Important = 5, Optional = 2).
 - **Track any access failures.** Some environments restrict which sites you may retrieve from the Internet. This covers every kind of resource the assessment relies on, not just web pages: repository landing and documentation pages, API endpoints, direct file downloads, FTP/S3/cloud-container listings,
@@ -54,7 +54,7 @@ Your only goal is to evaluate datasets based on the AIRBDS (AI-Ready Biological 
   were trying to establish from it, the reason it failed, and which question IDs
   are affected. You will use this information when reporting.
 
-3) **Reporting**
+3. **Reporting**
 
 - Once the assessment is complete, generate a table with a row for each question ID, the Scope (`scope`), the question itself (`question`), the grade (`grade`), the answer, the score for that question and the justification, in that order and with no other columns. The questions in the output must be in the same order as in the metric file, covering every question ID defined under `questions` (from the first to the last) and no others.
 
@@ -99,10 +99,26 @@ Your only goal is to evaluate datasets based on the AIRBDS (AI-Ready Biological 
       and that re-running the assessment in an environment that can execute the
       script will calculate them mechanistically.
 
-4. **Optional: save the assessment as a YAML file**
+4. **Follow-up**
 
-- After presenting the report, offer to save the assessment as a YAML file the user can download and keep. Only proceed if the user wants it; otherwise stop here.
-- If the user agrees, build a YAML document in the shape of `assets/review_template.yaml` (bundled with this skill), filled in from the assessment you just produced:
+- Once the report is complete, in a line or two invite the user both to explore it and to take the file: ask whether there is any part of the assessment they would like to look at more closely — a particular question's answer, the evidence behind it, why the dataset missed a higher grade, or what would most improve its score — or whether they would like it saved as a YAML file they can keep. Do not summarise the report again; they have just read it.
+- Answer what they raise from the assessment you performed. Where they ask why an answer is what it is, explain your reasoning and point to the `guidance` in the metric that governs it.
+- **Appraise what they tell you critically; do not simply accept it.** An answer changes only when the user identifies something specific that survives your own checking. That can be either of two things, and both are legitimate — your first answer is not privileged merely because you gave it:
+  - **Evidence you did not account for** — material you never saw, could not reach, or had in front of you and overlooked.
+  - **A flaw in how you judged evidence you did see** — an aspect of it you failed to weigh, a misreading of what it says, or the wrong `guidance` applied to it. The user is entitled to argue that your judgement on the evidence was wrong, not only that you were missing some.
+- **Re-examine what they point to, then reach your own conclusion.** Go back to the resource or the reasoning in question and look again — re-fetching the page if you can. Re-examining is not conceding: it is a perfectly good outcome to look again, find your original reading was right, and say so, explaining why the answer stands. Changing an answer you have checked and still believe is correct would leave the user with a worse assessment than the one they came in with.
+  - Evidence means something checkable — a page, file, endpoint or record you can inspect. Retrieve it and judge it yourself where you can, rather than taking a description of its contents on trust.
+  - **The metric decides what counts, not the user's preference.** Re-read the question's `guidance` and the metric's `instructions` before revising. For example, metadata that is not collocated with the data does not satisfy a metadata question however thorough the external document is — the metric is explicit that a journal article or supplementary file hosted elsewhere does not count.
+  - Be as willing to revise **down** as up. Evidence can show a "Yes" was too generous, not only that a "No" was harsh.
+  - If a question is genuinely borderline, say so and give both readings rather than silently picking one. The user can record their own view in the saved file, where the comment field is theirs to edit.
+- **If an answer does change, the assessment changes.** Re-issue the affected table rows, then **re-score** — run `scripts/score.py` again with the corrected answers rather than adjusting the total yourself — and state the new final score and grade. The warnings rules in step 3 apply to the new figures.
+- Follow their lead: keep going while they have questions, and do not press once they have finished. Go to step 5 whenever they ask for the file.
+
+5. **Optional: save the assessment as a YAML file**
+
+- Save the assessment as a YAML file the user can download and keep when they ask for it — whether in reply to the offer in step 4 or at any point after. If they never ask for it, do not produce one.
+- Build a YAML document in the shape of `assets/review_template.yaml` (bundled with this skill), filled in from the assessment you produced:
+  - Use the **final** state of the assessment throughout — the answers, scores, justifications, summary, score and grade as they stand after any corrections made in step 4, not as first reported.
   - `schema_version`: the metric version — copy the `schema_version` value from `assets/airbds_metric.json`.
   - `reviewer.name`: your own model identifier (e.g. `claude-opus-4-8`) — the model that performed the assessment. Leave `reviewer.initials`, `reviewer.orcid`, and `reviewer.affiliation` blank. Tell the user they can edit these to record their own name/ORCID before using it anywhere that expects a named reviewer.
   - `reviewer.review_date`: the current date and time in ISO 8601, including a timezone (e.g. `2026-06-03T14:32:05Z`).
@@ -138,7 +154,7 @@ recalculated.
 
 The review-template shape is at `assets/review_template.yaml`, also
 bundled with this skill. It is the blank assessment template used for the
-optional saved YAML file (see step 4): a top-level `schema_version`, a
+optional saved YAML file (see step 5): a top-level `schema_version`, a
 `reviewer` block, a `dataset` block, and an `answers` map keyed by question id.
 
 The version manifest is **not bundled** — it is fetched remotely at

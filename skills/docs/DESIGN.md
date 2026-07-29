@@ -133,6 +133,53 @@ Three consequences shaped the design:
   the mechanism on every successful run would be noise that trains them to skip
   the warnings section — the place a genuine problem has to be noticed.
 
+## The assessment is open to challenge, but not to pressure
+
+The report is not the end of the exchange. A follow-up step invites the user to
+examine any part of the assessment — a particular answer, the evidence behind it,
+why a higher grade was missed — in the same breath as offering them the saved
+file. Two things motivate it. The model's weakest answers are the ones where a
+resource was unreachable, and the user often knows the dataset better than a
+crawl of its landing page does; and a score someone cannot interrogate is a score
+they have no reason to trust.
+
+That invitation creates the obvious hazard, so `SKILL.md` sets the bar for
+changing an answer explicitly. Two grounds qualify: **evidence** the model did
+not account for — never saw, could not reach, or overlooked — and a **flaw in
+how it judged evidence it did see**, such as an aspect it failed to weigh or the
+wrong `guidance` applied. The second matters as much as the first. Restricting
+revision to new material would leave a user unable to argue the most ordinary
+case of all: that the model looked at the right page and read it wrongly.
+
+What qualifies a ground is not its kind but its specificity: the user must name
+something that survives checking. The model is told to re-examine what it is
+pointed at — re-fetching the resource where it can, and judging it rather than
+accepting a description of it — and then to reach its own conclusion, with looking
+again and explaining why the answer stands called out as a perfectly good outcome.
+Re-examining is not conceding.
+
+The step is deliberately written as an examination rather than a dispute. Users
+are assumed to be acting in good faith, because they overwhelmingly are, and an
+instruction to resist them would sour a conversation whose whole purpose is to
+improve the assessment. But the risk this guards against never depended on bad
+faith: a well-meant "are you sure?" is exactly what makes a model abandon a
+correct answer. So the counterweight is put as a service to the user rather than a
+defence against them — changing an answer you have checked and still believe leaves
+them with a worse assessment than they arrived with.
+
+It is pushed to revise **down** as readily as up, because the pressure in these
+conversations runs one way: users press on "No" answers, and an assessment that
+only ever ratchets upward is worthless for comparing datasets.
+
+A revision is not recorded in the saved file. The comment fields carry the final
+reasoning, and an assessment corrected on good evidence is simply a better
+assessment — not a suspect one that needs flagging.
+
+Any change to an answer re-enters the scoring path rather than being patched
+arithmetically: the model re-runs `scripts/score.py` on the corrected answers.
+This is the moment the temptation to adjust a total by hand is strongest, and
+giving in to it would forfeit the determinism the script exists to provide.
+
 ## The output is the shared review template
 
 An assessment produced by the skill is written in the same

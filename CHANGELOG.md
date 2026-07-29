@@ -189,6 +189,45 @@ Changes to the AIRBDS assessment skill (`skills/`). Each channel —
 below is scoped to the channel(s) named in its heading. See
 [`skills/docs/MAINTENANCE.md`](skills/docs/MAINTENANCE.md).
 
+## [0.7.0] — `development` (2026-07-29)
+
+Minor rather than patch: the skill gains an interaction phase it did not have.
+An assessment could previously only be delivered and saved; it can now be
+examined, and an answer revised on evidence — which re-scores the dataset and can
+change the grade it is reported as having earned.
+
+- **Added a follow-up step (new step 4; saving the YAML becomes step 5).** Once
+  the report is delivered the skill invites the user to examine any part of the
+  assessment — a particular answer, the evidence behind it, why a higher grade was
+  missed, what would most improve the score — in the same breath as offering the
+  saved file, so it costs one question rather than two. The model's weakest answers
+  are those where a resource was unreachable, and the user frequently knows the
+  dataset better than its landing page shows.
+- **The bar for changing an answer is set explicitly**, so the invitation cannot
+  turn into negotiation. Two grounds qualify: evidence the model did not account
+  for (never saw, could not reach, or overlooked), and a flaw in how it judged
+  evidence it *did* see — an aspect it failed to weigh, a misreading, or the wrong
+  `guidance` applied. The second is included deliberately: restricting revision to
+  new material would leave a user unable to argue the commonest case of all, that
+  the model read the right page wrongly.
+- What qualifies a ground is its specificity, not its kind: the user must name
+  something that survives checking. The model re-examines what it is pointed at —
+  re-fetching where it can, judging the resource rather than a description of it —
+  then reaches its own conclusion; looking again and explaining why the answer
+  stands is called out as a perfectly good outcome. It is pushed to revise **down**
+  as readily as up, since users press on "No" answers and an assessment that only
+  ratchets upward is useless for comparing datasets.
+- The step is written as an examination, not a dispute: users are assumed to act in
+  good faith, so there is no instruction to resist them. The counterweight against
+  abandoning a correct answer under a well-meant "are you sure?" is framed as a
+  service to the user — revising something you have checked and still believe leaves
+  them with a worse assessment than they arrived with.
+- A revised answer **re-enters the scoring path**: the model re-runs
+  `scripts/score.py` on the corrected answers rather than adjusting the total
+  itself, and the saved YAML records the assessment's final state. Revisions are
+  not otherwise flagged in the file — a correction on good evidence is simply a
+  better assessment.
+
 ## [0.6.0] — `development` (2026-07-29)
 
 - **Scoring is now mechanical.** The skill bundles `scripts/score.py`, which takes
