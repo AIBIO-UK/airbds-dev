@@ -189,6 +189,34 @@ Changes to the AIRBDS assessment skill (`skills/`). Each channel —
 below is scoped to the channel(s) named in its heading. See
 [`skills/docs/MAINTENANCE.md`](skills/docs/MAINTENANCE.md).
 
+## [0.7.1] — `development` (2026-07-29)
+
+- **Dropped the `## Files:` section.** All 37 lines of it restated things stated
+  where they are used — the metric's field names appear in steps 2 and 3, the
+  review template's in step 5, and the version manifest's logic and URL in step 1
+  — or described structure discoverable by opening the file. The Agent Skills
+  best-practice test is "would the agent get this wrong without this
+  instruction?", and a manifest at the end of the file is also the "see
+  references/ for details" anti-pattern its guidance warns against: a file
+  reference is more use at its point of need, carrying the condition for reading
+  it. 168 lines to 130 (~4,360 to ~3,860 tokens, against the spec's 500-line /
+  5,000-token guidance). Only one clause was kept, folded into step 3 — that the
+  scorer needs no packages installed, without which a model may attempt `pip
+  install` in a sandbox with no network.
+- **Frontmatter made spec-conformant.** `version` and `channel` move under
+  `metadata`; `tags: [science]` becomes a block sequence. The specification
+  defines a closed set of top-level fields and the reference validator
+  (`agentskills validate`) rejects any others outright — it also parses with
+  StrictYAML, which forbids inline flow style. Worth fixing rather than ignoring
+  because `channel` is read by the skill itself for the update check, so a strict
+  client would either reject the skill or drop the field and break that check
+  silently. `SKILL.md` step 1 now names `metadata.channel`, and
+  `skills/docs/MAINTENANCE.md` records the layout, the validator command, and why
+  `metadata.hermes` stays nested despite not being conformant (it matches Hermes'
+  own skill files). Both the checked-in skill and the built zip validate clean.
+  `testing` still carries the old layout and will be brought into line at its
+  next promotion.
+
 ## [0.7.0] — `development` (2026-07-29)
 
 Minor rather than patch: the skill gains an interaction phase it did not have.

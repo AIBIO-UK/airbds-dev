@@ -68,12 +68,43 @@ metric YAML (`assets/airbds_metric.yaml`):
 - A skill never looks at other channels, so a `testing` skill is **not** nudged
   when `development` moves ahead.
 
-For this to work, each skill declares its `channel` in its `SKILL.md`
-frontmatter and bundles the metric YAML whose `schema_version` is the version it
-assesses against. Keep the manifest's `metric_version` for a channel in step
-with that bundled `schema_version`. Neither channel's skill carries a
-`metric_version` frontmatter field any more — both derive their metric version
-from the bundled `schema_version`.
+For this to work, each skill declares its channel in its `SKILL.md` frontmatter
+and bundles the metric file whose `schema_version` is the version it assesses
+against. Keep the manifest's `metric_version` for a channel in step with that
+bundled `schema_version`. Neither channel's skill carries a `metric_version`
+frontmatter field any more — both derive their metric version from the bundled
+`schema_version`.
+
+The channel and skill version live **under `metadata`** —
+`metadata.channel`, `metadata.version`. The Agent Skills specification defines a
+closed set of top-level frontmatter fields (`name`, `description`, `license`,
+`compatibility`, `metadata`, `allowed-tools`) and `metadata` is the mapping
+provided for everything else, so a conformant client is entitled to reject a
+skill that puts its own keys at the top level. `channel` is read by the skill
+itself for the update check, so a client that dropped it would break that check
+silently. Validate with the reference library before publishing:
+
+```bash
+pip install skills-ref   # provides the `agentskills` command
+agentskills validate skills/development/airbds-assessment-skill
+```
+
+Note it parses frontmatter with StrictYAML, which is stricter than YAML proper:
+inline flow style (`tags: [science]`) is rejected, so use block sequences.
+
+**`metadata.hermes` is deliberately non-conformant — leave it nested.** The spec
+describes `metadata` as a map of string keys to *string* values, so a strict
+reader flattens the nested block to a string (`agentskills read-properties`
+returns `"{'tags': ['science'], 'category': 'science'}"` — a Python repr, not
+even valid JSON). It is kept nested because that is the shape Hermes' own skill
+files use, and Hermes reads it with an ordinary YAML parser, which yields the
+structure intended. Flattening to `hermes-tags` / `hermes-category` would be
+spec-clean but would stop matching what Hermes expects. Revisit only if Hermes
+documents a different layout.
+
+> The `development` skill follows this layout. `testing` still carries
+> top-level `version`/`channel` and will be brought into line at its next
+> promotion from `development`.
 
 ## Keeping the manifest in step
 
