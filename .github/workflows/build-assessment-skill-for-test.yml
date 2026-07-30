@@ -5,7 +5,6 @@ on:
   push:
     branches:
       - main
-      - skills-testing
     paths:
       - 'skills/testing/airbds-assessment-skill/SKILL.md'
       - 'skills/testing/airbds-assessment-skill/assets/*'

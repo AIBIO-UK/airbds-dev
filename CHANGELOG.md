@@ -452,6 +452,13 @@ layout — that carry no version of their own. Recorded by month, newest first.
   version.
 
 ### Changed
+- **Both skill build workflows now trigger on `main` only.** They also listed a
+  `skills-testing` / `skills-development` branch; neither exists on the remote
+  (`skills-testing` was deleted once its work had merged, `skills-development`
+  never existed). Nothing else in the repository referenced either name. This
+  makes `skills/docs/MAINTENANCE.md`'s description of the workflows — "each
+  pushes on `main`" — exact; a rebuild from another branch is still available
+  through `workflow_dispatch`.
 - **The docs now name the YAML as the metric's source of truth and the Google
   Sheet as its editing interface**, rather than the other way round: the sheet is
   where the working group authors the metric, but `metric/airbds_metric_vX.Y.yaml`
