@@ -189,6 +189,29 @@ Changes to the AIRBDS assessment skill (`skills/`). Each channel —
 below is scoped to the channel(s) named in its heading. See
 [`skills/docs/MAINTENANCE.md`](skills/docs/MAINTENANCE.md).
 
+## [0.7.1] — `testing` (2026-07-30)
+
+- Promoted the `development` assessment skill to the `testing` channel, taking it
+  from 0.5.1 to 0.7.1. `testing` therefore picks up everything under [0.7.0] and
+  [0.7.1] — `development` below: mechanical scoring by the bundled
+  `scripts/score.py`, the examine-and-revise phase before the assessment is
+  saved, the dropped `## Files:` section, and the spec-conformant frontmatter.
+  `SKILL.md` was copied from `development` with only the channel-specific
+  references swapped (`development` → `testing`); the two files differ in that
+  word alone.
+- **The bundle gains `scripts/` and swaps the metric for its JSON rendering**, to
+  match `development`: `assets/airbds_metric.yaml` → `assets/airbds_metric.json`
+  (still v0.5 — the JSON is the same document, so
+  `channels.testing.metric_version` stays at 0.5), plus a new
+  `scripts/score.py` → `reviews/src/scripts/airbds_scoring.py` symlink. The
+  `testing` build workflow's `paths:` filter follows the new symlink targets, and
+  now lists `scripts/*`; a stale filter would silently stop rebuilds firing.
+- `skills/versions.json` `channels.testing.skill_version` bumped to match. With
+  `testing` now on the `metadata.version`/`metadata.channel` layout, the notes in
+  `skills/docs/MAINTENANCE.md` and `skills/docs/DESIGN.md` that described the
+  JSON metric, `scripts/`, and the conformant frontmatter as `development`-only
+  no longer apply and were removed.
+
 ## [0.7.1] — `development` (2026-07-29)
 
 - **Dropped the `## Files:` section.** All 37 lines of it restated things stated

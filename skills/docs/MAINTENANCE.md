@@ -58,7 +58,7 @@ Each entry under `channels` records, for that channel's current skill:
 At start-up an assessment skill makes a **best-effort** fetch of this manifest
 and compares the manifest's `metric_version` for **its own channel only**
 against its own metric version — the `schema_version` field of its bundled
-metric YAML (`assets/airbds_metric.yaml`):
+metric file (`assets/airbds_metric.json`):
 
 - If the manifest is **strictly newer**, the skill pauses and **asks the user**
   whether to proceed with the older bundled metric or stop and update to the
@@ -102,15 +102,13 @@ structure intended. Flattening to `hermes-tags` / `hermes-category` would be
 spec-clean but would stop matching what Hermes expects. Revisit only if Hermes
 documents a different layout.
 
-> The `development` skill follows this layout. `testing` still carries
-> top-level `version`/`channel` and will be brought into line at its next
-> promotion from `development`.
+Both channels follow this layout.
 
 ## Keeping the manifest in step
 
 Bump a channel's `metric_version` in `versions.json` **only when that channel's
 skill is actually repointed to a new metric** — i.e. when you repoint the skill's
-bundled `assets/airbds_metric.yaml` symlink at a new `metric/airbds_metric_v*.yaml`
+bundled `assets/airbds_metric.json` symlink at a new `metric/airbds_metric_v*.json`
 (so its `schema_version` changes). Leave a channel untouched if it intentionally
 stays on the older metric. A stale entry will either suppress a needed update
 prompt or nag users who are already current.

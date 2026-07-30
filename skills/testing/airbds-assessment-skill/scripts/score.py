@@ -1,0 +1,1 @@
+../../../../reviews/src/scripts/airbds_scoring.py
