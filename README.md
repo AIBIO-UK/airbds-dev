@@ -60,12 +60,21 @@ Two ways to use the current metric (v0.5) directly — pick whichever suits you:
 
 | | Link | Best for |
 |---|---|---|
-| 📊 **Google Sheet** (live source of truth) | [Open the sheet](https://docs.google.com/spreadsheets/d/1eriM8bXAoNXsIR9l8OpI1XYEp8FbtBWt05CTIP9cVeg/edit) | Browsing, filtering, or copying into your own spreadsheet — no coding required |
-| 📄 **YAML file** (generated from the sheet) | [`metric/airbds_metric_v0.5.yaml`](metric/airbds_metric_v0.5.yaml) | Scripting, tooling, or anything that reads the metric programmatically |
+| 📄 **YAML file** (source of truth) | [`metric/airbds_metric_v0.5.yaml`](metric/airbds_metric_v0.5.yaml) | Scripting, tooling, or anything that reads the metric programmatically |
+| 📊 **Google Sheet** (editing interface) | [Open the sheet](https://docs.google.com/spreadsheets/d/13w-MiUQc2sLzRFqRQD_YT6BisE3Orv5Oj3i0YBw7r_M/edit) | Browsing, filtering, or copying into your own spreadsheet — no coding required |
 
-The metric itself is **YAML-only** — the sheet is the source of truth and the YAML
-is generated from it; see [`metric/README.md`](metric/README.md) for how. (The
-*review template* still offers both YAML and CSV — that is a separate file.)
+The committed **YAML is the source of truth**: it is what this repository and
+downstream consumers read, and what every review is scored against. The Google
+Sheet is the working group's **editing interface** — the metric is drafted and
+amended there, and those edits are pulled into the YAML by the build script, with
+a weekly drift check flagging any mismatch; see
+[`metric/README.md`](metric/README.md) for how.
+
+A JSON rendering, [`metric/airbds_metric_v0.5.json`](metric/airbds_metric_v0.5.json),
+sits beside the YAML: the same document, written by the same generator run, and
+**subsidiary to the YAML** — it exists only for consumers that cannot parse YAML,
+so the YAML remains the file to cite and to change. (The *review template* is
+separate again, and offers both YAML and CSV.)
 
 ---
 

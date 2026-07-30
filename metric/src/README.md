@@ -4,8 +4,8 @@ Tooling that regenerates the canonical metric from its upstream source. Each
 metric version pins how it is built:
 
 - **v0.3** — from the committed spreadsheet in [`metric/upstream/`](../upstream/).
-- **v0.4** — from the working group's public Google Sheet (the source of truth
-  lives in Drive, not the repo).
+- **v0.4** — from the working group's public Google Sheet (the editing interface
+  lives in Drive; the generated YAML in the repo is the source of truth).
 - **v0.5** — from the working group's public Google Sheet (as v0.4), and also
   captures the sheet's Instructions tab into the metric YAML.
 

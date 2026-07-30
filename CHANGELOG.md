@@ -429,6 +429,18 @@ layout — that carry no version of their own. Recorded by month, newest first.
   version.
 
 ### Changed
+- **The docs now name the YAML as the metric's source of truth and the Google
+  Sheet as its editing interface**, rather than the other way round: the sheet is
+  where the working group authors the metric, but `metric/airbds_metric_vX.Y.yaml`
+  is what the repository and downstream consumers read and what reviews are
+  scored against. Reworded in the main `README.md`, `metric/README.md`, and
+  `metric/src/README.md`. The same passages now record that
+  `metric/airbds_metric_v0.5.json` is subsidiary to the YAML — same document,
+  same build run, for consumers without a YAML parser — and the JSON was added to
+  the "Files in This Folder" table in `metric/README.md`, which had omitted it.
+- The main `README.md`'s "Use the Metric" sheet link pointed at the **v0.4**
+  sheet while the section describes v0.5; it now points at the v0.5 sheet
+  (`13w-MiUQ…`), matching `metric/airbds_metric_v0.5.upstream.json`.
 - The publication repository was renamed from `AIBIO-UK/airbds-metric` to
   `AIBIO-UK/airbds-core`, and every identity/attribution reference here follows
   it: `CITATION.cff` `repository-code`, the suggested-citation blocks in

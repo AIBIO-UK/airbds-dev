@@ -17,18 +17,20 @@ Ethics) and three weight tiers (Critical, Important, Optional), plus the
 `grade_points` and `grading` rules that turn a set of Yes/No answers into a
 weighted score and a grade.
 
-The working group's **Google Sheet** is where the metric is authored — the
-upstream source of truth. `metric/airbds_metric_v0.5.yaml` is generated from it
-and is the canonical machine-readable artifact that everything in this
-repository (and downstream consumers) reads: the exact question text, guidance,
-scopes, and scoring rules.
+`metric/airbds_metric_v0.5.yaml` is the **source of truth**: the canonical
+machine-readable artifact that everything in this repository (and downstream
+consumers) reads — the exact question text, guidance, scopes, and scoring rules.
+The working group's **Google Sheet** is the **editing interface** where the
+metric is authored; edits made there are pulled into the YAML by the build
+script, which also writes a subsidiary `airbds_metric_v0.5.json` rendering of
+the same document.
 
 ### Use the Metric
 
 Two ways to use v0.5 directly:
 
-- **[Open the Google Sheet](https://docs.google.com/spreadsheets/d/13w-MiUQc2sLzRFqRQD_YT6BisE3Orv5Oj3i0YBw7r_M/edit)** — the live source of truth, with built-in formulas that calculate the weighted score and grade automatically as you fill in answers. **Recommended for scoring a dataset today.**
-- **[`airbds_metric_v0.5.yaml`](airbds_metric_v0.5.yaml)** — the generated YAML, for anything programmatic.
+- **[Open the Google Sheet](https://docs.google.com/spreadsheets/d/13w-MiUQc2sLzRFqRQD_YT6BisE3Orv5Oj3i0YBw7r_M/edit)** — the live editing interface, with built-in formulas that calculate the weighted score and grade automatically as you fill in answers. **Recommended for scoring a dataset today.**
+- **[`airbds_metric_v0.5.yaml`](airbds_metric_v0.5.yaml)** — the source of truth, for anything programmatic (or [`airbds_metric_v0.5.json`](airbds_metric_v0.5.json), subsidiary to it, where a YAML parser is unavailable).
 
 To score a **filled-in YAML or CSV review** rather than the Sheet, use the review
 processor, which validates the file, computes the weighted score and grade, and
@@ -103,13 +105,15 @@ Changes to this folder have a disproportionate downstream impact. Multiple files
 | Filename | Format | Purpose |
 |----------|--------|---------|
 | `airbds_metric_v0.5.yaml` | YAML | **Canonical — current.** 25-question metric: question text, grades, guidance, scopes, `instructions`, and the `grade_points`/`grading` scoring rules |
+| `airbds_metric_v0.5.json` | JSON | **Subsidiary to the YAML.** The same v0.5 document, written by the same generator run, for consumers that cannot parse YAML — cite and change the YAML, not this |
 | `airbds_metric_v0.5.upstream.json` | JSON | v0.5 provenance: source sheet id/url + `content_sha256` "revision" + generation timestamp |
 | `airbds_metric_v0.4.yaml` | YAML | **Previous version — retained.** 27-question metric; reviews carrying `schema_version: "0.4"` still score against it |
 | `airbds_metric_v0.3.yaml` | YAML | **Previous version — retained.** 28-question metric; reviews carrying `schema_version: "0.3"` still score against it |
 | `README.md` | Markdown | This file — contributor guide for the metric folder |
 
-Metric output is **YAML-only**. (The *review template* under `reviews/` still
-ships in both YAML and CSV — that is a separate file, see Group B below.)
+The metric is **authored as YAML**, with the JSON a subsidiary rendering of it
+from v0.5 onwards. (The *review template* under `reviews/` ships in both YAML
+and CSV — that is a separate file, see Group B below.)
 
 > **v0.5 is the current version.** `airbds_metric_v0.5.*` is generated from the working group's Google Sheet (see [How the v0.5 metric files are generated](#how-the-v05-metric-files-are-generated) and the `[0.5]` entry in [CHANGELOG.md](../CHANGELOG.md)). **v0.4 and v0.3 are retained** for reference and for re-scoring older reviews — the review processor auto-selects the metric matching each review's `schema_version`.
 
