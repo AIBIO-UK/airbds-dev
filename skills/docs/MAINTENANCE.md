@@ -129,9 +129,9 @@ Each channel's downloadable skill zip is built and published by a GitHub Actions
 workflow:
 
 - `testing` → [`.github/workflows/build-assessment-skill-for-test.yml`](../../.github/workflows/build-assessment-skill-for-test.yml)
-  (release tag `assessment-skill-testing`, asset `airbds-assessment-skill.zip`).
+  (release tag `assessment-skill-testing`, asset `airbds-assessment-skill-testing.zip`).
 - `development` → [`.github/workflows/build-assessment-skill-for-development.yml`](../../.github/workflows/build-assessment-skill-for-development.yml)
-  (release tag `assessment-skill-development`, asset `airbds-assessment-skill-dev.zip`).
+  (release tag `assessment-skill-development`, asset `airbds-assessment-skill-development.zip`).
 
 Each pushes on `main`, zips its channel's skill directory (dereferencing the
 symlinked metric/template into real files), and recreates its release so the

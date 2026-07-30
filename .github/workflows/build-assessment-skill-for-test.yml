@@ -34,7 +34,7 @@ jobs:
           # Zip from inside the skill directory so its structure (including
           # assets/) is preserved with the skill dir as the zip root. No -y,
           # so the symlinked metric template is dereferenced into a real file.
-          ( cd skills/testing/airbds-assessment-skill && zip -r - . ) > airbds-assessment-skill.zip
+          ( cd skills/testing/airbds-assessment-skill && zip -r - . ) > airbds-assessment-skill-testing.zip
 
       - name: Delete previous release and tag
         # softprops/action-gh-release updates an existing release's assets but
@@ -54,4 +54,4 @@ jobs:
           name: "AIRBDS assessment testing skill"
           draft: false
           prerelease: true
-          files: airbds-assessment-skill.zip
+          files: airbds-assessment-skill-testing.zip

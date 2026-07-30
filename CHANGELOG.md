@@ -452,6 +452,18 @@ layout — that carry no version of their own. Recorded by month, newest first.
   version.
 
 ### Changed
+- **Both skill assets now name their channel in full**:
+  `airbds-assessment-skill-testing.zip` (was `airbds-assessment-skill.zip`, with
+  no channel at all) and `airbds-assessment-skill-development.zip` (was
+  `airbds-assessment-skill-dev.zip`). A downloaded file now says which channel it
+  came from, and the two names are formed the same way instead of one spelling the
+  channel out and the other abbreviating it. Coupled change per channel across its
+  build workflow (both the `zip` step and `files:`), its `skill_update_url` in
+  `skills/versions.json`, and the asset name in `skills/docs/MAINTENANCE.md`, plus
+  the install link in `skills/README.md`. The asset URL is not baked into a
+  published skill — the runtime update check reads `skill_update_url` out of the
+  manifest it fetches — so installed skills are unaffected, but each old download
+  URL stops resolving once that channel's next build replaces its release.
 - **Dropped "zip" from both release names** — "AIRBDS assessment testing skill",
   not "…skill zip". The release *is* the skill; naming the container made it read
   as an archive with a skill somewhere inside it, which is the wrong mental model
