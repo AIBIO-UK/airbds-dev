@@ -51,7 +51,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: assessment-skill-testing
-          name: "AIRBDS assessment testing skill zip"
+          name: "AIRBDS assessment testing skill"
           draft: false
           prerelease: true
           files: airbds-assessment-skill.zip

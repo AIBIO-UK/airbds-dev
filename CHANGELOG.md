@@ -452,6 +452,10 @@ layout — that carry no version of their own. Recorded by month, newest first.
   version.
 
 ### Changed
+- **Dropped "zip" from both release names** — "AIRBDS assessment testing skill",
+  not "…skill zip". The release *is* the skill; naming the container made it read
+  as an archive with a skill somewhere inside it, which is the wrong mental model
+  for something a user installs whole.
 - **Both skill build workflows now trigger on `main` only.** They also listed a
   `skills-testing` / `skills-development` branch; neither exists on the remote
   (`skills-testing` was deleted once its work had merged, `skills-development`
