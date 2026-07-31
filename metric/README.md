@@ -146,6 +146,24 @@ metric/src/scripts/build_metric_yaml_from_spreadsheet_v0.3.py
 
 From v0.4 the metric is authored in the working group's **public Google Sheet** rather than a committed `.xlsx`. `metric/src/scripts/build_metric_from_google_sheet_v0.5.py` pulls the Scoring, Lookups, and Instructions tabs and regenerates `airbds_metric_v0.5.yaml`, recording which sheet and a content-hash "revision" in `airbds_metric_v0.5.upstream.json` plus a `# Source:` breadcrumb in the YAML. (v0.5 also captures the sheet's Instructions tab into a top-level `instructions:` block.) See [`metric/src/README.md`](src/README.md) for the commands, the `--check` drift check, and offline use. A weekly workflow (`.github/workflows/metric-upstream-drift-check.yml`) confirms each committed YAML still matches its Sheet, opening an issue if it has drifted. Each committed version keeps its own generator (`…_v0.4.py`, `…_v0.5.py`); the v0.3 `.xlsx` chain stays in place unchanged.
 
+### Publishing a Version to `airbds-core`
+
+This is the **development** repository; the canonical metric is published from
+[AIBIO-UK/airbds-core](https://github.com/AIBIO-UK/airbds-core). Once a version
+here is final, `metric/src/scripts/release_metric_to_core.sh` publishes it:
+
+```bash
+./metric/src/scripts/release_metric_to_core.sh 0.5 --dry-run   # rehearse first
+./metric/src/scripts/release_metric_to_core.sh 0.5
+```
+
+It copies `metric/airbds_metric_v0.5.yaml` to the root of `airbds-core` as the
+**unversioned `airbds_metric.yaml`**, on a `release/metric-v0.5` branch, and
+opens a pull request. It does not merge and does not tag — because the published
+filename carries no version, tagging the merged release is what gives downstream
+consumers something to pin to, and that stays a deliberate manual step. See
+[`metric/src/README.md`](src/README.md) for the options and the full behaviour.
+
 ### Why ALL Files Must Change Together
 
 #### The review-template YAML ↔ CSV pair must always be identical in content

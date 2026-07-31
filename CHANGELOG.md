@@ -442,6 +442,21 @@ layout — that carry no version of their own. Recorded by month, newest first.
 ## 2026-07
 
 ### Added
+- `metric/src/scripts/release_metric_to_core.sh` — publishes one metric version
+  to the publication repository,
+  [AIBIO-UK/airbds-core](https://github.com/AIBIO-UK/airbds-core). It copies
+  `metric/airbds_metric_v<version>.yaml` to that repository's root as the
+  **unversioned `airbds_metric.yaml`**, commits it on a `release/metric-v<version>`
+  branch, pushes, and opens a PR for working-group review. Because the published
+  filename carries no version, a tag or GitHub release in `airbds-core` is what
+  downstream consumers pin to — so the script stops at the PR and never merges or
+  tags. It clones the publication repo into a temporary directory each run rather
+  than using a local checkout, publishes the YAML only, refuses to overwrite an
+  existing release branch, and is a no-op when the published file already matches.
+  `--dry-run` rehearses the whole thing without pushing. Documented in
+  `metric/src/README.md` and `metric/README.md`; tested offline in
+  `metric/src/tests/test_release_metric_to_core.py`, which drives the script
+  against a throwaway local repository with a stubbed `gh`.
 - `skills/docs/DESIGN.md` — how the assessment skill is put together: what
   `SKILL.md`'s frontmatter and body each do, what the bundled `assets/` carry,
   and why the metric is shipped as a symlinked data file rather than restated as

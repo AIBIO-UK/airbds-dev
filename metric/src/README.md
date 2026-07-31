@@ -1,7 +1,8 @@
 # `metric/src/` — metric-build tooling
 
-Tooling that regenerates the canonical metric from its upstream source. Each
-metric version pins how it is built:
+Tooling that regenerates the canonical metric from its upstream source, and
+publishes a finished version to the publication repository. Each metric version
+pins how it is built:
 
 - **v0.3** — from the committed spreadsheet in [`metric/upstream/`](../upstream/).
 - **v0.4** — from the working group's public Google Sheet (the editing interface
@@ -129,5 +130,61 @@ python3 metric/src/tests/test_build_metric_yaml_v05.py   # or: pytest metric/src
 As with v0.4, editorial metadata not in the sheet lives in the script's `CONFIG`
 block.
 
+## Releasing a version to `airbds-core`
+
+`scripts/release_metric_to_core.sh` publishes one metric version to the
+publication repository, [AIBIO-UK/airbds-core][core]. It copies
+`metric/airbds_metric_v<version>.yaml` to that repository's **root** as the
+unversioned **`airbds_metric.yaml`**, commits it on a release branch, pushes, and
+opens a pull request for working-group review.
+
+```bash
+./metric/src/scripts/release_metric_to_core.sh 0.5             # branch, push, PR
+./metric/src/scripts/release_metric_to_core.sh 0.5 --dry-run   # rehearse locally
+```
+
+Needs `git`, and the [GitHub CLI](https://cli.github.com) authenticated with
+`repo` scope (not needed for `--dry-run`). The default push URL is
+`git@github.com:AIBIO-UK/airbds-core.git` — override with `--remote` (or
+`AIRBDS_CORE_REMOTE`) where SSH is unavailable, such as in CI.
+
+Useful options — `--help` lists them all:
+
+| Option | Effect |
+|---|---|
+| `--dry-run` | Commit locally only; no push, no PR. Keeps the temporary clone and prints its path so the result can be inspected |
+| `--branch <name>` | Release branch name (default `release/metric-v<version>`) |
+| `--base <name>` | Branch the PR targets (default `main`) |
+| `--draft` | Open the pull request as a draft |
+| `--repo`, `--remote` | Target a different repository or push URL |
+
+Things it deliberately does **not** do:
+
+- **It never merges and never tags.** The PR is left open; tagging the release in
+  `airbds-core` is a separate step after merge. Since the published filename
+  carries no version, a tag or GitHub release is what downstream consumers pin
+  to.
+- **It never touches a local `airbds-core` checkout.** The publication repo is
+  cloned into a temporary directory each run and removed afterwards, so the
+  release can never pick up unrelated local state.
+- **It publishes only the YAML** — not the subsidiary `.json`, the
+  `.upstream.json` provenance sidecar, or any surrounding repo file.
+
+It refuses to run if the release branch already exists on the remote (pass
+`--branch` or delete it), and exits successfully without creating a branch or PR
+if the published file already matches the version being released. It warns if the
+source YAML has uncommitted changes, and publishes the working-tree version —
+the PR body records the `airbds-dev` commit the file came from, noting when it
+was dirty.
+
+Offline tests drive the whole script against a throwaway local repository with a
+stubbed `gh`, so they neither reach the network nor touch the real publication
+repository:
+
+```bash
+python3 metric/src/tests/test_release_metric_to_core.py   # or: pytest metric/src/tests/
+```
+
+[core]: https://github.com/AIBIO-UK/airbds-core
 [sheet]: https://docs.google.com/spreadsheets/d/1eriM8bXAoNXsIR9l8OpI1XYEp8FbtBWt05CTIP9cVeg/edit
 [sheet-v05]: https://docs.google.com/spreadsheets/d/13w-MiUQc2sLzRFqRQD_YT6BisE3Orv5Oj3i0YBw7r_M/edit
