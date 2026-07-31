@@ -36,7 +36,7 @@ Needs only the Python 3 standard library.
 
 `scripts/release_skill_to_core.sh` promotes the **testing** channel's skill zip
 to the publication repository, [AIBIO-UK/airbds-core][core], as
-`skill/airbds-assessment-skill.zip`, on a release branch with a pull request left
+`skills/airbds-assessment-skill.zip`, on a release branch with a pull request left
 open for review.
 
 ```bash

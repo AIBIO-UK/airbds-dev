@@ -445,7 +445,7 @@ layout — that carry no version of their own. Recorded by month, newest first.
 - `skills/src/scripts/release_skill_to_core.sh` — the push to production for the
   assessment skill. Promotes the **testing** channel's zip to
   [AIBIO-UK/airbds-core](https://github.com/AIBIO-UK/airbds-core) as
-  `skill/airbds-assessment-skill.zip` (no channel, no version in the filename),
+  `skills/airbds-assessment-skill.zip` (no channel, no version in the filename),
   on a `release/skill-v<version>` branch with a PR left open for review. It
   **promotes rather than rebuilds**: the zip is downloaded from this repo's
   `assessment-skill-testing` release, so production gets byte-for-byte what was

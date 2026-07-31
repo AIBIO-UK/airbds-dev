@@ -7,7 +7,7 @@
 # rather than rebuilding it here, so what ships is byte-for-byte what was tested.
 # The zip is downloaded from the airbds-dev release, checked against its
 # published digest and against skills/versions.json, then committed to
-# AIBIO-UK/airbds-core as skill/airbds-assessment-skill.zip on a release branch,
+# AIBIO-UK/airbds-core as skills/airbds-assessment-skill.zip on a release branch,
 # with a pull request left open for review.
 #
 #   ./skills/src/scripts/release_skill_to_core.sh
@@ -34,7 +34,7 @@ ASSET_NAME="airbds-assessment-skill-${CHANNEL}.zip"
 SOURCE_REPO="AIBIO-UK/airbds-dev"
 
 # Neither channel nor version — see the header note.
-DEST_FILE="skill/airbds-assessment-skill.zip"
+DEST_FILE="skills/airbds-assessment-skill.zip"
 
 die() { echo "error: $*" >&2; exit 1; }
 

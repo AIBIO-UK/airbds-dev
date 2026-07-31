@@ -169,7 +169,7 @@ python3 skills/src/scripts/validate_skills_versions.py
 The `testing` and `development` channels are staging: their zips are published as
 releases *in this repo*. Production is the publication repository,
 [AIBIO-UK/airbds-core](https://github.com/AIBIO-UK/airbds-core), where the skill
-lives at `skill/airbds-assessment-skill.zip` — no channel and no version in the
+lives at `skills/airbds-assessment-skill.zip` — no channel and no version in the
 filename.
 
 ```bash

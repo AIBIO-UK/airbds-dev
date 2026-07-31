@@ -37,7 +37,7 @@ release branch, and open a pull request.
 Required:
   --src <file>       File to publish, in this repository
   --dest <path>      Destination path within the publication repo, e.g.
-                     airbds_metric.yaml or skill/airbds-assessment-skill.zip
+                     airbds_metric.yaml or skills/airbds-assessment-skill.zip
   --branch <name>    Release branch to create
 
 Options:

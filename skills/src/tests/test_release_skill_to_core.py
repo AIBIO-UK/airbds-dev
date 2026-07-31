@@ -23,7 +23,7 @@ TESTS_DIR = Path(__file__).resolve().parent
 REPO_ROOT = TESTS_DIR.parent.parent.parent
 SCRIPT = REPO_ROOT / "skills" / "src" / "scripts" / "release_skill_to_core.sh"
 MANIFEST = REPO_ROOT / "skills" / "versions.json"
-DEST_FILE = "skill/airbds-assessment-skill.zip"
+DEST_FILE = "skills/airbds-assessment-skill.zip"
 
 # NUL-separated, not newline: the PR body is multi-line, and splitting on
 # newlines would silently truncate it to its first line.
@@ -127,7 +127,7 @@ def _remote_branches(origin):
 
 
 def test_publishes_zip_and_opens_pr(tmp_path):
-    """The happy path: the zip lands at skill/airbds-assessment-skill.zip."""
+    """The happy path: the zip lands at skills/airbds-assessment-skill.zip."""
     version = _manifest_skill_version()
     zip_path = _make_zip(tmp_path)
     origin = _make_origin(tmp_path)
