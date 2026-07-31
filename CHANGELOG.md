@@ -442,6 +442,15 @@ layout — that carry no version of their own. Recorded by month, newest first.
 ## 2026-07
 
 ### Added
+- `scripts/publish-to-core.sh` — the shared engine for publishing a file to
+  [AIBIO-UK/airbds-core](https://github.com/AIBIO-UK/airbds-core). It knows
+  nothing about metrics or skills, only how to land a file there safely: clone to
+  a temp dir, guard against an existing release branch, commit, push, open a PR,
+  never merge, never tag. `release_metric_to_core.sh` was refactored onto it so
+  that further release scripts need not duplicate ~100 lines of the same shell;
+  its existing tests passed unchanged across the refactor, which is what made the
+  extraction safe to do. Lives in top-level `scripts/` because it genuinely spans
+  domains rather than serving one.
 - `metric/src/scripts/release_metric_to_core.sh` — publishes one metric version
   to the publication repository,
   [AIBIO-UK/airbds-core](https://github.com/AIBIO-UK/airbds-core). It copies

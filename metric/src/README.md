@@ -158,6 +158,10 @@ Useful options — `--help` lists them all:
 | `--draft` | Open the pull request as a draft |
 | `--repo`, `--remote` | Target a different repository or push URL |
 
+The clone/branch/commit/push/PR mechanics live in the shared
+[`scripts/publish-to-core.sh`](../../scripts/publish-to-core.sh); this script
+computes the file, destination, branch, and PR text and forwards the rest.
+
 Things it deliberately does **not** do:
 
 - **It never merges and never tags.** The PR is left open; tagging the release in

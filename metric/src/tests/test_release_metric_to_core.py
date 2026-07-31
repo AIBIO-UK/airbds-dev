@@ -24,11 +24,20 @@ VERSION = "0.5"
 SRC_YAML = REPO_ROOT / "metric" / f"airbds_metric_v{VERSION}.yaml"
 DEST_FILE = "airbds_metric.yaml"
 
+# Records its arguments NUL-separated, then prints a plausible PR URL. NUL and
+# not newline: the PR body is multi-line, and splitting on newlines would
+# silently truncate it to its first line.
 GH_STUB = """#!/usr/bin/env bash
-# Records its arguments one per line, then prints a plausible PR URL.
-printf '%s\\n' "$@" >> "$GH_CALLS"
+printf '%s\\0' "$@" >> "$GH_CALLS"
 echo "https://github.com/fake/core/pull/1"
 """
+
+
+def _read_gh_calls(path):
+    if not path.exists():
+        return []
+    raw = path.read_bytes()
+    return [a.decode() for a in raw.split(b"\0")[:-1]] if raw else []
 
 
 def _git(*args, cwd):
@@ -77,8 +86,7 @@ def _run(tmp_path, origin, *args, expect_ok=True):
     )
     if expect_ok:
         assert proc.returncode == 0, f"script failed:\n{proc.stdout}\n{proc.stderr}"
-    gh_args = calls.read_text(encoding="utf-8").splitlines() if calls.exists() else []
-    return proc, gh_args
+    return proc, _read_gh_calls(calls)
 
 
 def _remote_branches(origin):
