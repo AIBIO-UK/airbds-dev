@@ -154,12 +154,12 @@ Actions tab without a code change.
 ## Validation
 
 `versions.json` is checked in CI by the `validate-skills-versions` workflow,
-which runs [`scripts/validate-skills-versions.py`](../../scripts/validate-skills-versions.py).
+which runs [`skills/src/scripts/validate_skills_versions.py`](../src/scripts/validate_skills_versions.py).
 It confirms the manifest is valid JSON, every channel has the required fields,
 and every advertised `metric_version` has a matching
 `metric/airbds_metric_v<version>.yaml`. Run it locally before committing a
 manifest change:
 
 ```
-python3 scripts/validate-skills-versions.py
+python3 skills/src/scripts/validate_skills_versions.py
 ```

@@ -87,7 +87,7 @@ airbds-dev/
 ├── metric/    # The versioned scoring metric (YAML), its build tooling, and upstream source
 ├── reviews/   # Review template + converter library (live); manual-review material (dormant)
 ├── skills/    # AI-agent skills for performing assessments and contributing them to a website
-└── scripts/   # Repo-wide helper scripts (e.g. D2 diagram rendering)
+└── scripts/   # Helper scripts that span the whole repo (D2 diagram rendering)
 ```
 
 ---

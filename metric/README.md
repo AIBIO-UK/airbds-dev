@@ -231,7 +231,7 @@ Use this as a checklist when implementing any metric change.
 - The review processor needs **no update** — it auto-selects `metric/airbds_metric_v<schema_version>.yaml` per review. Its workflows need none either, and neither runs automatically now: `review-check.yml` is disabled (the manual review process is not live) and `review-test.yml` is `workflow_dispatch`-only.
 - `skills/GF/GF-airbds-assessment-skill/SKILL.md` — update embedded templates, question table, file paths, skill version
 - `skills/testing/airbds-assessment-skill/SKILL.md` — update template filename **only if the XLSX is also regenerated**
-- `skills/versions.json` — per-channel update manifest the assessment skills read at runtime; bump a channel's `metric_version` only when that channel's skill is actually repointed to the new metric (leave channels intentionally kept on the old metric untouched). Validate with `scripts/validate-skills-versions.py`
+- `skills/versions.json` — per-channel update manifest the assessment skills read at runtime; bump a channel's `metric_version` only when that channel's skill is actually repointed to the new metric (leave channels intentionally kept on the old metric untouched). Validate with `skills/src/scripts/validate_skills_versions.py`
 - `skills/docs/DESIGN.md` — the bundle diagram spells out the `assets/airbds_metric.yaml` symlink target, so update it whenever a channel's symlink is repointed (same trigger as the `versions.json` bump above)
 - `reviews/docs/tutorial-yaml.md` — update all `vX.Y` path references
 - `reviews/docs/tutorial-csv.md` — update all `vX.Y` path references

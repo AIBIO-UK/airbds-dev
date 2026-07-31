@@ -11,13 +11,13 @@ on:
     paths:
       - 'skills/versions.json'
       - 'metric/airbds_metric_v*.yaml'
-      - 'scripts/validate-skills-versions.py'
+      - 'skills/src/scripts/validate_skills_versions.py'
       - '.github/workflows/validate-skills-versions.yml'
   pull_request:
     paths:
       - 'skills/versions.json'
       - 'metric/airbds_metric_v*.yaml'
-      - 'scripts/validate-skills-versions.py'
+      - 'skills/src/scripts/validate_skills_versions.py'
       - '.github/workflows/validate-skills-versions.yml'
 
 permissions:
@@ -36,4 +36,4 @@ jobs:
           python-version: '3.11'
 
       - name: Validate skills/versions.json
-        run: python3 scripts/validate-skills-versions.py
+        run: python3 skills/src/scripts/validate_skills_versions.py

@@ -467,6 +467,18 @@ layout — that carry no version of their own. Recorded by month, newest first.
   version.
 
 ### Changed
+- **Moved the skills-manifest validator into the skills domain**:
+  `scripts/validate-skills-versions.py` → `skills/src/scripts/validate_skills_versions.py`
+  (renamed to snake_case to match the scripts already under `metric/src/` and
+  `reviews/src/`). It validates `skills/versions.json` and nothing else, so it
+  belongs beside the skills it serves rather than in top-level `scripts/`, which
+  is for helpers that span the whole repo — now just `render-diagrams.sh`.
+  Coupled change across the script's own path references, the
+  `validate-skills-versions.yml` workflow (both `paths:` filters and the `run:`
+  step — a stale path filter would silently stop the check firing),
+  `skills/docs/MAINTENANCE.md`, `metric/README.md`, and the top-level `README.md`
+  structure tree. Added `skills/src/README.md` documenting the script, matching
+  the `README.md` each sibling `src/` folder already carries.
 - **Both skill assets now name their channel in full**:
   `airbds-assessment-skill-testing.zip` (was `airbds-assessment-skill.zip`, with
   no channel at all) and `airbds-assessment-skill-development.zip` (was

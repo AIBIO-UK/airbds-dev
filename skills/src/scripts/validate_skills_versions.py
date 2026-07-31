@@ -15,14 +15,14 @@ Checks:
 
 Exits 0 when the manifest is valid, 1 (listing every problem) otherwise.
 
-Run locally:  python3 scripts/validate-skills-versions.py
+Run locally:  python3 skills/src/scripts/validate_skills_versions.py
 Run in CI:    .github/workflows/validate-skills-versions.yml
 """
 import json
 import sys
 from pathlib import Path
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
+REPO_ROOT = Path(__file__).resolve().parents[3]
 MANIFEST = REPO_ROOT / "skills" / "versions.json"
 REQUIRED_CHANNEL_FIELDS = ("metric_version", "skill_version", "skill_update_url")
 
