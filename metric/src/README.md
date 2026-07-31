@@ -159,8 +159,10 @@ Useful options — `--help` lists them all:
 | `--repo`, `--remote` | Target a different repository or push URL |
 
 The clone/branch/commit/push/PR mechanics live in the shared
-[`scripts/publish-to-core.sh`](../../scripts/publish-to-core.sh); this script
-computes the file, destination, branch, and PR text and forwards the rest.
+[`scripts/publish-to-core.sh`](../../scripts/publish-to-core.sh), which the skill
+release ([`skills/src/scripts/release_skill_to_core.sh`](../../skills/src/scripts/release_skill_to_core.sh))
+uses too; this script computes the file, destination, branch, and PR text and
+forwards the rest.
 
 Things it deliberately does **not** do:
 

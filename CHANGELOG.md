@@ -442,15 +442,33 @@ layout — that carry no version of their own. Recorded by month, newest first.
 ## 2026-07
 
 ### Added
-- `scripts/publish-to-core.sh` — the shared engine for publishing a file to
-  [AIBIO-UK/airbds-core](https://github.com/AIBIO-UK/airbds-core). It knows
-  nothing about metrics or skills, only how to land a file there safely: clone to
-  a temp dir, guard against an existing release branch, commit, push, open a PR,
-  never merge, never tag. `release_metric_to_core.sh` was refactored onto it so
-  that further release scripts need not duplicate ~100 lines of the same shell;
-  its existing tests passed unchanged across the refactor, which is what made the
-  extraction safe to do. Lives in top-level `scripts/` because it genuinely spans
-  domains rather than serving one.
+- `skills/src/scripts/release_skill_to_core.sh` — the push to production for the
+  assessment skill. Promotes the **testing** channel's zip to
+  [AIBIO-UK/airbds-core](https://github.com/AIBIO-UK/airbds-core) as
+  `skill/airbds-assessment-skill.zip` (no channel, no version in the filename),
+  on a `release/skill-v<version>` branch with a PR left open for review. It
+  **promotes rather than rebuilds**: the zip is downloaded from this repo's
+  `assessment-skill-testing` release, so production gets byte-for-byte what was
+  tested instead of a locally rebuilt artifact that could differ (symlink
+  dereferencing, file ordering, a dirty tree) under the same version number. The
+  download is checked against the digest GitHub recorded at upload, and the PR
+  body carries the sha256 for the reviewer. Before publishing it reads `SKILL.md`
+  out of the zip and refuses a bundle from the wrong channel, or one whose
+  `metadata.version` disagrees with the `testing` entry in `skills/versions.json`
+  — that manifest is what installed skills poll, so publishing a version it does
+  not advertise would ship users a release nothing announces. `--force`
+  overrides, `--zip` publishes a local file, `--dry-run` rehearses. Documented in
+  `skills/src/README.md` and `skills/docs/MAINTENANCE.md`; tested offline in
+  `skills/src/tests/test_release_skill_to_core.py` (9 tests, synthesised zip and
+  stubbed `gh`).
+- `scripts/publish-to-core.sh` — the shared engine behind both release scripts.
+  It knows nothing about metrics or skills, only how to land a file in
+  `airbds-core` safely: clone to a temp dir, guard against an existing release
+  branch, commit, push, open a PR, never merge, never tag. The metric release was
+  refactored onto it rather than having the skill release duplicate ~100 lines of
+  the same shell; its existing tests passed unchanged across the refactor. Lives
+  in top-level `scripts/` because it genuinely spans domains — both `metric/` and
+  `skills/` publish through it.
 - `metric/src/scripts/release_metric_to_core.sh` — publishes one metric version
   to the publication repository,
   [AIBIO-UK/airbds-core](https://github.com/AIBIO-UK/airbds-core). It copies

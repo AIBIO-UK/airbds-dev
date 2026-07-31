@@ -163,3 +163,27 @@ manifest change:
 ```
 python3 skills/src/scripts/validate_skills_versions.py
 ```
+
+## Promoting to production
+
+The `testing` and `development` channels are staging: their zips are published as
+releases *in this repo*. Production is the publication repository,
+[AIBIO-UK/airbds-core](https://github.com/AIBIO-UK/airbds-core), where the skill
+lives at `skill/airbds-assessment-skill.zip` — no channel and no version in the
+filename.
+
+```bash
+./skills/src/scripts/release_skill_to_core.sh --dry-run   # rehearse
+./skills/src/scripts/release_skill_to_core.sh             # branch, push, PR
+```
+
+It promotes the `testing` release asset **as built** rather than rebuilding it,
+so production gets byte-for-byte what was tested, and it refuses to publish a zip
+whose `metadata.version` disagrees with the `testing` entry in `versions.json`.
+Bump the manifest first, let the build workflow republish the release, then
+promote. See [`skills/src/README.md`](../src/README.md) for the full behaviour.
+
+> `versions.json`'s `skill_update_url`s still point at this repo's releases. They
+> are not repointed by publishing to `airbds-core` — that is a separate decision,
+> and the file's own `_comment_urls` explains why they must not move until
+> `airbds-core` actually hosts the manifest and releases.
