@@ -20,7 +20,7 @@ from pathlib import Path
 TESTS_DIR = Path(__file__).resolve().parent
 REPO_ROOT = TESTS_DIR.parent.parent.parent
 SCRIPT = REPO_ROOT / "metric" / "src" / "scripts" / "release_metric_to_core.sh"
-VERSION = "0.5"
+VERSION = "1.0"
 SRC_YAML = REPO_ROOT / "metric" / f"airbds_metric_v{VERSION}.yaml"
 DEST_FILE = "airbds_metric.yaml"
 
@@ -103,21 +103,21 @@ def test_publishes_unversioned_yaml_and_opens_pr(tmp_path):
     origin = _make_origin(tmp_path)
     proc, gh_args = _run(tmp_path, origin)
 
-    assert "release/metric-v0.5" in _remote_branches(origin)
-    published = _file_at(origin, "release/metric-v0.5", DEST_FILE)
+    assert "release/metric-v1.0" in _remote_branches(origin)
+    published = _file_at(origin, "release/metric-v1.0", DEST_FILE)
     assert published == SRC_YAML.read_text(encoding="utf-8")
 
     # The versioned name must not follow the file across.
     assert DEST_FILE in _git(
-        "ls-tree", "--name-only", "release/metric-v0.5", cwd=origin
+        "ls-tree", "--name-only", "release/metric-v1.0", cwd=origin
     ).split()
     assert f"airbds_metric_v{VERSION}.yaml" not in _git(
-        "ls-tree", "--name-only", "release/metric-v0.5", cwd=origin
+        "ls-tree", "--name-only", "release/metric-v1.0", cwd=origin
     )
 
     assert "pr" in gh_args and "create" in gh_args
     assert "--base" in gh_args and gh_args[gh_args.index("--base") + 1] == "main"
-    assert gh_args[gh_args.index("--head") + 1] == "release/metric-v0.5"
+    assert gh_args[gh_args.index("--head") + 1] == "release/metric-v1.0"
     assert gh_args[gh_args.index("--repo") + 1] == "fake/core"
     assert f"v{VERSION}" in gh_args[gh_args.index("--title") + 1]
     assert "--draft" not in gh_args
@@ -146,11 +146,11 @@ def test_no_op_when_already_published(tmp_path):
 def test_custom_branch_base_and_draft(tmp_path):
     origin = _make_origin(tmp_path)
     _, gh_args = _run(
-        tmp_path, origin, "--branch", "publish/v0.5", "--base", "main", "--draft"
+        tmp_path, origin, "--branch", "publish/v1.0", "--base", "main", "--draft"
     )
 
-    assert "publish/v0.5" in _remote_branches(origin)
-    assert gh_args[gh_args.index("--head") + 1] == "publish/v0.5"
+    assert "publish/v1.0" in _remote_branches(origin)
+    assert gh_args[gh_args.index("--head") + 1] == "publish/v1.0"
     assert "--draft" in gh_args
 
 

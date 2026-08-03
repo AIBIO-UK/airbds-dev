@@ -6,7 +6,7 @@ artifacts, plus a body of work that carries no version at all:
 
 | Section | Versioned by | Released as |
 |---|---|---|
-| [Metric](#metric) | `schema_version` — 0.3, 0.4, 0.5 | a new `metric/airbds_metric_vX.Y.yaml` |
+| [Metric](#metric) | `schema_version` — 0.3, 0.4, 1.0 | a new `metric/airbds_metric_vX.Y.yaml` |
 | [Assessment skill](#assessment-skill) | `skills/versions.json`, per channel | the `assessment-skill-development` / `assessment-skill-testing` release builds |
 | [Repository](#repository) | nothing | nothing — recorded by date |
 
@@ -26,45 +26,74 @@ pipeline that produces `metric/airbds_metric_vX.Y.yaml`.
 
 ## [Unreleased]
 
+Nothing yet.
+
+---
+
+## [1.0] — current
+
+> **v1.0 is now the current version, and the metric is declared stable.** It is
+> [0.5] unchanged — the same 25 questions, the same Critical/Important/Optional
+> weights, the same grade thresholds — released under a stable version number.
+> The metric, the review template (`reviews/review_template.{yaml,csv}`), and the
+> sheet→YAML converter target v1.0, as do all three assessment skill channels
+> (see [Assessment skill](#assessment-skill)).
+>
+> **v0.5 was withdrawn rather than retained.** Retention exists so a review can
+> be re-scored against the metric it was scored with, and no review ever carried
+> `schema_version: "0.5"`. A retained file identical to its successor in
+> everything but its version number would only invite the question of which to
+> use — and would have doubled the generator, the provenance sidecar, and the
+> drift-check matrix entry, so every working-group sheet edit opened two issues
+> for one drift. v0.4 and v0.3 are retained as before.
+
 ### Added
-- `metric/airbds_metric_v0.5.json` — a JSON rendering of the v0.5 metric,
-  written by the same build run as the YAML and covered by its `--check`. It
-  exists so consumers that cannot depend on a YAML parser (chiefly the
-  assessment skill's bundled scorer) can read the metric. Produced by parsing
-  the rendered YAML and re-serialising it, so the two are the same document; the
-  YAML remains canonical and is the version humans read.
+- `metric/airbds_metric_v1.0.{yaml,json,upstream.json}`, generated from the
+  working group's Google Sheet by
+  `metric/src/scripts/build_metric_from_google_sheet_v1.0.py` — the v0.5
+  generator renamed, so the git history of both is continuous.
+- The JSON rendering, first added during v0.5 development: written by the same
+  build run as the YAML and covered by its `--check`, so consumers that cannot
+  depend on a YAML parser (chiefly the assessment skill's bundled scorer) can
+  read the metric. Produced by parsing the rendered YAML and re-serialising it,
+  so the two are the same document; the YAML remains canonical.
+
+### Changed
+- Two edits made in the sheet alongside the version bump, neither affecting
+  scoring: the Gold grade's description gained "(or equivalent)", and the
+  Instructions tab's own heading now names v1.0. Question text, weights, and
+  every threshold are byte-identical to v0.5.
+- `build_metric_yaml_from_google_sheet_v0.{4,5}.py` renamed to
+  `build_metric_from_google_sheet_v0.4.py` / `…_v1.0.py` — they no longer
+  produce only YAML. Both were renamed together because the drift-check workflow
+  builds the script name from its version matrix.
+- The v0.5 review-template pair was **not** archived to
+  `reviews/archived_templates/`, unlike the v0.4 pair before it: v0.5 was
+  withdrawn rather than superseded, and an archived template for a metric file
+  that no longer exists could not be filled in and scored.
 
 ### Fixed
-- **`--check` now compares metric content, not raw bytes**, in both the v0.4 and
-  v0.5 generators. The `# Source content sha256:` breadcrumb is set aside for the
+- **`--check` compares metric content, not raw bytes**, in both the v0.4 and
+  v1.0 generators. The `# Source content sha256:` breadcrumb is set aside for the
   comparison: it hashes the raw source CSVs, so it moved whenever the sheet's
   bytes moved — including for edits the generators never read (a cell in an
   unread pivot column, a heading in the excluded data-entry block, trailing
-  whitespace). The v0.5 check had been failing for exactly this reason while
-  every extracted field was byte-identical, which also made the scheduled
+  whitespace). The check had been failing for exactly this reason while every
+  extracted field was byte-identical, which also made the scheduled
   `metric-upstream-drift-check.yml` open issues for a metric that had not
   changed. A bare hash difference is now a passing `NOTE` naming both hashes; a
   real content change still exits 1. `test_committed_yaml_regenerates_byte_for_byte`
   was failing on this and now passes, with new coverage asserting that a genuine
   content change is still caught and a hash-only change is not.
 
-### Changed
-- `build_metric_yaml_from_google_sheet_v0.{4,5}.py` renamed to
-  `build_metric_from_google_sheet_v0.{4,5}.py` — they no longer produce only
-  YAML. Both were renamed together because the drift-check workflow builds the
-  script name from its version matrix.
-
 ---
 
-## [0.5] — current
+## [0.5] — superseded by [1.0], withdrawn
 
-> **v0.5 is now the current version.** The metric, the review template
-> (`reviews/review_template.{yaml,csv}`), and the sheet→YAML converter target
-> v0.5. The version-aware review processor scores each review against the metric
-> matching its `schema_version`, so v0.4 and v0.3 reviews still score correctly;
-> those metrics and their archived review templates are retained. Both
-> assessment skill channels target v0.5 (see
-> [Assessment skill](#assessment-skill)).
+> **v0.5 is no longer in the repository.** [1.0] is this metric unchanged, under
+> a stable version number; `metric/airbds_metric_v0.5.*` was removed rather than
+> retained because no review was ever scored against it. This entry is kept as
+> the record of what changed at v0.5 — every change below is in v1.0.
 
 ### Added
 - `instructions:` — a new top-level block in the metric YAML, captured verbatim

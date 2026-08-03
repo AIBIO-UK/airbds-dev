@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
-"""Offline tests for the v0.5 metric build script.
+"""Offline tests for the v1.0 metric build script.
 
 These run against committed fixture CSVs (the three source tabs exported from the
-canonical Google Sheet), so they need no network. They cover the v0.5-specific
-behaviour — the restructured grade-points pivot and the new Instructions capture —
-plus a byte-for-byte check that the committed metric YAML still regenerates.
+canonical Google Sheet), so they need no network. They cover how the sheet is
+read — the grade-points pivot and the Instructions capture — plus a
+byte-for-byte check that the committed metric YAML still regenerates.
 
 Run directly:
-    python3 metric/src/tests/test_build_metric_yaml_v0.5.py
+    python3 metric/src/tests/test_build_metric_yaml_v10.py
 or under pytest:
-    pytest metric/src/tests/test_build_metric_yaml_v0.5.py
+    pytest metric/src/tests/test_build_metric_yaml_v10.py
 """
 
 import importlib.util
@@ -18,14 +18,14 @@ from pathlib import Path
 TESTS_DIR = Path(__file__).resolve().parent
 FIXTURES = TESTS_DIR / "fixtures"
 REPO_ROOT = TESTS_DIR.parent.parent.parent
-SCRIPT = REPO_ROOT / "metric" / "src" / "scripts" / "build_metric_from_google_sheet_v0.5.py"
-COMMITTED_YAML = REPO_ROOT / "metric" / "airbds_metric_v0.5.yaml"
-COMMITTED_JSON = REPO_ROOT / "metric" / "airbds_metric_v0.5.json"
+SCRIPT = REPO_ROOT / "metric" / "src" / "scripts" / "build_metric_from_google_sheet_v1.0.py"
+COMMITTED_YAML = REPO_ROOT / "metric" / "airbds_metric_v1.0.yaml"
+COMMITTED_JSON = REPO_ROOT / "metric" / "airbds_metric_v1.0.json"
 
 
 def _load_build_module():
-    """Import the build script by path (its filename contains a dot: v0.5)."""
-    spec = importlib.util.spec_from_file_location("build_v05", SCRIPT)
+    """Import the build script by path (its filename contains a dot: v1.0)."""
+    spec = importlib.util.spec_from_file_location("build_v10", SCRIPT)
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
     return mod
@@ -39,9 +39,9 @@ import sheet_source as ss  # noqa: E402
 
 
 def _worksheets():
-    scoring = (FIXTURES / "scoring-v0.5.csv").read_text(encoding="utf-8")
-    lookups = (FIXTURES / "config-v0.5.csv").read_text(encoding="utf-8")
-    instructions = (FIXTURES / "instructions-v0.5.csv").read_text(encoding="utf-8")
+    scoring = (FIXTURES / "scoring-v1.0.csv").read_text(encoding="utf-8")
+    lookups = (FIXTURES / "config-v1.0.csv").read_text(encoding="utf-8")
+    instructions = (FIXTURES / "instructions-v1.0.csv").read_text(encoding="utf-8")
     return (bm.CsvWorksheet(scoring), bm.CsvWorksheet(lookups),
             bm.CsvWorksheet(instructions), scoring, lookups, instructions)
 
@@ -66,7 +66,7 @@ def test_read_questions():
 def test_read_grade_points_from_pivot():
     _, lookups_ws, *_ = _worksheets()
     pts = bm.read_grade_points(lookups_ws)
-    # v0.5 reads these from the 'Points per Question' column of the pivot.
+    # Read from the 'Points per Question' column of the Lookups pivot.
     assert pts == {"Critical": 80, "Important": 5, "Optional": 2}, pts
 
 
@@ -110,7 +110,7 @@ def test_committed_yaml_regenerates_byte_for_byte():
 
     import yaml
     doc = yaml.safe_load(generated)  # must be valid YAML
-    assert doc["schema_version"] == "0.5"
+    assert doc["schema_version"] == "1.0"
     assert doc["instructions"].strip().endswith("specific questions.")
     assert len(doc["questions"]) == 25
     assert doc["grade_points"] == {"Critical": 80, "Important": 5, "Optional": 2}
@@ -123,7 +123,7 @@ def test_committed_yaml_regenerates_byte_for_byte():
     # heading in the excluded data-entry block, trailing whitespace). Comparing it
     # would fail this test for a metric that is byte-identical in every field.
     assert ss.strip_source_breadcrumb(generated) == ss.strip_source_breadcrumb(committed), (
-        "committed metric/airbds_metric_v0.5.yaml is out of sync with the fixtures; "
+        "committed metric/airbds_metric_v1.0.yaml is out of sync with the fixtures; "
         "regenerate it from the sheet (or fixtures) and commit the result."
     )
 
@@ -162,12 +162,12 @@ def test_committed_json_is_the_committed_yaml():
     committed_json = json.loads(COMMITTED_JSON.read_text(encoding="utf-8"))
     committed_yaml = yaml.safe_load(COMMITTED_YAML.read_text(encoding="utf-8"))
     assert committed_json == committed_yaml, (
-        "metric/airbds_metric_v0.5.json is out of sync with the YAML; "
+        "metric/airbds_metric_v1.0.json is out of sync with the YAML; "
         f"regenerate both with: python3 {bm.SCRIPT_PATH}"
     )
 
     # The JSON is what score.py reads; these are the fields it depends on.
-    assert committed_json["schema_version"] == "0.5"
+    assert committed_json["schema_version"] == "1.0"
     assert committed_json["grade_points"]
     assert committed_json["grading"]
     assert all(

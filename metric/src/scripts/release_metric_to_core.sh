@@ -9,8 +9,8 @@
 # published filename carries no version, a tag or release in airbds-core is what
 # downstream consumers pin to, so tagging stays a deliberate step.
 #
-#   ./metric/src/scripts/release_metric_to_core.sh 0.5
-#   ./metric/src/scripts/release_metric_to_core.sh v0.5 --dry-run
+#   ./metric/src/scripts/release_metric_to_core.sh 1.0
+#   ./metric/src/scripts/release_metric_to_core.sh v1.0 --dry-run
 #
 # The clone/branch/commit/push/PR mechanics live in scripts/publish-to-core.sh;
 # every option it takes (--dry-run, --draft, --base, --repo, --remote, --branch)
@@ -35,7 +35,7 @@ Publish metric/airbds_metric_v<version>.yaml to the root of the publication
 repository as ${DEST_FILE}, on a release branch, and open a pull request.
 
 Arguments:
-  <version>          Metric version to publish, e.g. 0.5 or v0.5
+  <version>          Metric version to publish, e.g. 1.0 or v1.0
 
 Options:
   --branch <name>    Release branch name (default: release/metric-v<version>)
@@ -64,9 +64,9 @@ done
 
 [ -n "$VERSION" ] || { usage >&2; die "a metric version is required"; }
 
-# Accept 0.5 or v0.5; carry the bare number around and add the v where needed.
+# Accept 1.0 or v1.0; carry the bare number around and add the v where needed.
 VERSION="${VERSION#v}"
-[[ "$VERSION" =~ ^[0-9]+\.[0-9]+$ ]] || die "version must look like 0.5 or v0.5, got: ${VERSION}"
+[[ "$VERSION" =~ ^[0-9]+\.[0-9]+$ ]] || die "version must look like 1.0 or v1.0, got: ${VERSION}"
 
 SRC_FILE="${REPO_ROOT}/metric/airbds_metric_v${VERSION}.yaml"
 [ -f "$SRC_FILE" ] || die "no metric file for v${VERSION} at ${SRC_FILE#"$REPO_ROOT"/}"

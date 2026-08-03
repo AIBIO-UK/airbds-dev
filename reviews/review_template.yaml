@@ -1,6 +1,6 @@
-# Review template — AIRBDS AI-Readiness Dataset Scoring Metric v0.5
+# Review template — AIRBDS AI-Readiness Dataset Scoring Metric v1.0
 # Fill in all fields. For each question, set answer to "Yes" or "No".
-# This YAML lists answer slots by question id; see airbds_metric_v0.5.yaml (or
+# This YAML lists answer slots by question id; see airbds_metric_v1.0.yaml (or
 # review_template.csv) for the full question text and guidance. Generic
 # reviewer instructions are in that metric's `instructions:` block.
 # See reviews/GUIDANCE.md and the metric YAML's grading block for grading details.
@@ -11,7 +11,7 @@
 # This validates the review, fills in the result block, and renames the file.
 # To submit, open a PR at https://github.com/AIBIO-UK/airbds-dev
 
-schema_version: "0.5"
+schema_version: "1.0"
 
 reviewer:
   name: ""            # Full name

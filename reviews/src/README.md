@@ -69,7 +69,7 @@ Notes:
   ```bash
   # {"ABC-01": "Yes", ...} for every question id in the metric
   python3 reviews/src/scripts/airbds_scoring.py answers.json \
-      --metric metric/airbds_metric_v0.5.json
+      --metric metric/airbds_metric_v1.0.json
   ```
 
 - `scripts/build_review_template.py` — generates the blank template pair
@@ -78,8 +78,8 @@ Notes:
   two formats always agree. Regenerate on a metric bump; `--check` for drift:
 
   ```bash
-  python3 reviews/src/scripts/build_review_template.py --version 0.5          # regenerate
-  python3 reviews/src/scripts/build_review_template.py --version 0.5 --check  # verify in sync
+  python3 reviews/src/scripts/build_review_template.py --version 1.0          # regenerate
+  python3 reviews/src/scripts/build_review_template.py --version 1.0 --check  # verify in sync
   ```
 
 Needs Python 3 with `pyyaml`, except `airbds_scoring.py`, which deliberately
