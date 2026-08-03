@@ -32,9 +32,12 @@ The split follows the [agentskills.io](https://agentskills.io) layout: data the
 skill reads lives in `assets/`, executables in `scripts/`. `score.py` therefore
 looks for its metric in `../assets/` rather than beside itself.
 
-Both channels have this layout and currently point at v0.5; a channel may sit on
-an older metric, so read the symlink rather than this diagram if you need a
-channel's actual version.
+Both source channels — `development/` and `testing/` — have this layout and
+currently point at v0.5; a channel may sit on an older metric, so read the
+symlink rather than this diagram if you need a channel's actual version. The
+`production` bundle is derived from the `testing` one at release time and so has
+the same layout by construction (see
+[`MAINTENANCE.md`](MAINTENANCE.md#promoting-to-production)).
 
 `assets/airbds_metric.json` is a complete description of the metric: every
 question, its scope and weighting, the reviewer guidance attached to it, and the

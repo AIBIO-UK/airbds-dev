@@ -184,10 +184,30 @@ first versioned, publicly released, machine-readable edition.*
 # Assessment skill
 
 Changes to the AIRBDS assessment skill (`skills/`). Each channel —
-`development` and `testing` — carries its own version in
-`skills/versions.json` and is published by its own build workflow, so a version
-below is scoped to the channel(s) named in its heading. See
+`development`, `testing`, and `production` — carries its own version in
+`skills/versions.json`, so a version below is scoped to the channel(s) named in
+its heading. `development` and `testing` are published by their own build
+workflows here; `production` is published to `airbds-core` by
+`skills/src/scripts/release_skill_to_core.sh`. See
 [`skills/docs/MAINTENANCE.md`](skills/docs/MAINTENANCE.md).
+
+## [0.7.1] — `production` (2026-08-03)
+
+- **`production` is now a release channel.** It has no source directory here: the
+  production bundle is the `testing` build with its release channel rewritten,
+  published to
+  [AIBIO-UK/airbds-core](https://github.com/AIBIO-UK/airbds-core) as
+  `skills/airbds-assessment-skill.zip` and existing nowhere else, so there is no
+  second copy to drift from it.
+- **This fixes a production skill that reported the wrong channel.** The zip
+  already in `airbds-core` was the `testing` artifact published untouched, so
+  every production install declared `metadata.channel: testing` and ran its
+  update check against `channels.testing`. A bundle carries its channel inside
+  it, so promoting without a rewrite could not have produced anything else.
+- `skills/versions.json` gains `channels.production` (metric 0.5, skill 0.7.1).
+  Its `skill_update_url` points at `airbds-core`, where the production zip
+  genuinely lives; `testing` and `development` still point at this repo's
+  releases, and the manifest itself still lives — and is still served from — here.
 
 ## [0.7.1] — `testing` (2026-07-30)
 
@@ -438,6 +458,39 @@ change the grade it is reported as having earned.
 
 Changes to the repository itself — workflows, tooling, documentation, and
 layout — that carry no version of their own. Recorded by month, newest first.
+
+## 2026-08
+
+### Added
+- `skills/src/scripts/rechannel_skill_zip.py` — derives the `production` skill
+  bundle from the tested `testing` one by substituting the channel token in
+  `SKILL.md`, and proves that is all it did. A bundle carries its channel inside
+  itself (`metadata.channel`, plus the prose naming which `channels.<name>` entry
+  of the update manifest to read), so the alternative to rewriting is either
+  shipping production users a bundle marked `testing`, or maintaining a third
+  copy of `SKILL.md` in a `production/` directory that differs from `testing` by
+  one word — duplication that drifts, and a build workflow publishing a
+  "production" release from the repo where production does not live. The rewrite
+  copies every other member verbatim (bytes, times, permissions, order) and
+  verifies the result: undoing the substitution must reproduce the source
+  `SKILL.md` byte for byte, nothing else may differ, and the result must not
+  still mention the old channel. It refuses when the source already mentions
+  `production`, the one case where a substitution cannot be undone and so cannot
+  be checked. `--check` runs the same verification against an already-published
+  zip, so a reviewer of the `airbds-core` PR can audit the artifact rather than
+  trust it. Tested in `skills/src/tests/test_rechannel_skill_zip.py` (9 tests).
+
+### Changed
+- `skills/src/scripts/release_skill_to_core.sh` now publishes to the
+  **`production`** channel rather than republishing the `testing` artifact as-is.
+  It still promotes rather than rebuilds — same download, same digest check — and
+  runs the result through `rechannel_skill_zip.py` before committing it, so what
+  ships is provably the tested artifact modulo the channel token. The version
+  gate moved from the `testing` entry in `skills/versions.json` to the
+  `production` entry, because that is what an installed production skill polls;
+  bump it before promoting. The PR body carries both sha256s and the `--check`
+  command that verifies them. `--force` still overrides a manifest disagreement
+  but never a failed rewrite: that would publish an artifact nobody can check.
 
 ## 2026-07
 

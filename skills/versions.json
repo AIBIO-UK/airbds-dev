@@ -1,9 +1,14 @@
 {
   "_comment": "Source of truth for the CURRENT AIRBDS assessment-skill release on each channel. The assessment skill fetches this at runtime to tell a user when a newer skill — one that assesses against a newer AIRBDS metric version — is available for THEIR OWN channel. A skill compares only against its own channel: a 'testing' skill is never nudged because 'development' has moved ahead. Update this file whenever a channel's released skill starts targeting a new metric version (see skills/README.md).",
-  "_comment_urls": "These URLs point at airbds-dev because the 'testing' and 'development' channels are development artifacts: the build workflows in this repo publish their zips as releases HERE. A future released channel is expected to be served from the publication repo (AIBIO-UK/airbds-core) instead — do not repoint these until that repo actually hosts the manifest and releases, or the update check will 404 again. Note that AIBIO-UK/airbds-metric now redirects to airbds-core, so an old URL resolves to the publication repo rather than to this one; a redirect is not a substitute for the file actually being there.",
+  "_comment_urls": "The 'testing' and 'development' skill_update_urls point at airbds-dev because those channels are development artifacts: the build workflows in this repo publish their zips as releases HERE. 'production' points at the publication repo (AIBIO-UK/airbds-core), which is where the production zip actually lives — it is published there by skills/src/scripts/release_skill_to_core.sh and exists nowhere else, so there is no second copy to drift. Note that the MANIFEST ITSELF still lives here and is still served from the raw_url below: that URL is baked into every published skill, so do not repoint it until airbds-core actually hosts this file. Note too that AIBIO-UK/airbds-metric now redirects to airbds-core, so an old URL resolves to the publication repo rather than to this one; a redirect is not a substitute for the file actually being there.",
   "manifest_version": 1,
   "raw_url": "https://raw.githubusercontent.com/AIBIO-UK/airbds-dev/main/skills/versions.json",
   "channels": {
+    "production": {
+      "metric_version": "0.5",
+      "skill_version": "0.7.1",
+      "skill_update_url": "https://github.com/AIBIO-UK/airbds-core/raw/main/skills/airbds-assessment-skill.zip"
+    },
     "testing": {
       "metric_version": "0.5",
       "skill_version": "0.7.1",

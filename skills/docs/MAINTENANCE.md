@@ -5,13 +5,25 @@ want to *use* a skill need none of this — see [`../README.md`](../README.md).
 
 ## Release channels
 
-The assessment skill is developed in channels, one directory each:
+The assessment skill is developed in channels:
 
 - `development/` — the working copy under active development.
 - `testing/` — the copy promoted to a testing release.
+- `production` — **not a directory here.** The production bundle is the `testing`
+  build with its release channel rewritten, published to
+  [AIBIO-UK/airbds-core](https://github.com/AIBIO-UK/airbds-core) as
+  `skills/airbds-assessment-skill.zip`. See
+  [Promoting to production](#promoting-to-production).
 
-There are no production skills yet. Each channel evolves independently: `testing`
-may sit on an older AIRBDS metric version while `development` has moved ahead.
+Each channel evolves independently: `testing` may sit on an older AIRBDS metric
+version while `development` has moved ahead.
+
+> **Why production has no source directory.** A third copy of `SKILL.md`
+> differing from `testing` by one word is exactly the kind of duplication that
+> drifts, and it would need a third build workflow publishing a
+> "production" release from a repo that is not where production lives. Deriving
+> it at release time instead means the production bundle exists in one place
+> only — `airbds-core` — so there is no second copy to get out of step.
 
 ## The version manifest (`versions.json`)
 
@@ -117,6 +129,11 @@ When a metric version bump is the trigger, follow the Coupled File Groups
 manifest in [`metric/README.md`](../../metric/README.md), which lists
 `versions.json` alongside every other coupled file.
 
+`channels.production` is the exception to "bump when the skill changes": nothing
+in this repo changes what production serves, so its entry moves only when a
+promotion is actually made — and it is bumped *before* running the release
+script, which refuses to publish a zip that entry does not advertise.
+
 Record every skill version bump — and every channel promotion — under the
 **Assessment skill** section of [`CHANGELOG.md`](../../CHANGELOG.md), with a
 heading naming the version and the channel(s) it applies to. Skill versions are
@@ -172,18 +189,60 @@ releases *in this repo*. Production is the publication repository,
 lives at `skills/airbds-assessment-skill.zip` — no channel and no version in the
 filename.
 
+Promotion is one step, which both produces the production bundle and opens the
+pull request that publishes it. There is no production zip in this repo to fall
+out of step with the one in `airbds-core`:
+
 ```bash
 ./skills/src/scripts/release_skill_to_core.sh --dry-run   # rehearse
 ./skills/src/scripts/release_skill_to_core.sh             # branch, push, PR
 ```
 
-It promotes the `testing` release asset **as built** rather than rebuilding it,
-so production gets byte-for-byte what was tested, and it refuses to publish a zip
-whose `metadata.version` disagrees with the `testing` entry in `versions.json`.
-Bump the manifest first, let the build workflow republish the release, then
-promote. See [`skills/src/README.md`](../src/README.md) for the full behaviour.
+Order of operations, because the script enforces it:
 
-> `versions.json`'s `skill_update_url`s still point at this repo's releases. They
-> are not repointed by publishing to `airbds-core` — that is a separate decision,
-> and the file's own `_comment_urls` explains why they must not move until
-> `airbds-core` actually hosts the manifest and releases.
+1. Promote `development` → `testing` as usual and let the `testing` build
+   workflow republish the release.
+2. Set `channels.production` in `versions.json` to the version being promoted,
+   and commit it. The script gates on **that** entry, not on `testing`, because
+   `channels.production` is what an installed production skill polls; publishing
+   a zip it does not advertise ships a version nothing announces.
+3. Run the script.
+
+### The channel rewrite
+
+The script starts from the `testing` release asset — the artifact people have
+actually been testing — and changes exactly one thing in it: the release channel.
+That step cannot be skipped. A bundle carries its channel *inside* it
+(`metadata.channel`, plus the prose naming which `channels.<name>` entry to read),
+so publishing the tested bytes untouched tells every production user, and the
+runtime update check, that they are on `testing` — which is how the zip currently
+in `airbds-core` came to claim the wrong channel.
+
+So the old byte-for-byte guarantee is not available, and is replaced by a
+verified one:
+[`skills/src/scripts/rechannel_skill_zip.py`](../src/scripts/rechannel_skill_zip.py)
+substitutes the channel token in `SKILL.md`, copies every other member verbatim
+(same bytes, times, and permissions), and then proves the result is only that:
+undoing the substitution must reproduce the tested `SKILL.md` byte for byte. It
+refuses if the source bundle already mentions `production` anywhere, because that
+is the one case where the substitution could not be undone — and so the one case
+where "only the channel changed" could not be checked. Reword the mention and
+rebuild the `testing` release.
+
+A reviewer can audit the published zip without trusting any of this:
+
+```bash
+skills/src/scripts/rechannel_skill_zip.py \
+  --in airbds-assessment-skill-testing.zip --check airbds-assessment-skill.zip
+```
+
+See [`skills/src/README.md`](../src/README.md) for the full behaviour.
+
+> `versions.json` itself still lives in **this** repo and is still served from
+> the `raw_url` baked into every published skill, including the production one —
+> publishing to `airbds-core` does not move it, and the file's own
+> `_comment_urls` explains why it must not move until `airbds-core` actually
+> hosts it. What *does* point at `airbds-core` is
+> `channels.production.skill_update_url`, because that is where the production
+> zip genuinely is. The `testing` and `development` URLs still point at this
+> repo's releases.

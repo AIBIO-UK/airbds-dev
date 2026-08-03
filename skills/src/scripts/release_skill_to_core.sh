@@ -1,14 +1,26 @@
 #!/usr/bin/env bash
 #
-# Publish the current testing assessment-skill zip to the publication repository.
+# Publish the production assessment-skill zip to the publication repository.
 #
-# This is the push to production. It promotes the exact artifact the testing
+# This is the push to production. It starts from the exact artifact the testing
 # channel's build workflow produced — the zip people have actually been testing —
-# rather than rebuilding it here, so what ships is byte-for-byte what was tested.
+# rather than rebuilding it here, and changes one thing in it: the release
+# channel. That step is unavoidable. A bundle carries its channel inside it
+# (metadata.channel in SKILL.md, and the prose naming which channels.<name>
+# entry of the update manifest to read), so shipping the tested bytes untouched
+# tells every production user, and the runtime update check, that they are on
+# 'testing' — which is exactly the bug this fixes.
+#
+# The rewrite is mechanical and verified rather than trusted: undoing it must
+# reproduce the tested SKILL.md byte for byte, and every other member of the zip
+# is copied verbatim. So what ships is provably the tested artifact modulo the
+# channel token. See skills/src/scripts/rechannel_skill_zip.py, which a reviewer
+# can re-run with --check against the published zip.
+#
 # The zip is downloaded from the airbds-dev release, checked against its
-# published digest and against skills/versions.json, then committed to
-# AIBIO-UK/airbds-core as skills/airbds-assessment-skill.zip on a release branch,
-# with a pull request left open for review.
+# published digest and against skills/versions.json, rechannelled, then committed
+# to AIBIO-UK/airbds-core as skills/airbds-assessment-skill.zip on a release
+# branch, with a pull request left open for review.
 #
 #   ./skills/src/scripts/release_skill_to_core.sh
 #   ./skills/src/scripts/release_skill_to_core.sh --dry-run
@@ -19,18 +31,22 @@
 # skill". Pin a tag or release there to depend on a specific build.
 #
 # The clone/branch/commit/push/PR mechanics live in scripts/publish-to-core.sh.
-# Needs git, unzip, and gh (authenticated) — gh is required even for --dry-run
-# unless --zip supplies the artifact locally.
+# Needs git, unzip, python3, and gh (authenticated) — gh is required even for
+# --dry-run unless --zip supplies the artifact locally.
 # See skills/src/README.md for the full workflow.
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
 PUBLISH="${REPO_ROOT}/scripts/publish-to-core.sh"
 MANIFEST="${REPO_ROOT}/skills/versions.json"
+RECHANNEL="${REPO_ROOT}/skills/src/scripts/rechannel_skill_zip.py"
 
-CHANNEL="testing"
-RELEASE_TAG="assessment-skill-${CHANNEL}"
-ASSET_NAME="airbds-assessment-skill-${CHANNEL}.zip"
+# The channel promoted from, and the channel published as. Only the second one
+# is what production users see; the first is where the artifact came from.
+SOURCE_CHANNEL="testing"
+TARGET_CHANNEL="production"
+RELEASE_TAG="assessment-skill-${SOURCE_CHANNEL}"
+ASSET_NAME="airbds-assessment-skill-${SOURCE_CHANNEL}.zip"
 SOURCE_REPO="AIBIO-UK/airbds-dev"
 
 # Neither channel nor version — see the header note.
@@ -42,15 +58,18 @@ usage() {
   cat <<EOF
 Usage: $(basename "$0") [options]
 
-Promote the current ${CHANNEL} assessment-skill zip to the publication
-repository as ${DEST_FILE}, on a release branch, and open a pull request.
+Promote the current ${SOURCE_CHANNEL} assessment-skill zip to the publication
+repository, rewritten to the '${TARGET_CHANNEL}' channel, on a release branch,
+and open a pull request.
 
-The artifact is downloaded from the ${SOURCE_REPO} '${RELEASE_TAG}' release,
-so what ships is exactly what was tested.
+  published to:  ${DEST_FILE}
+  taken from:    ${SOURCE_REPO} '${RELEASE_TAG}' release
+
+So what ships is what was tested, with only its channel changed — verifiably so.
 
 Options:
   --zip <file>       Publish this local zip instead of downloading the release.
-                     Skips the digest check; the manifest checks still run
+                     Skips the digest check; every other check still runs
   --branch <name>    Release branch name (default: release/skill-v<version>)
   --dry-run          Commit locally only — no push, no PR
   --draft            Open the pull request as a draft
@@ -79,6 +98,7 @@ while [ $# -gt 0 ]; do
 done
 
 command -v unzip >/dev/null 2>&1 || die "unzip is required"
+command -v python3 >/dev/null 2>&1 || die "python3 is required"
 
 WORK="$(mktemp -d)"
 trap 'rm -rf "$WORK"' EXIT
@@ -113,7 +133,7 @@ else
   RELEASE_NOTE="[\`${ASSET_NAME}\`](https://github.com/${SOURCE_REPO}/releases/download/${RELEASE_TAG}/${ASSET_NAME}), built ${PUBLISHED_AT}"
 fi
 
-ZIP_SHA256="$(sha256sum "$ZIP" | cut -d' ' -f1)"
+SOURCE_SHA256="$(sha256sum "$ZIP" | cut -d' ' -f1)"
 
 # ------------------------------------------------- what is actually in the zip
 unzip -q -o "$ZIP" SKILL.md -d "$WORK/inspect" 2>/dev/null ||
@@ -131,11 +151,13 @@ zip_channel="$(sed -n 's/^  channel: *"\{0,1\}\([^"]*\)"\{0,1\} *$/\1/p' "$SKILL
 echo "==> zip contains skill v${zip_version} (channel: ${zip_channel})"
 
 problems=()
-[ "$zip_channel" = "$CHANNEL" ] ||
-  problems+=("zip is from the '${zip_channel}' channel, expected '${CHANNEL}'")
+[ "$zip_channel" = "$SOURCE_CHANNEL" ] ||
+  problems+=("zip is from the '${zip_channel}' channel, expected '${SOURCE_CHANNEL}'")
 
 # skills/versions.json is what the published skills poll for updates, so a zip
 # that disagrees with it would ship users a version the manifest never announces.
+# The entry that matters is the TARGET channel's: that is the one production
+# skills will read once this zip is installed.
 manifest_version=""
 manifest_metric=""
 if [ -f "$MANIFEST" ]; then
@@ -145,14 +167,14 @@ if [ -f "$MANIFEST" ]; then
 import json, sys
 c = json.load(open(sys.argv[1]))['channels'].get(sys.argv[2], {})
 print(c.get('skill_version', '-'), c.get('metric_version', '-'))
-" "$MANIFEST" "$CHANNEL" 2>/dev/null || echo '- -')"
+" "$MANIFEST" "$TARGET_CHANNEL" 2>/dev/null || echo '- -')"
   if [ "$manifest_version" = "-" ]; then manifest_version=""; fi
   if [ "$manifest_metric" = "-" ]; then manifest_metric=""; fi
 
   [ -n "$manifest_version" ] ||
-    problems+=("skills/versions.json has no skill_version for the '${CHANNEL}' channel")
+    problems+=("skills/versions.json has no skill_version for the '${TARGET_CHANNEL}' channel — add one before promoting, or the published skill polls an entry that does not exist")
   if [ -n "$manifest_version" ] && [ "$manifest_version" != "$zip_version" ]; then
-    problems+=("zip is skill v${zip_version} but skills/versions.json advertises v${manifest_version} for '${CHANNEL}' — the manifest is what installed skills poll, so publishing this would ship a version nothing announces")
+    problems+=("zip is skill v${zip_version} but skills/versions.json advertises v${manifest_version} for '${TARGET_CHANNEL}' — the manifest is what installed skills poll, so publishing this would ship a version nothing announces")
   fi
 else
   problems+=("skills/versions.json not found at ${MANIFEST}")
@@ -170,24 +192,51 @@ if [ ${#problems[@]} -gt 0 ]; then
   echo "warning: --force given, publishing anyway" >&2
 fi
 
+# ----------------------------------------------------------- the channel swap
+# Only SKILL.md changes, and only its channel token; the rewrite is verified to
+# be exactly reversible before this returns, so a failure here means the bundle
+# could not be promoted without an unprovable edit. Not something --force covers.
+PUBLISH_ZIP="${WORK}/airbds-assessment-skill-${TARGET_CHANNEL}.zip"
+echo "==> rewriting channel ${SOURCE_CHANNEL} -> ${TARGET_CHANNEL}"
+python3 "$RECHANNEL" \
+  --in "$ZIP" --out "$PUBLISH_ZIP" \
+  --from "$SOURCE_CHANNEL" --to "$TARGET_CHANNEL" ||
+  die "could not rewrite the bundle's channel — nothing published"
+
+PUBLISH_SHA256="$(sha256sum "$PUBLISH_ZIP" | cut -d' ' -f1)"
+
 [ -n "$BRANCH" ] || BRANCH="release/skill-v${zip_version}"
 
 SRC_COMMIT="$(git -C "$REPO_ROOT" rev-parse --short HEAD 2>/dev/null || echo unknown)"
 
-BODY="Promotes the **${CHANNEL}** AIRBDS assessment skill to production as \`${DEST_FILE}\`.
+BODY="Promotes the **${SOURCE_CHANNEL}** AIRBDS assessment skill to
+**${TARGET_CHANNEL}** as \`${DEST_FILE}\`.
 
 | | |
 |---|---|
 | Skill version | ${zip_version} |
 | Metric version | ${manifest_metric:-unknown} |
+| Published as channel | ${TARGET_CHANNEL} |
 | Built from channel | ${zip_channel} |
-| Artifact | ${RELEASE_NOTE} |
-| sha256 | \`${ZIP_SHA256}\` |
+| Source artifact | ${RELEASE_NOTE} |
+| Source sha256 | \`${SOURCE_SHA256}\` |
+| Published sha256 | \`${PUBLISH_SHA256}\` |
 | Released from | AIBIO-UK/airbds-dev@${SRC_COMMIT} |
 
-This is the artifact the testing channel's build workflow produced — it is
-promoted as built, not rebuilt here, so what ships is byte-for-byte what was
-tested. Verify by comparing the sha256 above against the release asset.
+This is the artifact the \`${SOURCE_CHANNEL}\` channel's build workflow produced
+— not rebuilt here — with exactly one mechanical change: the release channel in
+\`SKILL.md\`, which a bundle carries inside itself, is rewritten from
+\`${SOURCE_CHANNEL}\` to \`${TARGET_CHANNEL}\`. Every other file is copied
+verbatim, and the rewrite is verified to be exactly reversible, so undoing it
+reproduces the tested \`SKILL.md\` byte for byte.
+
+To check that claim rather than take it, download the source artifact above and
+run, from a checkout of AIBIO-UK/airbds-dev:
+
+\`\`\`
+skills/src/scripts/rechannel_skill_zip.py \\
+  --in ${ASSET_NAME} --check airbds-assessment-skill.zip
+\`\`\`
 
 The published filename carries neither channel nor version; pin a tag or release
 in this repository to depend on a specific build.
@@ -197,15 +246,16 @@ Opened by \`skills/src/scripts/release_skill_to_core.sh\`."
 # Called rather than exec'd: the zip lives in $WORK, so the cleanup trap has to
 # survive until publish-to-core.sh has copied it.
 "$PUBLISH" \
-  --src "$ZIP" \
+  --src "$PUBLISH_ZIP" \
   --dest "$DEST_FILE" \
   --branch "$BRANCH" \
   --title "Release AIRBDS assessment skill v${zip_version}" \
   --body "$BODY" \
   --commit-message "release: publish AIRBDS assessment skill v${zip_version}
 
-Promotes the ${CHANNEL} channel build from AIBIO-UK/airbds-dev@${SRC_COMMIT}
-to ${DEST_FILE}.
+Promotes the ${SOURCE_CHANNEL} channel build from AIBIO-UK/airbds-dev@${SRC_COMMIT}
+to ${DEST_FILE}, rewritten to the ${TARGET_CHANNEL} channel.
 
-sha256: ${ZIP_SHA256}" \
+source sha256:    ${SOURCE_SHA256}
+published sha256: ${PUBLISH_SHA256}" \
   ${PASSTHROUGH[@]+"${PASSTHROUGH[@]}"}

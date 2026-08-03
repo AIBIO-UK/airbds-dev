@@ -16,6 +16,7 @@ import hashlib
 import json
 import os
 import subprocess
+import sys
 import zipfile
 from pathlib import Path
 
@@ -40,7 +41,8 @@ def _read_gh_calls(path):
     return [a.decode() for a in raw.split(b"\0")[:-1]] if raw else []
 
 
-def _manifest_skill_version(channel="testing"):
+def _manifest_skill_version(channel="production"):
+    """The gate is the *target* channel's entry — what production skills poll."""
     return json.loads(MANIFEST.read_text())["channels"][channel]["skill_version"]
 
 
@@ -50,7 +52,7 @@ def _git(*args, cwd):
     ).stdout
 
 
-def _make_zip(tmp_path, version=None, channel="testing", name="skill.zip"):
+def _make_zip(tmp_path, version=None, channel="testing", name="skill.zip", body=""):
     """A minimal skill bundle: SKILL.md frontmatter is all the script reads."""
     if version is None:
         version = _manifest_skill_version()
@@ -62,6 +64,7 @@ def _make_zip(tmp_path, version=None, channel="testing", name="skill.zip"):
         f'  version: "{version}"\n'
         f"  channel: {channel}\n"
         "---\n\n# AIRBDS assessment skill\n"
+        f"\nLook up `channels.{channel}` in the manifest.\n{body}"
     )
     path = tmp_path / name
     with zipfile.ZipFile(path, "w") as z:
@@ -69,6 +72,23 @@ def _make_zip(tmp_path, version=None, channel="testing", name="skill.zip"):
         z.writestr("assets/airbds_metric.json", '{"schema_version": "0.5"}')
         z.writestr("scripts/score.py", "# scorer\n")
     return path
+
+
+def _rechannel(zip_path, out_path, src="testing", dst="production"):
+    """What the release script publishes, produced the same way it produces it."""
+    subprocess.run(
+        [
+            sys.executable,
+            str(REPO_ROOT / "skills" / "src" / "scripts" / "rechannel_skill_zip.py"),
+            "--in", str(zip_path),
+            "--out", str(out_path),
+            "--from", src,
+            "--to", dst,
+        ],
+        check=True,
+        capture_output=True,
+    )
+    return out_path
 
 
 def _make_origin(tmp_path, seed_zip=None):
@@ -137,21 +157,34 @@ def test_publishes_zip_and_opens_pr(tmp_path):
     assert branch in _remote_branches(origin)
 
     # Compare bytes, not text — a corrupted binary commit is the failure mode.
-    published = subprocess.run(
+    published_bytes = subprocess.run(
         ["git", "show", f"{branch}:{DEST_FILE}"],
         cwd=origin, check=True, capture_output=True,
     ).stdout
-    assert published == zip_path.read_bytes()
-    assert zipfile.ZipFile(zip_path).testzip() is None
+    published = tmp_path / "published.zip"
+    published.write_bytes(published_bytes)
+    assert zipfile.ZipFile(published).testzip() is None
+
+    # What ships is the source with its channel rewritten — so not the source
+    # bytes, but the bytes the same rewrite produces from them.
+    assert published_bytes != zip_path.read_bytes()
+    assert published_bytes == _rechannel(zip_path, tmp_path / "expected.zip").read_bytes()
+
+    skill_md = zipfile.ZipFile(published).read("SKILL.md").decode()
+    assert "channel: production" in skill_md
+    assert "channels.production" in skill_md
+    assert "testing" not in skill_md
 
     assert "pr" in gh_args and "create" in gh_args
     assert gh_args[gh_args.index("--head") + 1] == branch
     assert gh_args[gh_args.index("--base") + 1] == "main"
     assert version in gh_args[gh_args.index("--title") + 1]
 
-    # The PR body must carry the digest a reviewer checks against the release.
+    # The PR body must carry both digests: the source one a reviewer checks
+    # against the release, and the published one they check against the commit.
     body = gh_args[gh_args.index("--body") + 1]
     assert hashlib.sha256(zip_path.read_bytes()).hexdigest() in body
+    assert hashlib.sha256(published_bytes).hexdigest() in body
     assert "https://github.com/fake/core/pull/1" in proc.stdout
 
 
@@ -177,13 +210,38 @@ def test_force_overrides_version_mismatch(tmp_path):
 
 
 def test_refuses_wrong_channel(tmp_path):
-    """Only the testing channel is promoted to production."""
-    zip_path = _make_zip(tmp_path, channel="development")
+    """Only a testing build is promoted — including one already marked production."""
+    for channel in ("development", "production"):
+        zip_path = _make_zip(tmp_path, channel=channel, name=f"{channel}.zip")
+        sub = tmp_path / channel
+        sub.mkdir()
+        origin = _make_origin(sub)
+        proc, _ = _run(tmp_path, origin, zip_path, expect_ok=False)
+
+        assert proc.returncode != 0
+        assert f"'{channel}' channel" in proc.stderr
+        assert _remote_branches(origin) == ["main"]
+
+
+def test_refuses_an_unverifiable_channel_rewrite(tmp_path):
+    """A bundle already mentioning 'production' cannot be rewritten provably."""
+    zip_path = _make_zip(tmp_path, body="\nNot for production use.\n")
     origin = _make_origin(tmp_path)
-    proc, _ = _run(tmp_path, origin, zip_path, expect_ok=False)
+    proc, gh_args = _run(tmp_path, origin, zip_path, expect_ok=False)
 
     assert proc.returncode != 0
-    assert "'development' channel" in proc.stderr
+    assert "not reversible" in proc.stderr
+    assert _remote_branches(origin) == ["main"]
+    assert gh_args == []
+
+
+def test_force_does_not_override_a_failed_rewrite(tmp_path):
+    """--force covers a manifest disagreement, never an unprovable artifact."""
+    zip_path = _make_zip(tmp_path, body="\nNot for production use.\n")
+    origin = _make_origin(tmp_path)
+    proc, _ = _run(tmp_path, origin, zip_path, "--force", expect_ok=False)
+
+    assert proc.returncode != 0
     assert _remote_branches(origin) == ["main"]
 
 
@@ -209,8 +267,10 @@ def test_dry_run_pushes_nothing(tmp_path):
 
 
 def test_no_op_when_already_published(tmp_path):
+    """Already-published means the rewritten zip, since that is what is shipped."""
     zip_path = _make_zip(tmp_path)
-    origin = _make_origin(tmp_path, seed_zip=zip_path)
+    published = _rechannel(zip_path, tmp_path / "published.zip")
+    origin = _make_origin(tmp_path, seed_zip=published)
     proc, gh_args = _run(tmp_path, origin, zip_path)
 
     assert _remote_branches(origin) == ["main"]
@@ -237,7 +297,6 @@ def test_missing_zip_is_an_error(tmp_path):
 
 
 if __name__ == "__main__":
-    import sys
     import tempfile
 
     failures = 0
