@@ -231,6 +231,27 @@ workflows here; `production` is published to `airbds-core` by
 `skills/src/scripts/release_skill_to_core.sh`. See
 [`skills/docs/MAINTENANCE.md`](skills/docs/MAINTENANCE.md).
 
+## [0.8.0] — `development` and `testing` (2026-08-04)
+
+- **Repointed at AIRBDS metric v1.0.0** (was 0.5), by moving each channel's
+  `assets/airbds_metric.json` symlink to `metric/airbds_metric_v1.0.0.json`.
+  Nothing in `SKILL.md` names a metric version — the skill reads `schema_version`
+  out of the bundle — so repointing the symlink is the whole change, and both
+  channels' bundled `score.py` scores an all-Yes sheet at 782/Gold exactly as
+  before. The metric is the same instrument under a stable version number (see
+  the `[1.0.0]` entry under [Metric](#metric)); the version users are told they
+  are being assessed against is what changes.
+- Promoted `development` to `testing` at 0.8.0: `SKILL.md` copied across with
+  only the channel-specific references swapped (`development` → `testing`), so
+  the two files differ in that word alone.
+- `skills/versions.json` `channels.{development,testing}` bumped to
+  `metric_version` 1.0.0 / `skill_version` 0.8.0. A MINOR bump, not a patch: the
+  skill now assesses against a different metric document, which is a change in
+  what it does rather than a fix to how it does it.
+- Both build workflows' `paths:` filters follow the repointed symlink to
+  `metric/airbds_metric_v1.0.0.json`; a stale filter would have left each
+  published zip carrying the withdrawn metric, silently.
+
 ## [0.7.1] — `production` (2026-08-03)
 
 - **`production` is now a release channel.** It has no source directory here: the
