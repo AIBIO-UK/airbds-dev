@@ -231,6 +231,24 @@ workflows here; `production` is published to `airbds-core` by
 `skills/src/scripts/release_skill_to_core.sh`. See
 [`skills/docs/MAINTENANCE.md`](skills/docs/MAINTENANCE.md).
 
+## [0.8.1] — all channels (2026-08-04)
+
+- **Expanded AIRBDS correctly.** `SKILL.md` glossed the acronym as "AI-Ready
+  Biological Data Sets" in two places — the frontmatter `description` and the
+  goal statement. The working group, and every other file in this repository
+  (`README.md`, `CONTRIBUTING.md`, `CITATION.cff`, every metric YAML header),
+  calls it **AI-Ready Bioscience Datasets**. The skill was the only thing using
+  the other wording, and it is the artifact users install, so it was also the
+  most visible place to have it wrong.
+- Wording only: no change to the questions, the scoring, the bundled metric, or
+  any behaviour. A PATCH bump on all three channels — `development` and
+  `testing` rebuilt from source, `production` promoted from the `testing` build
+  as usual. The `description` is what an assistant matches on when deciding to
+  invoke the skill, so it ships in the bundle rather than waiting for the next
+  substantive release.
+- The same correction was applied to the retained (deprecated) Gemini variant at
+  `skills/GF/GF-airbds-assessment-skill/SKILL.md`, which carries no version.
+
 ## [0.8.0] — all channels (2026-08-04)
 
 - **Repointed at AIRBDS metric v1.0.0** (was 0.5), by moving each channel's
