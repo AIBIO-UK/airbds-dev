@@ -28,7 +28,7 @@ Download the blank review template directly from the repository:
 
 To download: click the link above, then on GitHub click the **Download raw file** button (the down-arrow icon near the top-right of the file view).
 
-> The canonical question reference — with full guidance text and weights — is in [metric/airbds_metric_v1.0.yaml](../../metric/airbds_metric_v1.0.yaml).
+> The canonical question reference — with full guidance text and weights — is in [metric/airbds_metric_v1.0.0.yaml](../../metric/airbds_metric_v1.0.0.yaml).
 
 ---
 
@@ -54,7 +54,7 @@ Click in the **`value`** cell next to each field and type your information:
 
 | Field | What to enter |
 |---|---|
-| `schema_version` | Leave as `1.0` |
+| `schema_version` | Leave as `1.0.0` |
 | `reviewer_name` | Your full name |
 | `reviewer_initials` | Your initials (e.g. `CH`) |
 | `reviewer_orcid` | Your ORCID (e.g. `0000-0000-0000-0000`), or leave blank |
@@ -153,7 +153,7 @@ Look up your critical, important, and optional pass rates in this table:
 | Silver | ⚪ | = 1.0 (all) | ≥ 0.5 | any |
 | Gold | 🟡 | = 1.0 (all) | = 1.0 (all) | ≥ 0.5 |
 
-What the grades mean is explained in [reviews/GUIDANCE.md](../GUIDANCE.md); the thresholds are in the metric (`airbds_metric_v1.0.yaml`).
+What the grades mean is explained in [reviews/GUIDANCE.md](../GUIDANCE.md); the thresholds are in the metric (`airbds_metric_v1.0.0.yaml`).
 
 ---
 

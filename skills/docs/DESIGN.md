@@ -22,7 +22,7 @@ given URL. Its body is the instructions the assistant follows once invoked.
 airbds-assessment-skill/
 ├── SKILL.md
 ├── assets/
-│   ├── airbds_metric.json     → ../../../../metric/airbds_metric_v1.0.json
+│   ├── airbds_metric.json     → ../../../../metric/airbds_metric_v1.0.0.json
 │   └── review_template.yaml   → ../../../../reviews/review_template.yaml
 └── scripts/
     └── score.py               → ../../../../reviews/src/scripts/airbds_scoring.py
@@ -33,7 +33,7 @@ skill reads lives in `assets/`, executables in `scripts/`. `score.py` therefore
 looks for its metric in `../assets/` rather than beside itself.
 
 Both source channels — `development/` and `testing/` — have this layout and
-currently point at v1.0; a channel may sit on an older metric, so read the
+currently point at v1.0.0; a channel may sit on an older metric, so read the
 symlink rather than this diagram if you need a channel's actual version. The
 `production` bundle is derived from the `testing` one at release time and so has
 the same layout by construction (see

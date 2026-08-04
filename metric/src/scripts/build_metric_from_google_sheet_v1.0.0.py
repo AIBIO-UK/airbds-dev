@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
-"""Build the canonical v1.0 metric files from the AIRBDS Google Sheet.
+"""Build the canonical v1.0.0 metric files from the AIRBDS Google Sheet.
 
-Like v0.4 and v0.5 before it, v1.0 is authored in a public Google Sheet (the
+Like v0.4 and v0.5 before it, v1.0.0 is authored in a public Google Sheet (the
 working group's live doc). This script pulls the Scoring, Lookups, and
 Instructions tabs via the public CSV export (the sheet's own export format, not
 this script's output format) and regenerates the metric files from them.
 
 Two renderings of the same metric are written:
 
-  * airbds_metric_v1.0.yaml — the canonical, human-readable form. Carries the
+  * airbds_metric_v1.0.0.yaml — the canonical, human-readable form. Carries the
     explanatory comments and is what people read and review.
-  * airbds_metric_v1.0.json — the same content for consumers that must run
+  * airbds_metric_v1.0.0.json — the same content for consumers that must run
     without a YAML parser, notably the assessment skill's bundled scoring
     script (see skills/docs/DESIGN.md). Produced by parsing the YAML this
     script just rendered and re-serialising it, so the two cannot disagree:
@@ -19,19 +19,19 @@ Two renderings of the same metric are written:
     only maintainer commentary is lost.
 
 Usage:
-    # Regenerate metric/airbds_metric_v1.0.yaml from the live sheet
-    python3 metric/src/scripts/build_metric_from_google_sheet_v1.0.py
+    # Regenerate metric/airbds_metric_v1.0.0.yaml from the live sheet
+    python3 metric/src/scripts/build_metric_from_google_sheet_v1.0.0.py
 
     # Verify the committed file still matches the live sheet (the drift check)
-    python3 metric/src/scripts/build_metric_from_google_sheet_v1.0.py --check
+    python3 metric/src/scripts/build_metric_from_google_sheet_v1.0.0.py --check
 
     # Work offline from exported CSVs instead of fetching
-    python3 metric/src/scripts/build_metric_from_google_sheet_v1.0.py \
+    python3 metric/src/scripts/build_metric_from_google_sheet_v1.0.0.py \
         --scoring-csv scoring.csv --lookups-csv lookups.csv \
         --instructions-csv instructions.csv
 
-Schema notes (v1.0):
-  * v1.0 declares the metric stable. It supersedes v0.5 with no change to the
+Schema notes (v1.0.0):
+  * v1.0.0 declares the metric stable. It supersedes v0.5 with no change to the
     questions, weights, or grade thresholds — the same 25 questions, the same
     Critical/Important/Optional tiers, the same grading table. v0.5 was
     withdrawn rather than retained: no review ever carried
@@ -88,10 +88,10 @@ SCRIPT_PATH = f"metric/src/scripts/{Path(__file__).name}"
 
 # ── Editorial config (NOT in the sheet — edit here) ──────────────────────────
 
-VERSION = "1.0"
+VERSION = "1.0.0"
 
 DEFAULT_SHEET = "https://docs.google.com/spreadsheets/d/13w-MiUQc2sLzRFqRQD_YT6BisE3Orv5Oj3i0YBw7r_M/edit"
-DEFAULT_OUTPUT = REPO_ROOT / "metric" / "airbds_metric_v1.0.yaml"
+DEFAULT_OUTPUT = REPO_ROOT / "metric" / "airbds_metric_v1.0.0.yaml"
 
 METADATA = {
     "metric_name": "AIRBDS AI-Readiness Dataset Scoring Metric",
@@ -578,7 +578,7 @@ def write_manifest(path: Path, src: dict, content_sha256: str, generated_at: str
 
 
 def main() -> None:
-    ap = argparse.ArgumentParser(description="Build the v1.0 metric YAML + JSON from the Google Sheet.")
+    ap = argparse.ArgumentParser(description="Build the v1.0.0 metric YAML + JSON from the Google Sheet.")
     ap.add_argument("--sheet", default=DEFAULT_SHEET, help="sheet URL or id (default: the canonical sheet)")
     ap.add_argument("--scoring-csv", type=Path, help="local Scoring tab CSV (offline; with --lookups-csv/--instructions-csv)")
     ap.add_argument("--lookups-csv", type=Path, help="local Lookups tab CSV (offline)")

@@ -69,7 +69,7 @@ def _make_zip(tmp_path, version=None, channel="testing", name="skill.zip", body=
     path = tmp_path / name
     with zipfile.ZipFile(path, "w") as z:
         z.writestr("SKILL.md", skill_md)
-        z.writestr("assets/airbds_metric.json", '{"schema_version": "1.0"}')
+        z.writestr("assets/airbds_metric.json", '{"schema_version": "1.0.0"}')
         z.writestr("scripts/score.py", "# scorer\n")
     return path
 

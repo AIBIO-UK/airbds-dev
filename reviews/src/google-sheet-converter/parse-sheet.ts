@@ -32,15 +32,22 @@ export function extractReviewInfo(rows: string[][]): Map<string, string> {
   return info;
 }
 
-/** Matches the "… Metric v1.0" version label on the Instructions tab. */
-const METRIC_VERSION = /Metric\s+v\.?\s*(\d+\.\d+)/i;
+/**
+ * Matches the "… Metric v1.0.0" version label on the Instructions tab.
+ *
+ * The patch component is optional but must be captured when present: without
+ * it the pattern silently truncates "v1.0.0" to "1.0" and the caller then
+ * looks for a metric file that does not exist. Retained v0.3 and v0.4 sheets
+ * carry two-part labels, so it cannot be required.
+ */
+const METRIC_VERSION = /Metric\s+v\.?\s*(\d+\.\d+(?:\.\d+)?)/i;
 
 /**
  * Read the metric version the sheet declares for itself, from the review-info
- * (Instructions) tab — e.g. the "AIRBDS Dataset Metric v1.0" title cell. The
+ * (Instructions) tab — e.g. the "AIRBDS Dataset Metric v1.0.0" title cell. The
  * sheet is trusted for the version (it is only ever distrusted for the score),
  * so the right metric/airbds_metric_v<version>.yaml can be selected without a
- * flag. Returns the version string (e.g. "1.0") or null if no version is found.
+ * flag. Returns the version string (e.g. "1.0.0") or null if no version is found.
  */
 export function detectSchemaVersion(reviewCsv: string): string | null {
   for (const row of parseCsv(reviewCsv)) {

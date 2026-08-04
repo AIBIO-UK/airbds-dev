@@ -9,7 +9,7 @@ dataset against an older metric version.
 
 **For new reviews, use the current template in the parent directory**
 ([`reviews/review_template.yaml`](../review_template.yaml) /
-[`review_template.csv`](../review_template.csv) — currently v1.0). You only need a
+[`review_template.csv`](../review_template.csv) — currently v1.0.0). You only need a
 file from here if you specifically want to review against an earlier metric.
 
 Each review carries a `schema_version` field; the review processor scores it

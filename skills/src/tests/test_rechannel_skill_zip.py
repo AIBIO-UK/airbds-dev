@@ -43,7 +43,7 @@ Look up `channels.{channel}` in the manifest, matching this skill's own
 
 # Modes matter: score.py is executable in the bundle and must stay that way.
 MEMBERS = {
-    "assets/airbds_metric.json": (b'{"schema_version": "1.0"}', 0o644),
+    "assets/airbds_metric.json": (b'{"schema_version": "1.0.0"}', 0o644),
     "scripts/score.py": (b"#!/usr/bin/env python3\n", 0o755),
 }
 

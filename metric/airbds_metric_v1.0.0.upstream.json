@@ -1,0 +1,8 @@
+{
+  "metric_version": "1.0.0",
+  "sheet_url": "https://docs.google.com/spreadsheets/d/13w-MiUQc2sLzRFqRQD_YT6BisE3Orv5Oj3i0YBw7r_M/edit",
+  "sheet_id": "13w-MiUQc2sLzRFqRQD_YT6BisE3Orv5Oj3i0YBw7r_M",
+  "content_sha256": "54987a09312575b54502c45a84d35f2c1803ab0d1b4323d35f939dd2ffbd496c",
+  "generated_at": "2026-08-04T17:07:49Z",
+  "generator": "metric/src/scripts/build_metric_from_google_sheet_v1.0.0.py"
+}

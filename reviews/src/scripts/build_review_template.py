@@ -14,10 +14,10 @@ scorer reads it.
 
 Usage:
     # Regenerate reviews/review_template.{yaml,csv} for the current metric
-    python3 reviews/src/scripts/build_review_template.py --version 1.0
+    python3 reviews/src/scripts/build_review_template.py --version 1.0.0
 
     # Verify the committed pair still matches the metric (suitable for CI)
-    python3 reviews/src/scripts/build_review_template.py --version 1.0 --check
+    python3 reviews/src/scripts/build_review_template.py --version 1.0.0 --check
 
 Exit codes:
     0 — wrote the files (default), or --check found both already in sync

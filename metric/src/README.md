@@ -7,9 +7,9 @@ pins how it is built:
 - **v0.3** — from the committed spreadsheet in [`metric/upstream/`](../upstream/).
 - **v0.4** — from the working group's public Google Sheet (the editing interface
   lives in Drive; the generated YAML in the repo is the source of truth).
-- **v1.0** — from the working group's public Google Sheet (as v0.4), and also
+- **v1.0.0** — from the working group's public Google Sheet (as v0.4), and also
   captures the sheet's Instructions tab into the metric YAML. Its generator is
-  the v0.5 one renamed: v1.0 supersedes v0.5 unchanged, and v0.5 was withdrawn.
+  the v0.5 one renamed: v1.0.0 supersedes v0.5 unchanged, and v0.5 was withdrawn.
 
 > **Review tooling** (the Google-Sheet → review-YAML converter and the review
 > processor/scorer) lives under [`reviews/src/`](../../reviews/src/), beside the
@@ -80,11 +80,11 @@ change the metric and will fail the check, because that text ships to reviewers.
 description, and the scope descriptions — lives in the script's `CONFIG` block;
 edit it there and re-run.
 
-## v1.0 — from the public Google Sheet
+## v1.0.0 — from the public Google Sheet
 
-`scripts/build_metric_from_google_sheet_v1.0.py` works like the v0.4
-script (pulls the Scoring and Lookups tabs from the [v1.0 sheet][sheet-v10] via
-the public CSV export and regenerates `metric/airbds_metric_v1.0.yaml`), with
+`scripts/build_metric_from_google_sheet_v1.0.0.py` works like the v0.4
+script (pulls the Scoring and Lookups tabs from the [v1.0.0 sheet][sheet-v100] via
+the public CSV export and regenerates `metric/airbds_metric_v1.0.0.yaml`), with
 three differences, all inherited from v0.5:
 
 - **Instructions capture.** It also pulls the sheet's **Instructions** tab and
@@ -99,7 +99,7 @@ three differences, all inherited from v0.5:
   a flat `Grade / Points` table). The `Required proportions` grading table is
   unchanged.
 - **A JSON rendering alongside the YAML.** Each run also writes
-  `metric/airbds_metric_v1.0.json` for consumers that cannot depend on a YAML
+  `metric/airbds_metric_v1.0.0.json` for consumers that cannot depend on a YAML
   parser — chiefly the assessment skill's bundled scorer, which must run in
   whatever environment the user's AI assistant provides. It is produced by
   parsing the YAML the run has just rendered and re-serialising it, so it is the
@@ -111,13 +111,13 @@ three differences, all inherited from v0.5:
 
 ```bash
 # Regenerate from the live sheet (also writes the provenance sidecar + breadcrumb)
-python3 metric/src/scripts/build_metric_from_google_sheet_v1.0.py
+python3 metric/src/scripts/build_metric_from_google_sheet_v1.0.0.py
 
 # Verify the committed file still matches the live sheet (the drift check)
-python3 metric/src/scripts/build_metric_from_google_sheet_v1.0.py --check
+python3 metric/src/scripts/build_metric_from_google_sheet_v1.0.0.py --check
 
 # Work offline from exported CSVs (all three tabs required together)
-python3 metric/src/scripts/build_metric_from_google_sheet_v1.0.py \
+python3 metric/src/scripts/build_metric_from_google_sheet_v1.0.0.py \
     --scoring-csv scoring.csv --lookups-csv lookups.csv \
     --instructions-csv instructions.csv
 ```
@@ -125,7 +125,7 @@ python3 metric/src/scripts/build_metric_from_google_sheet_v1.0.py \
 Offline tests run against committed fixtures of the three source tabs:
 
 ```bash
-python3 metric/src/tests/test_build_metric_yaml_v10.py   # or: pytest metric/src/tests/
+python3 metric/src/tests/test_build_metric_yaml_v100.py   # or: pytest metric/src/tests/
 ```
 
 As with v0.4, editorial metadata not in the sheet lives in the script's `CONFIG`
@@ -140,8 +140,8 @@ unversioned **`airbds_metric.yaml`**, commits it on a release branch, pushes, an
 opens a pull request for working-group review.
 
 ```bash
-./metric/src/scripts/release_metric_to_core.sh 1.0             # branch, push, PR
-./metric/src/scripts/release_metric_to_core.sh 1.0 --dry-run   # rehearse locally
+./metric/src/scripts/release_metric_to_core.sh 1.0.0             # branch, push, PR
+./metric/src/scripts/release_metric_to_core.sh 1.0.0 --dry-run   # rehearse locally
 ```
 
 Needs `git`, and the [GitHub CLI](https://cli.github.com) authenticated with
@@ -194,4 +194,4 @@ python3 metric/src/tests/test_release_metric_to_core.py   # or: pytest metric/sr
 
 [core]: https://github.com/AIBIO-UK/airbds-core
 [sheet]: https://docs.google.com/spreadsheets/d/1eriM8bXAoNXsIR9l8OpI1XYEp8FbtBWt05CTIP9cVeg/edit
-[sheet-v10]: https://docs.google.com/spreadsheets/d/13w-MiUQc2sLzRFqRQD_YT6BisE3Orv5Oj3i0YBw7r_M/edit
+[sheet-v100]: https://docs.google.com/spreadsheets/d/13w-MiUQc2sLzRFqRQD_YT6BisE3Orv5Oj3i0YBw7r_M/edit

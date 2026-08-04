@@ -1,11 +1,11 @@
-Instructions,,AIRBDS Dataset Metric v1.0
+Instructions,,AIRBDS Dataset Metric v1.0.0
 ,,"The AIRBDS metric is designed to assess the AI-readiness of a dataset. Answer each question 'Yes' or 'No'. Review the Notes field for guidance and examples for specific questions."
 ,,
 ,,
 Review informaton,,
 ,Reviewer name:,Ada Lovelace
 ,Review date:,2026-07-23
-,Dataset name:,Example v1.0 Bioscience Dataset
+,Dataset name:,Example v1.0.0 Bioscience Dataset
 ,Dataset link:,https://example.org/datasets/5
 ,Resource name:,Zenodo
 ,Accession number:,https://doi.org/10.5281/zenodo.99999

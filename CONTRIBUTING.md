@@ -125,7 +125,7 @@ the `review:` commit prefix.
    ```
 4. **Commit your changes** using the [convention below](#commit-message-convention):
    ```bash
-   git add metric/airbds_metric_v1.0.yaml CHANGELOG.md
+   git add metric/airbds_metric_v1.0.0.yaml CHANGELOG.md
    git commit -m "metric: add ABC-29 reproducibility question"
    ```
 5. **Push to your fork:**
@@ -189,7 +189,7 @@ working material lives here, so anything actionable must resolve here for now.
 ```
 airbds-dev/
 ├── metric/
-│   └── airbds_metric_v1.0.yaml   # Canonical metric (questions, weights, grading rules)
+│   └── airbds_metric_v1.0.0.yaml # Canonical metric (questions, weights, grading rules)
 ├── reviews/                      # Reviews + review tooling
 │   ├── review_template.yaml      # Blank template for new reviews
 │   └── testing/                  # Completed dataset reviews (one file per review)
@@ -221,27 +221,34 @@ The metric follows [Semantic Versioning](https://semver.org/)
 | Guidance-only clarifications (no change to question meaning) | PATCH |
 | Question additions, deletions, or rewordings that change meaning | MINOR |
 | Changes to scoring weights or grade thresholds | MAJOR |
-| Declaring the metric stable at 1.0, with no content change | MAJOR |
+| Declaring the metric stable at 1.0.0, with no content change | MAJOR |
 
-That last row is how v1.0 came about: it is v0.5 unchanged, released under a
+That last row is how v1.0.0 came about: it is v0.5 unchanged, released under a
 stable version number. A bump with no content change is legitimate, but say so
 explicitly in the `CHANGELOG.md` entry — a version that differs from its
 predecessor in nothing but its number is otherwise indistinguishable from one
 where a change was missed.
 
-**Trailing zeros are dropped** in the version string: the metric is `1.0`, never
-`1.0.0`, and a third component appears only for a PATCH (`1.0.1`). This is not
-cosmetic. The version string is a path component
-(`metric/airbds_metric_v1.0.yaml`), a key in `skills/versions.json`, and the
+**Write all three components**, trailing zeros included: the metric is `1.0.0`,
+not `1.0`. This is not cosmetic. The version string is a path component
+(`metric/airbds_metric_v1.0.0.yaml`), a key in `skills/versions.json`, and the
 value of each review's `schema_version` — all resolved by exact string match, so
-a review saying `1.0.0` would find no metric file at all.
+a review saying `1.0` would find no metric file at all. Two places parse the
+shape rather than match it, and both had to be widened for the third component:
+`release_metric_to_core.sh`'s version argument, and the converter's
+`detectSchemaVersion`, which previously truncated a `v1.0.0` sheet label to
+`1.0` and would then have looked for a metric file that does not exist.
+
+The retained v0.4 and v0.3 metrics keep their two-part names: four committed
+reviews carry those exact strings, so renaming the files would orphan them.
+Both forms therefore resolve, and neither is normalised into the other.
 
 The canonical metric file is versioned in its filename
 (e.g. `airbds_metric_v1.0.yaml`). When a new version is released:
-1. The new YAML file is added (e.g. `airbds_metric_v1.1.yaml`)
+1. The new YAML file is added (e.g. `airbds_metric_v1.1.0.yaml`)
 2. The old file is kept for archival purposes — so a review scored against it
    can still be re-scored. A version no review ever used may instead be
-   **withdrawn** (as v0.5 was when v1.0 superseded it unchanged), since there is
+   **withdrawn** (as v0.5 was when v1.0.0 superseded it unchanged), since there is
    nothing to re-score and a duplicate file only invites the question of which
    one to use.
 3. The **Metric** section of `CHANGELOG.md` is updated

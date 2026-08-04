@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Tests for airbds_scoring.py — the shared scorer.
 
-These run against the committed v1.0 metric, so they exercise the real grading
+These run against the committed v1.0.0 metric, so they exercise the real grading
 thresholds rather than a fixture's. The parity test is the important one: it
 asserts the JSON path (what the assessment skill runs) and the YAML path (what
 review_processor.py runs on submitted reviews) produce identical results, which
@@ -21,8 +21,8 @@ import pytest
 TESTS_DIR = Path(__file__).resolve().parent
 REPO_ROOT = TESTS_DIR.parent.parent.parent
 SCRIPTS_DIR = REPO_ROOT / "reviews" / "src" / "scripts"
-METRIC_JSON = REPO_ROOT / "metric" / "airbds_metric_v1.0.json"
-METRIC_YAML = REPO_ROOT / "metric" / "airbds_metric_v1.0.yaml"
+METRIC_JSON = REPO_ROOT / "metric" / "airbds_metric_v1.0.0.json"
+METRIC_YAML = REPO_ROOT / "metric" / "airbds_metric_v1.0.0.yaml"
 SCORE_PY = SCRIPTS_DIR / "airbds_scoring.py"
 
 sys.path.insert(0, str(SCRIPTS_DIR))
