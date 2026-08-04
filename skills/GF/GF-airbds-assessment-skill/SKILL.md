@@ -2,7 +2,7 @@
 name: GF-airbds-assessment-skill
 description: >
   Use this skill whenever a user wants to assess, score, or evaluate a life science
-  dataset against the AIRBDS (AI-Ready Biological Data Sets) criteria. Triggers include
+  dataset against the AIRBDS (AI-Ready Bioscience Datasets) criteria. Triggers include
   any mention of "AIRBDS", "AI-ready dataset", "dataset scoring", or requests to grade
   a biological/biomedical dataset's AI-readiness. Activate when the user provides a
   dataset URL and asks for an assessment, audit, or readiness check.
