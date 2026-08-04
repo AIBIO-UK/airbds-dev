@@ -7,7 +7,14 @@
 # safely: clone to a temporary directory, branch, commit, push, open a PR, and
 # leave it open for review. It never merges and never tags.
 #
-# Callers (they compute the file, destination, branch, and PR text):
+# A release is not always one file. The publication repo's prose quotes the
+# versions it ships, and that prose goes stale unless the release updates it too.
+# --post-copy runs an arbitrary command inside the clone for exactly that, and
+# whatever it changes is committed alongside --src. The hook is why this stays
+# generic: the engine still knows nothing about what is being released, it only
+# knows that a caller may need a second edit in the same commit.
+#
+# Callers (they compute the file, destination, branch, PR text, and any hook):
 #   metric/src/scripts/release_metric_to_core.sh
 #   skills/src/scripts/release_skill_to_core.sh
 #
@@ -24,6 +31,7 @@ BRANCH=""
 TITLE=""
 BODY=""
 COMMIT_MSG=""
+POST_COPY=""
 DRY_RUN=0
 DRAFT=0
 
@@ -44,6 +52,11 @@ Options:
   --title <text>       Pull request title      (default: "Publish <dest>")
   --body <text>        Pull request body
   --commit-message <t> Commit message          (default: "release: publish <dest>")
+  --post-copy <cmd>    Shell command run inside the clone after --src is copied
+                       and before the commit, with the clone as its working
+                       directory and AIRBDS_CORE_CLONE set to its path. Anything
+                       it changes is committed too. A non-zero exit aborts the
+                       release before anything is pushed
   --base <name>        Branch to open the PR against            (default: ${BASE_BRANCH})
   --repo <owner/repo>  Publication repository                   (default: ${CORE_REPO})
   --remote <url>       Clone/push URL      (default: git@github.com:<owner/repo>.git)
@@ -68,6 +81,7 @@ while [ $# -gt 0 ]; do
     --title)          TITLE="${2:-}";       shift 2 ;;
     --body)           BODY="${2:-}";        shift 2 ;;
     --commit-message) COMMIT_MSG="${2:-}";  shift 2 ;;
+    --post-copy)      POST_COPY="${2:-}";   [ -n "$POST_COPY" ]   || die "--post-copy needs a value"; shift 2 ;;
     --base)           BASE_BRANCH="${2:-}"; [ -n "$BASE_BRANCH" ] || die "--base needs a value";   shift 2 ;;
     --repo)           CORE_REPO="${2:-}";   [ -n "$CORE_REPO" ]   || die "--repo needs a value";   shift 2 ;;
     --remote)         CORE_REMOTE="${2:-}"; [ -n "$CORE_REMOTE" ] || die "--remote needs a value"; shift 2 ;;
@@ -128,8 +142,19 @@ cp "$SRC" "$CLONE/$DEST"
 # Stage first, then compare against HEAD — a plain worktree diff reports no
 # change when the destination does not exist in the base branch yet.
 git -C "$CLONE" add "$DEST"
+
+if [ -n "$POST_COPY" ]; then
+  echo "==> running post-copy hook"
+  # Runs after the copy so the hook sees the released file in place, and before
+  # the staging check so a release that only needs the hook's edit — the zip
+  # unchanged, the prose stale — is still a release rather than a no-op.
+  ( cd "$CLONE" && AIRBDS_CORE_CLONE="$CLONE" bash -c "$POST_COPY" ) ||
+    die "post-copy hook failed — nothing committed, nothing published"
+  git -C "$CLONE" add -A
+fi
+
 if git -C "$CLONE" diff --cached --quiet; then
-  echo "==> ${CORE_REPO}:${DEST} is already identical — nothing to release"
+  echo "==> ${CORE_REPO}:${DEST} is already identical${POST_COPY:+, and the post-copy hook changed nothing} — nothing to release"
   exit 0
 fi
 

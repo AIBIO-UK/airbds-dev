@@ -33,6 +33,24 @@ printf '%s\\0' "$@" >> "$GH_CALLS"
 echo "https://github.com/fake/core/pull/1"
 """
 
+# The publication repo's skills/README.md, as the release script expects to find
+# it: version numbers wrapped in comment markers. Seeded deliberately stale so a
+# test that asserts the stamped value cannot pass by accident.
+CORE_SKILLS_README = """# AIRBDS assessment skills
+
+There is currently one skill at [`skills/airbds-assessment-skill.zip`](x),
+currently at version <!--skill-version-->0.0.1<!--/skill-version--> and assessing
+against [AIRBDS metric](y) v<!--metric-version-->0.0.1<!--/metric-version-->.
+"""
+
+CORE_SKILLS_README_PATH = "skills/README.md"
+
+
+def _core_readme(skill="0.0.1", metric="0.0.1"):
+    return CORE_SKILLS_README.replace(">0.0.1<!--/skill-version", f">{skill}<!--/skill-version").replace(
+        ">0.0.1<!--/metric-version", f">{metric}<!--/metric-version"
+    )
+
 
 def _read_gh_calls(path):
     if not path.exists():
@@ -44,6 +62,11 @@ def _read_gh_calls(path):
 def _manifest_skill_version(channel="production"):
     """The gate is the *target* channel's entry — what production skills poll."""
     return json.loads(MANIFEST.read_text())["channels"][channel]["skill_version"]
+
+
+def _manifest_metric_version(channel="production"):
+    """What the release stamps into the README as the metric being scored against."""
+    return json.loads(MANIFEST.read_text())["channels"][channel]["metric_version"]
 
 
 def _git(*args, cwd):
@@ -91,13 +114,17 @@ def _rechannel(zip_path, out_path, src="testing", dst="production"):
     return out_path
 
 
-def _make_origin(tmp_path, seed_zip=None):
+def _make_origin(tmp_path, seed_zip=None, seed_readme=CORE_SKILLS_README):
     seed = tmp_path / "seed"
     seed.mkdir()
     _git("init", "--quiet", "--initial-branch=main", cwd=seed)
     _git("config", "user.name", "test", cwd=seed)
     _git("config", "user.email", "test@example.com", cwd=seed)
     (seed / "README.md").write_text("# airbds-core\n", encoding="utf-8")
+    if seed_readme is not None:
+        readme = seed / CORE_SKILLS_README_PATH
+        readme.parent.mkdir(parents=True, exist_ok=True)
+        readme.write_text(seed_readme, encoding="utf-8")
     if seed_zip is not None:
         dest = seed / DEST_FILE
         dest.parent.mkdir(parents=True, exist_ok=True)
@@ -144,6 +171,10 @@ def _remote_branches(origin):
     return _git(
         "for-each-ref", "--format=%(refname:short)", "refs/heads", cwd=origin
     ).split()
+
+
+def _file_at(origin, branch, path):
+    return _git("show", f"{branch}:{path}", cwd=origin)
 
 
 def test_publishes_zip_and_opens_pr(tmp_path):
@@ -266,11 +297,64 @@ def test_dry_run_pushes_nothing(tmp_path):
     assert "not pushing" in proc.stdout
 
 
+def test_stamps_versions_into_the_core_readme(tmp_path):
+    """The prose ships with the bytes: both quoted versions move in one commit."""
+    version = _manifest_skill_version()
+    metric = _manifest_metric_version()
+    zip_path = _make_zip(tmp_path)
+    origin = _make_origin(tmp_path)
+    _run(tmp_path, origin, zip_path)
+
+    readme = _file_at(origin, f"release/skill-v{version}", CORE_SKILLS_README_PATH)
+    assert f"<!--skill-version-->{version}<!--/skill-version-->" in readme
+    assert f"<!--metric-version-->{metric}<!--/metric-version-->" in readme
+    assert "0.0.1" not in readme
+
+    # The markers survive the stamp — the next release needs them still there.
+    assert readme.count("<!--/skill-version-->") == 1
+    assert readme.count("<!--/metric-version-->") == 1
+
+
+def test_stale_readme_alone_is_still_a_release(tmp_path):
+    """Zip unchanged but the prose stale: the point of stamping before the check."""
+    version = _manifest_skill_version()
+    zip_path = _make_zip(tmp_path)
+    published = _rechannel(zip_path, tmp_path / "published.zip")
+    origin = _make_origin(tmp_path, seed_zip=published)
+    proc, gh_args = _run(tmp_path, origin, zip_path)
+
+    branch = f"release/skill-v{version}"
+    assert branch in _remote_branches(origin)
+    assert "nothing to release" not in proc.stdout
+    assert gh_args != []
+    assert f"<!--skill-version-->{version}<!--/skill-version-->" in _file_at(
+        origin, branch, CORE_SKILLS_README_PATH
+    )
+
+
+def test_refuses_a_readme_without_markers(tmp_path):
+    """An unconverted README fails the release rather than silently skipping it."""
+    zip_path = _make_zip(tmp_path)
+    origin = _make_origin(tmp_path, seed_readme="# AIRBDS assessment skills\n\nv0.0.1.\n")
+    proc, gh_args = _run(tmp_path, origin, zip_path, expect_ok=False)
+
+    assert proc.returncode != 0
+    assert "no <!--skill-version-->" in proc.stderr
+    assert "post-copy hook failed" in proc.stderr
+    assert _remote_branches(origin) == ["main"]
+    assert gh_args == []
+
+
 def test_no_op_when_already_published(tmp_path):
     """Already-published means the rewritten zip, since that is what is shipped."""
     zip_path = _make_zip(tmp_path)
     published = _rechannel(zip_path, tmp_path / "published.zip")
-    origin = _make_origin(tmp_path, seed_zip=published)
+    # The README has to be current too, or the stamp alone makes this a release.
+    origin = _make_origin(
+        tmp_path,
+        seed_zip=published,
+        seed_readme=_core_readme(_manifest_skill_version(), _manifest_metric_version()),
+    )
     proc, gh_args = _run(tmp_path, origin, zip_path)
 
     assert _remote_branches(origin) == ["main"]

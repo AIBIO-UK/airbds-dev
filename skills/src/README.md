@@ -74,6 +74,16 @@ installed production skill reads. A mismatch usually means it was not bumped
 before promoting — do that first, and check the release is current, before
 reaching for `--force`.
 
+**The prose ships with the bytes.** `airbds-core`'s `skills/README.md` quotes the
+skill and metric versions it is serving, and the same commit restamps them via
+[`scripts/stamp_core_versions.py`](../../scripts/stamp_core_versions.py) — those
+numbers are part of the release, not a follow-up someone has to remember. They
+live inside HTML comment markers (`<!--skill-version-->0.8.0<!--/skill-version-->`),
+which render as nothing, so the page reads unchanged and only the source carries
+the machinery. A README missing its markers fails the release rather than
+publishing a stale sentence; a stale README with an unchanged zip is still a
+release. See [MAINTENANCE.md](../docs/MAINTENANCE.md#the-readme-stamp).
+
 | Option | Effect |
 |---|---|
 | `--dry-run` | Commit locally only; no push, no PR |
@@ -92,6 +102,7 @@ the real publication repository:
 
 ```bash
 python3 skills/src/tests/test_release_skill_to_core.py   # or: pytest skills/src/tests/
+python3 scripts/tests/test_stamp_core_versions.py        # the README stamper
 ```
 
 ## Rewriting a bundle's channel

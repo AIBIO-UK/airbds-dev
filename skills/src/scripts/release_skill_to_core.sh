@@ -22,6 +22,12 @@
 # to AIBIO-UK/airbds-core as skills/airbds-assessment-skill.zip on a release
 # branch, with a pull request left open for review.
 #
+# The same commit restamps the versions quoted in that repo's skills/README.md,
+# which tells readers which skill and which metric they are downloading. Shipping
+# a new zip under a sentence still naming the old one is its own kind of wrong
+# artifact, so the prose moves with the bytes rather than in a follow-up commit
+# somebody has to remember. See scripts/stamp_core_versions.py.
+#
 #   ./skills/src/scripts/release_skill_to_core.sh
 #   ./skills/src/scripts/release_skill_to_core.sh --dry-run
 #   ./skills/src/scripts/release_skill_to_core.sh --zip /path/to/some.zip
@@ -40,6 +46,7 @@ REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
 PUBLISH="${REPO_ROOT}/scripts/publish-to-core.sh"
 MANIFEST="${REPO_ROOT}/skills/versions.json"
 RECHANNEL="${REPO_ROOT}/skills/src/scripts/rechannel_skill_zip.py"
+STAMP="${REPO_ROOT}/scripts/stamp_core_versions.py"
 
 # The channel promoted from, and the channel published as. Only the second one
 # is what production users see; the first is where the artifact came from.
@@ -209,6 +216,16 @@ PUBLISH_SHA256="$(sha256sum "$PUBLISH_ZIP" | cut -d' ' -f1)"
 
 SRC_COMMIT="$(git -C "$REPO_ROOT" rev-parse --short HEAD 2>/dev/null || echo unknown)"
 
+# ------------------------------------------------------------ the quoted prose
+# Runs inside the publication clone, so the stamper is named by absolute path and
+# the values are quoted for the shell that re-parses this string. The metric
+# version is stamped only when the manifest supplied one: better to leave that
+# number alone than to overwrite it with a guess.
+printf -v POST_COPY 'python3 %q --skill-version %q' "$STAMP" "$zip_version"
+if [ -n "$manifest_metric" ]; then
+  printf -v POST_COPY '%s --metric-version %q' "$POST_COPY" "$manifest_metric"
+fi
+
 BODY="Promotes the **${SOURCE_CHANNEL}** AIRBDS assessment skill to
 **${TARGET_CHANNEL}** as \`${DEST_FILE}\`.
 
@@ -238,6 +255,10 @@ skills/src/scripts/rechannel_skill_zip.py \\
   --in ${ASSET_NAME} --check airbds-assessment-skill.zip
 \`\`\`
 
+\`skills/README.md\` is restamped in the same commit so the versions it quotes
+match what this PR ships — skill ${zip_version}${manifest_metric:+, metric ${manifest_metric}}. Those numbers sit inside
+HTML comment markers, so the diff touches the source and not how the page reads.
+
 The published filename carries neither channel nor version; pin a tag or release
 in this repository to depend on a specific build.
 
@@ -251,10 +272,12 @@ Opened by \`skills/src/scripts/release_skill_to_core.sh\`."
   --branch "$BRANCH" \
   --title "Release AIRBDS assessment skill v${zip_version}" \
   --body "$BODY" \
+  --post-copy "$POST_COPY" \
   --commit-message "release: publish AIRBDS assessment skill v${zip_version}
 
 Promotes the ${SOURCE_CHANNEL} channel build from AIBIO-UK/airbds-dev@${SRC_COMMIT}
-to ${DEST_FILE}, rewritten to the ${TARGET_CHANNEL} channel.
+to ${DEST_FILE}, rewritten to the ${TARGET_CHANNEL} channel, and restamps the
+versions quoted in skills/README.md.
 
 source sha256:    ${SOURCE_SHA256}
 published sha256: ${PUBLISH_SHA256}" \

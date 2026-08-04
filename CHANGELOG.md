@@ -529,6 +529,20 @@ layout — that carry no version of their own. Recorded by month, newest first.
 ## 2026-08
 
 ### Added
+- `scripts/stamp_core_versions.py` — restamps the version numbers `airbds-core`'s
+  `skills/README.md` quotes, so a release updates the prose describing it in the
+  same commit that lands the artifact. That sentence ("currently at version 0.8.0
+  and assessing against AIRBDS metric v1.0.0") is how a reader learns what they
+  are downloading, and nothing in the release path had been touching it: the
+  v0.8.0 / metric v1.0.0 numbers were added by hand *after* both release PRs
+  merged. The numbers now live inside HTML comment markers, which render as
+  nothing — the published page is unchanged, and the stamper gets an unambiguous
+  target rather than a regex hunting version-shaped strings through prose that
+  will be reworded. Only the versions passed are rewritten, which is what lets a
+  metric release leave the skill version alone; rewriting is idempotent; a
+  missing marker is an error, not a silent skip. `--check` reports drift without
+  writing. Tested in `scripts/tests/test_stamp_core_versions.py` (12 tests).
+
 - `skills/src/scripts/rechannel_skill_zip.py` — derives the `production` skill
   bundle from the tested `testing` one by substituting the channel token in
   `SKILL.md`, and proves that is all it did. A bundle carries its channel inside
@@ -548,6 +562,21 @@ layout — that carry no version of their own. Recorded by month, newest first.
   trust it. Tested in `skills/src/tests/test_rechannel_skill_zip.py` (9 tests).
 
 ### Changed
+- `scripts/publish-to-core.sh` gained `--post-copy <cmd>`, a hook run inside the
+  clone after the released file is copied and before the commit, with anything it
+  changes committed alongside. A release is not always one file — the publication
+  repo's prose quotes what it ships — but the engine still knows nothing about
+  metrics or skills, only that a caller may need a second edit in the same commit.
+  The hook runs *before* the "already identical" check, so a release whose
+  artifact is unchanged but whose prose has drifted is still a release rather than
+  a no-op. A non-zero exit aborts before anything is pushed.
+- `skills/src/scripts/release_skill_to_core.sh` and
+  `metric/src/scripts/release_metric_to_core.sh` now stamp `skills/README.md` in
+  `airbds-core` through that hook — the skill release setting both the skill and
+  metric versions (the latter from `versions.json`, and only when it has one),
+  the metric release setting only the metric version. Each moves the number it
+  actually published and leaves the other alone. Both PR bodies and commit
+  messages say so, and a README without the markers fails the release loudly.
 - `skills/src/scripts/release_skill_to_core.sh` now publishes to the
   **`production`** channel rather than republishing the `testing` artifact as-is.
   It still promotes rather than rebuilds — same download, same digest check — and

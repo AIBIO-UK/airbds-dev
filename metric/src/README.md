@@ -165,6 +165,16 @@ release ([`skills/src/scripts/release_skill_to_core.sh`](../../skills/src/script
 uses too; this script computes the file, destination, branch, and PR text and
 forwards the rest.
 
+The same commit also restamps the metric version quoted in `airbds-core`'s
+`skills/README.md`, via
+[`scripts/stamp_core_versions.py`](../../scripts/stamp_core_versions.py). Because
+the published YAML is unversioned, that sentence is where a reader learns which
+metric is current — it has to move with the file. The skill version in that
+README is left alone; it belongs to the skill release. The number sits inside
+HTML comment markers, which render as nothing, and a README missing them fails
+the release rather than publishing a stale version. See
+[MAINTENANCE.md](../../skills/docs/MAINTENANCE.md#the-readme-stamp).
+
 Things it deliberately does **not** do:
 
 - **It never merges and never tags.** The PR is left open; tagging the release in

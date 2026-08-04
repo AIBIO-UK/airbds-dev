@@ -9,6 +9,12 @@
 # published filename carries no version, a tag or release in airbds-core is what
 # downstream consumers pin to, so tagging stays a deliberate step.
 #
+# The same commit restamps the metric version quoted in that repo's
+# skills/README.md: the published YAML is unversioned, so that sentence is where
+# a reader learns which metric is current, and it has to move with the file.
+# The skill version there is left alone — that one belongs to the skill release.
+# See scripts/stamp_core_versions.py.
+#
 #   ./metric/src/scripts/release_metric_to_core.sh 1.0.0
 #   ./metric/src/scripts/release_metric_to_core.sh v1.0.0 --dry-run
 #
@@ -20,6 +26,7 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
 PUBLISH="${REPO_ROOT}/scripts/publish-to-core.sh"
+STAMP="${REPO_ROOT}/scripts/stamp_core_versions.py"
 
 # The published filename is deliberately unversioned: downstream consumers pin a
 # git tag or release in airbds-core, not a filename.
@@ -86,6 +93,11 @@ if ! git -C "$REPO_ROOT" diff --quiet -- "$SRC_FILE" 2>/dev/null ||
   echo "warning: metric/airbds_metric_v${VERSION}.yaml has uncommitted changes — publishing the working-tree version" >&2
 fi
 
+# Runs inside the publication clone — absolute path, values quoted for the shell
+# that re-parses this string. Only the metric version: the skill version in that
+# README is the skill release's to set.
+printf -v POST_COPY 'python3 %q --metric-version %q' "$STAMP" "$VERSION"
+
 BODY="Publishes **AIRBDS metric v${VERSION}** to the repository root as \`${DEST_FILE}\`.
 
 | | |
@@ -93,6 +105,10 @@ BODY="Publishes **AIRBDS metric v${VERSION}** to the repository root as \`${DEST
 | Metric version | v${VERSION} |
 | Source | [\`metric/airbds_metric_v${VERSION}.yaml\`](https://github.com/AIBIO-UK/airbds-dev/blob/${SRC_COMMIT}/metric/airbds_metric_v${VERSION}.yaml) |
 | Source commit | AIBIO-UK/airbds-dev@${SRC_COMMIT}${SRC_DIRTY:+ (plus uncommitted working-tree changes)} |
+
+\`skills/README.md\` is restamped in the same commit so the metric version it
+quotes reads v${VERSION}. That number sits inside HTML comment markers, so the
+diff touches the source and not how the page reads.
 
 The published filename is unversioned — pin a tag or release in this repository
 to depend on a specific metric version.
@@ -105,8 +121,10 @@ exec "$PUBLISH" \
   --branch "$BRANCH" \
   --title "Release AIRBDS metric v${VERSION}" \
   --body "$BODY" \
+  --post-copy "$POST_COPY" \
   --commit-message "release: publish AIRBDS metric v${VERSION}
 
 Copies metric/airbds_metric_v${VERSION}.yaml from AIBIO-UK/airbds-dev@${SRC_COMMIT}
-to ${DEST_FILE} in the repository root." \
+to ${DEST_FILE} in the repository root, and restamps the metric version quoted
+in skills/README.md." \
   ${PASSTHROUGH[@]+"${PASSTHROUGH[@]}"}
