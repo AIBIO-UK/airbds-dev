@@ -238,6 +238,41 @@ skills/src/scripts/rechannel_skill_zip.py \
 
 See [`skills/src/README.md`](../src/README.md) for the full behaviour.
 
+### The README stamp
+
+`airbds-core`'s `skills/README.md` tells a reader which skill version they are
+about to download and which metric it scores against. Those numbers are part of
+the release, not commentary on it, so the release commit carries them: the same
+PR that lands the zip restamps that sentence via
+[`scripts/stamp_core_versions.py`](../../scripts/stamp_core_versions.py), run
+through `publish-to-core.sh`'s `--post-copy` hook.
+
+The numbers sit inside HTML comment markers in the README source:
+
+```markdown
+currently at version <!--skill-version-->0.8.0<!--/skill-version--> and assessing
+against [AIRBDS metric](...) v<!--metric-version-->1.0.0<!--/metric-version-->
+```
+
+Comments render as nothing, so the published page reads exactly as it always
+did — the markers exist only to give the stamper an unambiguous target, instead
+of a regex hunting version-shaped strings through prose that will be reworded
+eventually.
+
+Two consequences worth knowing:
+
+- **A missing marker fails the release.** If the README has been rewritten
+  without its markers, the hook exits non-zero and nothing is pushed. That is
+  deliberate: silently skipping the stamp would publish the stale sentence this
+  machinery exists to prevent. Restore the markers and re-run.
+- **A stale README is on its own reason to release.** The stamp runs before the
+  "already identical" check, so re-running a promotion whose zip has not changed
+  still opens a PR if the prose has drifted.
+
+The metric release ([`metric/src/scripts/release_metric_to_core.sh`](../../metric/src/scripts/release_metric_to_core.sh))
+stamps the same file, but only the metric version — each release moves the
+number it actually published and leaves the other alone.
+
 > `versions.json` itself still lives in **this** repo and is still served from
 > the `raw_url` baked into every published skill, including the production one —
 > publishing to `airbds-core` does not move it, and the file's own
