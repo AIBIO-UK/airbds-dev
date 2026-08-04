@@ -231,7 +231,7 @@ workflows here; `production` is published to `airbds-core` by
 `skills/src/scripts/release_skill_to_core.sh`. See
 [`skills/docs/MAINTENANCE.md`](skills/docs/MAINTENANCE.md).
 
-## [0.8.0] — `development` and `testing` (2026-08-04)
+## [0.8.0] — all channels (2026-08-04)
 
 - **Repointed at AIRBDS metric v1.0.0** (was 0.5), by moving each channel's
   `assets/airbds_metric.json` symlink to `metric/airbds_metric_v1.0.0.json`.
@@ -251,6 +251,12 @@ workflows here; `production` is published to `airbds-core` by
 - Both build workflows' `paths:` filters follow the repointed symlink to
   `metric/airbds_metric_v1.0.0.json`; a stale filter would have left each
   published zip carrying the withdrawn metric, silently.
+- **Promoted to `production`**, published to `airbds-core` as
+  `skills/airbds-assessment-skill.zip` — the `testing` build with its channel
+  rewritten, verified reversible. This is the first bundle actually published
+  under the `production` channel: the channel was introduced at [0.7.1] but
+  superseded by this release before it shipped, so no production skill ever
+  reported 0.7.1.
 
 ## [0.7.1] — `production` (2026-08-03)
 
