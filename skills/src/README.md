@@ -41,7 +41,7 @@ fails instead of publishing a skill that misreports the metric it scored against
 
 With `--since <git-ref>` it additionally enforces that a channel whose
 `metric_version` changed has had its `skill_version` raised by at least a MINOR.
-See [`skills/docs/MAINTENANCE.md`](../docs/MAINTENANCE.md#keeping-the-manifest-in-step)
+See [`skills/docs/MAINTAINING.md`](../docs/MAINTAINING.md#keeping-the-manifest-in-step)
 for that rule.
 
 A stale manifest fails silently in the worst way — it either suppresses an update
@@ -79,7 +79,7 @@ target channel's release. `--from`/`--to` override the default pair.
 
 Needs only the Python 3 standard library. Tested in
 [`src/tests/test_promote_skill_channel.py`](tests/test_promote_skill_channel.py)
-(13 tests). See [`skills/docs/MAINTENANCE.md`](../docs/MAINTENANCE.md#promoting-development-to-testing).
+(13 tests). See [`skills/docs/MAINTAINING.md`](../docs/MAINTAINING.md#promoting-development-to-testing).
 
 ## Publishing the skill to `airbds-core` (the push to production)
 
@@ -131,7 +131,7 @@ live inside HTML comment markers (`<!--skill-version-->0.8.0<!--/skill-version--
 which render as nothing, so the page reads unchanged and only the source carries
 the machinery. A README missing its markers fails the release rather than
 publishing a stale sentence; a stale README with an unchanged zip is still a
-release. See [MAINTENANCE.md](../docs/MAINTENANCE.md#the-readme-stamp).
+release. See [MAINTAINING.md](../docs/MAINTAINING.md#the-readme-stamp).
 
 | Option | Effect |
 |---|---|
@@ -202,7 +202,7 @@ Needs only the Python 3 standard library.
 
 > The skill **build** pipeline is not here: each channel is packaged by its own
 > workflow under [`.github/workflows/`](../../.github/workflows/). See
-> [`skills/docs/MAINTENANCE.md`](../docs/MAINTENANCE.md) for channels, the
+> [`skills/docs/MAINTAINING.md`](../docs/MAINTAINING.md) for channels, the
 > version manifest, and release builds, and
 > [`skills/docs/DESIGN.md`](../docs/DESIGN.md) for how a skill bundle is put
 > together.

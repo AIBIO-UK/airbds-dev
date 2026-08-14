@@ -3,7 +3,7 @@
 Why the AIRBDS assessment skill is shaped the way it is. Scope: the anatomy of
 the skill bundle and how work is divided between the instruction file and the
 data files it carries. The operational side — release channels, the version
-manifest, build workflows — is in [`MAINTENANCE.md`](MAINTENANCE.md).
+manifest, build workflows — is in [`MAINTAINING.md`](MAINTAINING.md).
 
 ## What a skill is
 
@@ -37,7 +37,7 @@ currently point at v1.0.0; a channel may sit on an older metric, so read the
 symlink rather than this diagram if you need a channel's actual version. The
 `production` bundle is derived from the `testing` one at release time and so has
 the same layout by construction (see
-[`MAINTENANCE.md`](MAINTENANCE.md#promoting-to-production)).
+[`MAINTAINING.md`](MAINTAINING.md#promoting-to-production)).
 
 `assets/airbds_metric.json` is a complete description of the metric: every
 question, its scope and weighting, the reviewer guidance attached to it, and the
@@ -77,7 +77,7 @@ assessing against by reading `schema_version` out of the bundled metric file;
 `SKILL.md` never hard-codes a version number. Pointing the symlink at a
 different `metric/airbds_metric_v*` pair is therefore the entire mechanism for
 moving a skill to a new metric version — see
-[`MAINTENANCE.md`](MAINTENANCE.md) for the manifest bookkeeping that has to
+[`MAINTAINING.md`](MAINTAINING.md) for the manifest bookkeeping that has to
 accompany it.
 
 ## Scoring is mechanical, not modelled

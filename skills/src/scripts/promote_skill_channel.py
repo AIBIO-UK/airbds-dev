@@ -37,7 +37,7 @@ validate_skills_versions.py would then reject.
             — so a difference is information, not an error, and --check exits 0
             either way unless something is actually broken.
 
-Needs only the standard library. See skills/docs/MAINTENANCE.md.
+Needs only the standard library. See skills/docs/MAINTAINING.md.
 """
 
 import argparse

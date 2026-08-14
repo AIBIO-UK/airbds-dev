@@ -12,7 +12,7 @@ go wrong.
 
 - The metric's own rules: [`metric/README.md`](metric/README.md)
 - The metric build and release tooling: [`metric/src/README.md`](metric/src/README.md)
-- The skill's channels, manifest, and promotion: [`skills/docs/MAINTENANCE.md`](skills/docs/MAINTENANCE.md)
+- The skill's channels, manifest, and promotion: [`skills/docs/MAINTAINING.md`](skills/docs/MAINTAINING.md)
 - The versioning policy: [`CONTRIBUTING.md#versioning-policy`](CONTRIBUTING.md#versioning-policy)
 
 ---
@@ -206,7 +206,7 @@ repoint, the channel-token rewrite, and the `testing` manifest bump in one step:
 ./skills/src/scripts/promote_skill_channel.py
 ```
 
-→ [`skills/docs/MAINTENANCE.md#promoting-development-to-testing`](skills/docs/MAINTENANCE.md#promoting-development-to-testing).
+→ [`skills/docs/MAINTAINING.md#promoting-development-to-testing`](skills/docs/MAINTAINING.md#promoting-development-to-testing).
 
 Finally, add an entry under the **Assessment skill** section of `CHANGELOG.md`,
 naming the version and the channels it applies to.
@@ -241,7 +241,7 @@ A channel deliberately held on the older metric is left alone entirely.
 `production` is not touched here, and is not cross-checked by the validator
 either — it has no source directory in this repo. It moves in Stage 7.
 
-→ [`skills/docs/MAINTENANCE.md#keeping-the-manifest-in-step`](skills/docs/MAINTENANCE.md#keeping-the-manifest-in-step).
+→ [`skills/docs/MAINTAINING.md#keeping-the-manifest-in-step`](skills/docs/MAINTAINING.md#keeping-the-manifest-in-step).
 
 ## Stage 6 — Let the channel builds republish
 
@@ -249,7 +249,7 @@ Pushing to `main` triggers the per-channel build workflows, which rezip the skil
 (dereferencing the symlinks into real files) and recreate the release the
 `skill_update_url` points at.
 
-→ [`skills/docs/MAINTENANCE.md#release-builds-github-actions`](skills/docs/MAINTENANCE.md#release-builds-github-actions).
+→ [`skills/docs/MAINTAINING.md#release-builds-github-actions`](skills/docs/MAINTAINING.md#release-builds-github-actions).
 
 Check the workflow actually ran and the release asset is current before
 promoting — Stage 7 publishes the built zip, so a failed or stale build promotes
@@ -272,7 +272,7 @@ script enforces it:
 ./skills/src/scripts/release_skill_to_core.sh
 ```
 
-→ [`skills/docs/MAINTENANCE.md#promoting-to-production`](skills/docs/MAINTENANCE.md#promoting-to-production)
+→ [`skills/docs/MAINTAINING.md#promoting-to-production`](skills/docs/MAINTAINING.md#promoting-to-production)
 and [`skills/src/README.md`](skills/src/README.md).
 
 This too **opens a pull request rather than merging.** Merge it, and the release
@@ -291,9 +291,9 @@ is done. Installed production skills pick the new bundle up through
 | 3 | `CHANGELOG.md` (Metric) | — this file |
 | 3b | MINOR/MAJOR only: `README.md`, `CITATION.cff`, `LICENSE.md`, `metric/README.md`, tutorials. Commit and push | — this file |
 | 4 | `release_metric_to_core.sh` → **merge the PR** | `metric/src/README.md` |
-| 5 | Repoint the skill symlinks; `versions.json`; `DESIGN.md`; `CHANGELOG.md` (Skill) | `skills/docs/MAINTENANCE.md` |
-| 6 | Confirm the channel build republished the release | `skills/docs/MAINTENANCE.md` |
-| 7 | `channels.production` first, then `release_skill_to_core.sh` → **merge the PR** | `skills/docs/MAINTENANCE.md` |
+| 5 | Repoint the skill symlinks; `versions.json`; `DESIGN.md`; `CHANGELOG.md` (Skill) | `skills/docs/MAINTAINING.md` |
+| 6 | Confirm the channel build republished the release | `skills/docs/MAINTAINING.md` |
+| 7 | `channels.production` first, then `release_skill_to_core.sh` → **merge the PR** | `skills/docs/MAINTAINING.md` |
 
 ## If something goes wrong after publishing
 

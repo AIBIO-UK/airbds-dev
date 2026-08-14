@@ -196,7 +196,7 @@ metric is current — it has to move with the file. The skill version in that
 README is left alone; it belongs to the skill release. The number sits inside
 HTML comment markers, which render as nothing, and a README missing them fails
 the release rather than publishing a stale version. See
-[MAINTENANCE.md](../../skills/docs/MAINTENANCE.md#the-readme-stamp).
+[MAINTAINING.md](../../skills/docs/MAINTAINING.md#the-readme-stamp).
 
 Things it deliberately does **not** do:
 

@@ -180,7 +180,7 @@ working material lives here, so anything actionable must resolve here for now.
 
 > The skills' update URLs are a special case: the URL is baked into each published
 > skill zip, so repointing it strands every already-installed skill. See
-> [`skills/docs/MAINTENANCE.md`](skills/docs/MAINTENANCE.md) before changing them.
+> [`skills/docs/MAINTAINING.md`](skills/docs/MAINTAINING.md) before changing them.
 
 ---
 

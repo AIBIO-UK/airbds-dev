@@ -229,7 +229,7 @@ Changes to the AIRBDS assessment skill (`skills/`). Each channel —
 its heading. `development` and `testing` are published by their own build
 workflows here; `production` is published to `airbds-core` by
 `skills/src/scripts/release_skill_to_core.sh`. See
-[`skills/docs/MAINTENANCE.md`](skills/docs/MAINTENANCE.md).
+[`skills/docs/MAINTAINING.md`](skills/docs/MAINTAINING.md).
 
 ## [0.8.1] — all channels (2026-08-04)
 
@@ -313,7 +313,7 @@ workflows here; `production` is published to `airbds-core` by
   now lists `scripts/*`; a stale filter would silently stop rebuilds firing.
 - `skills/versions.json` `channels.testing.skill_version` bumped to match. With
   `testing` now on the `metadata.version`/`metadata.channel` layout, the notes in
-  `skills/docs/MAINTENANCE.md` and `skills/docs/DESIGN.md` that described the
+  `skills/docs/MAINTAINING.md` and `skills/docs/DESIGN.md` that described the
   JSON metric, `scripts/`, and the conformant frontmatter as `development`-only
   no longer apply and were removed.
 
@@ -339,7 +339,7 @@ workflows here; `production` is published to `airbds-core` by
   because `channel` is read by the skill itself for the update check, so a strict
   client would either reject the skill or drop the field and break that check
   silently. `SKILL.md` step 1 now names `metadata.channel`, and
-  `skills/docs/MAINTENANCE.md` records the layout, the validator command, and why
+  `skills/docs/MAINTAINING.md` records the layout, the validator command, and why
   `metadata.hermes` stays nested despite not being conformant (it matches Hermes'
   own skill files). Both the checked-in skill and the built zip validate clean.
   `testing` still carries the old layout and will be brought into line at its
@@ -546,6 +546,12 @@ layout — that carry no version of their own. Recorded by month, newest first.
 
 ## 2026-08
 
+### Changed
+- Renamed `skills/docs/MAINTENANCE.md` to `skills/docs/MAINTAINING.md`, matching
+  the gerund form of the top-level process file it complements
+  (`RELEASING.md`, `CONTRIBUTING.md`). All references updated; the file's content
+  is unchanged.
+
 ### Added
 - **`skills/src/scripts/promote_skill_channel.py` — promotes one channel's bundle
   to another** (`development` → `testing` by default), a step that was a manual
@@ -732,7 +738,7 @@ layout — that carry no version of their own. Recorded by month, newest first.
   — that manifest is what installed skills poll, so publishing a version it does
   not advertise would ship users a release nothing announces. `--force`
   overrides, `--zip` publishes a local file, `--dry-run` rehearses. Documented in
-  `skills/src/README.md` and `skills/docs/MAINTENANCE.md`; tested offline in
+  `skills/src/README.md` and `skills/docs/MAINTAINING.md`; tested offline in
   `skills/src/tests/test_release_skill_to_core.py` (9 tests, synthesised zip and
   stubbed `gh`).
 - `scripts/publish-to-core.sh` — the shared engine behind both release scripts.
@@ -761,7 +767,7 @@ layout — that carry no version of their own. Recorded by month, newest first.
 - `skills/docs/DESIGN.md` — how the assessment skill is put together: what
   `SKILL.md`'s frontmatter and body each do, what the bundled `assets/` carry,
   and why the metric is shipped as a symlinked data file rather than restated as
-  prose in the instructions. Complements `skills/docs/MAINTENANCE.md`, which
+  prose in the instructions. Complements `skills/docs/MAINTAINING.md`, which
   covers the operational side (channels, the version manifest, release builds).
   Linked from `skills/README.md` and added to the Group C coupled-file list in
   `metric/README.md`, since its bundle diagram names the symlink's metric
@@ -777,7 +783,7 @@ layout — that carry no version of their own. Recorded by month, newest first.
   Coupled change across the script's own path references, the
   `validate-skills-versions.yml` workflow (both `paths:` filters and the `run:`
   step — a stale path filter would silently stop the check firing),
-  `skills/docs/MAINTENANCE.md`, `metric/README.md`, and the top-level `README.md`
+  `skills/docs/MAINTAINING.md`, `metric/README.md`, and the top-level `README.md`
   structure tree. Added `skills/src/README.md` documenting the script, matching
   the `README.md` each sibling `src/` folder already carries.
 - **Both skill assets now name their channel in full**:
@@ -787,7 +793,7 @@ layout — that carry no version of their own. Recorded by month, newest first.
   came from, and the two names are formed the same way instead of one spelling the
   channel out and the other abbreviating it. Coupled change per channel across its
   build workflow (both the `zip` step and `files:`), its `skill_update_url` in
-  `skills/versions.json`, and the asset name in `skills/docs/MAINTENANCE.md`, plus
+  `skills/versions.json`, and the asset name in `skills/docs/MAINTAINING.md`, plus
   the install link in `skills/README.md`. The asset URL is not baked into a
   published skill — the runtime update check reads `skill_update_url` out of the
   manifest it fetches — so installed skills are unaffected, but each old download
@@ -800,7 +806,7 @@ layout — that carry no version of their own. Recorded by month, newest first.
   `skills-testing` / `skills-development` branch; neither exists on the remote
   (`skills-testing` was deleted once its work had merged, `skills-development`
   never existed). Nothing else in the repository referenced either name. This
-  makes `skills/docs/MAINTENANCE.md`'s description of the workflows — "each
+  makes `skills/docs/MAINTAINING.md`'s description of the workflows — "each
   pushes on `main`" — exact; a rebuild from another branch is still available
   through `workflow_dispatch`.
 - **The docs now name the YAML as the metric's source of truth and the Google
@@ -827,7 +833,7 @@ layout — that carry no version of their own. Recorded by month, newest first.
 - `airbds-metric` now 301s to `airbds-core`, so surviving old links resolve.
   Freeing the `airbds-metric` name did **not** restore this repo's own original
   rename redirect, which was verified still returning 404 immediately after the
-  rename; `skills/docs/MAINTENANCE.md` records this so nobody plans around a
+  rename; `skills/docs/MAINTAINING.md` records this so nobody plans around a
   redirect that does not exist.
 - The `airbds-metric-tutorial` repository and its GitHub Pages URLs were
   deliberately left alone — renaming it is a separate migration with its own
