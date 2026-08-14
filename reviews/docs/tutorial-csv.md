@@ -177,7 +177,7 @@ If there is no accession number, use a short descriptive name for the dataset.
 
 Completed reviews are collected in the [`reviews/testing/`](../testing/) folder of this repository.
 
-See [CONTRIBUTING.md](../../CONTRIBUTING.md) for full submission instructions. The short version:
+See [`reviews/GUIDANCE.md`](../GUIDANCE.md) for the review procedure. The short version:
 
 1. Fork the repository on GitHub.
 2. Add your CSV to the `reviews/testing/` folder.

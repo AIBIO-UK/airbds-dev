@@ -13,7 +13,7 @@ go wrong.
 - The metric's own rules: [`metric/README.md`](metric/README.md)
 - The metric build and release tooling: [`metric/src/README.md`](metric/src/README.md)
 - The skill's channels, manifest, and promotion: [`skills/docs/MAINTAINING.md`](skills/docs/MAINTAINING.md)
-- The versioning policy: [`CONTRIBUTING.md#versioning-policy`](CONTRIBUTING.md#versioning-policy)
+- The versioning policy: [`metric/README.md#versioning-policy`](metric/README.md#versioning-policy)
 
 ---
 
@@ -56,8 +56,8 @@ other way round.
 ## Before you start: decide the bump
 
 Settle this *first*, because it decides how much of the work below applies. The
-canonical rules are the **Versioning Policy** at
-[`CONTRIBUTING.md#versioning-policy`](CONTRIBUTING.md#versioning-policy).
+canonical rules are the **versioning policy** at
+[`metric/README.md#versioning-policy`](metric/README.md#versioning-policy).
 
 | Bump | Means | What has to move |
 |---|---|---|
@@ -75,9 +75,8 @@ Write all three components: the version is `1.0.1`, never `1.0`. It is a path
 component, a JSON key in `skills/versions.json`, and each review's
 `schema_version` — all matched exactly.
 
-For a change originating outside the maintainer group, the issue-first workflow
-is at
-[`CONTRIBUTING.md#proposing-metric-changes`](CONTRIBUTING.md#proposing-metric-changes).
+The issue-first workflow for proposing a change is at
+[`metric/README.md#proposing-a-metric-change`](metric/README.md#proposing-a-metric-change).
 
 ## What you need before Stage 1
 
@@ -285,7 +284,7 @@ is done. Installed production skills pick the new bundle up through
 
 | # | Stage | Owner doc |
 |---|---|---|
-| 0 | Decide PATCH / MINOR / MAJOR | `CONTRIBUTING.md` |
+| 0 | Decide PATCH / MINOR / MAJOR | `metric/README.md` |
 | 1 | Bump `schema_version` in the sheet; regenerate the metric YAML + JSON | `metric/src/README.md` |
 | 2 | Archive the old review template pair; regenerate the new one | `reviews/src/README.md` |
 | 3 | `CHANGELOG.md` (Metric) | — this file |
@@ -322,7 +321,7 @@ deliberately does not:
 - **Merge a release pull request.** Both release scripts open one and stop.
   Publication is a working-group decision, not a script's.
 - **Tag anything.** Neither repository tags metric releases, by design — see
-  [`CONTRIBUTING.md#versioning-policy`](CONTRIBUTING.md#versioning-policy).
+  [`metric/README.md#versioning-policy`](metric/README.md#versioning-policy).
   Versions are carried by the filenames here, not by tags there. Don't add a tag
   step on the assumption one is missing.
 - **Repoint a skill channel.** Deliberate per channel, because a channel may be

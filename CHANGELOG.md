@@ -13,7 +13,7 @@ artifacts, plus a body of work that carries no version at all:
 The metric and the assessment skill follow
 [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html); the metric's bump
-rules are in [CONTRIBUTING.md](CONTRIBUTING.md#versioning-policy). Repository
+rules are in [metric/README.md](metric/README.md#versioning-policy). Repository
 changes have no version to be released under, so they are recorded by month,
 newest first.
 
@@ -547,6 +547,24 @@ layout — that carry no version of their own. Recorded by month, newest first.
 ## 2026-08
 
 ### Changed
+- **Removed `CONTRIBUTING.md`.** It was created early without working-group
+  discussion and had accumulated claims nobody had agreed to — a "respond within
+  14 days" review SLA chief among them — alongside a dataset-review walkthrough
+  for a now-dormant process and a hand-maintained repository-structure tree that
+  would drift. With no active outside contributors, a real contributing guide is
+  better written when there are contributors to write it for. The content worth
+  keeping was relocated rather than lost:
+  - The **versioning policy** and **how a metric change is proposed** moved to
+    [`metric/README.md`](metric/README.md) (the metric's own reference doc), where
+    `RELEASING.md`, `README.md`, `AGENTS.md`, and this changelog now deep-link.
+  - The **which-repository-does-a-link-point-at** convention moved to
+    [`AGENTS.md`](AGENTS.md), as an editing rule for anyone working in the repo.
+  - The **review procedure** moved to [`reviews/GUIDANCE.md`](reviews/GUIDANCE.md),
+    already the dormant reviewer doc, which now covers both completing/submitting a
+    review and how scoring works; the tutorials keep the full worked walkthrough.
+  A stale "CI scores it on the way in" in `reviews/src/README.md` was corrected in
+  passing — that CI is disabled.
+
 - Renamed `skills/docs/MAINTENANCE.md` to `skills/docs/MAINTAINING.md`, matching
   the gerund form of the top-level process file it complements
   (`RELEASING.md`, `CONTRIBUTING.md`). All references updated; the file's content

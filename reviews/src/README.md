@@ -52,8 +52,8 @@ Notes:
   left blank for you to fill in (warnings flag them). Warnings also list any
   unanswered questions — the file is a draft until every question is `Yes`/`No`.
 - After converting, name the file per
-  [`CONTRIBUTING.md`](../../CONTRIBUTING.md) (`<accession>_<INITIALS>_<n>.yaml`) and
-  submit it; CI scores it on the way in.
+  [`reviews/GUIDANCE.md`](../GUIDANCE.md) (`<accession>_<INITIALS>_<n>.yaml`) and
+  score it by running `review_processor.py` locally (the scoring CI is dormant).
 
 ## Python
 

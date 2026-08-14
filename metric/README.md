@@ -180,23 +180,62 @@ they do not hold the same data. Publishing one without the other would leave
 required; the retained v0.3 and v0.4 metrics predate it and publish as YAML
 alone.
 
-### Changing the metric
+### Proposing a metric change
 
-A metric change is proposed on an issue before any YAML is written, and the size
-of the version bump follows from what changed. Both are documented in
-[`CONTRIBUTING.md`](../CONTRIBUTING.md):
+A metric change is proposed on a GitHub Issue before any YAML is written, so the
+working group can discuss and reach consensus first.
 
-- [Proposing metric changes](../CONTRIBUTING.md#proposing-metric-changes) — the
-  issue-first workflow, the `[Metric Change]` title prefix, and what the issue
-  needs to state.
-- [Versioning policy](../CONTRIBUTING.md#versioning-policy) — which kind of
-  change bumps which component, why all three components are always written out,
-  and what happens to the outgoing version.
+- Check open and closed Issues to avoid duplicates.
+- Use the title prefix `[Metric Change]`.
+- State which question(s) are affected (e.g. `ABC-12`), the rationale, and any
+  evidence or references.
+- Indicate whether the change is guidance-only (PATCH), a question rewording
+  (MINOR), or a weight/threshold change (MAJOR) — see the versioning policy
+  below.
 
 Once a change is agreed, [`RELEASING.md`](../RELEASING.md) is the running order
 for getting it out: regenerating the metric, the files that have to move with it,
 publishing to `airbds-core`, and repointing the assessment skill at the new
 version.
+
+### Versioning policy
+
+The metric follows [Semantic Versioning](https://semver.org/)
+(**MAJOR.MINOR.PATCH**):
+
+| Change type | Version bump |
+|---|---|
+| Guidance-only clarifications (no change to question meaning) | PATCH |
+| Question additions, deletions, or rewordings that change meaning | MINOR |
+| Changes to scoring weights or grade thresholds | MAJOR |
+| Declaring the metric stable at 1.0.0, with no content change | MAJOR |
+
+That last row is how v1.0.0 came about: it is v0.5 unchanged, released under a
+stable version number. A bump with no content change is legitimate, but say so
+explicitly in the `CHANGELOG.md` entry — a version that differs from its
+predecessor in nothing but its number is otherwise indistinguishable from one
+where a change was missed.
+
+**Write all three components**, trailing zeros included: the metric is `1.0.0`,
+not `1.0`. This is not cosmetic. The version string is a path component
+(`metric/airbds_metric_v1.0.0.yaml`), a key in `skills/versions.json`, and the
+value of each review's `schema_version` — all resolved by exact string match, so
+a review saying `1.0` would find no metric file at all. The retained v0.4 and
+v0.3 metrics keep their two-part names: four committed reviews carry those exact
+strings, so renaming the files would orphan them.
+
+When a new version is released, the outgoing file is **retained** (so a review
+scored against it can still be re-scored), the **Metric** section of
+`CHANGELOG.md` gets an entry, and `CITATION.cff` is updated. A version no review
+ever used may instead be **withdrawn** rather than retained (as v0.5 was when
+v1.0.0 superseded it unchanged), since there is nothing to re-score.
+
+Metric versions are **not** tagged as GitHub Releases, in either repository — the
+version lives in the filename and in each review's `schema_version`. That is why
+superseded files are retained here rather than deleted: `airbds-core` publishes
+the current metric under an unversioned filename and answers "what is the AIRBDS
+metric?", while this repository answers "what was v0.4?". Anything depending on a
+specific version references the versioned file here.
 
 ---
 

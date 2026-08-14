@@ -234,8 +234,10 @@ to the assessment skill that carries the new metric — is in
 ## Contributing
 
 We welcome contributions including dataset reviews, metric improvements, and
-documentation fixes. Please read [CONTRIBUTING.md](CONTRIBUTING.md) before
-opening a PR. All contributors must abide by our [Code of Conduct](CODE_OF_CONDUCT.md).
+documentation fixes. Metric changes are proposed on an Issue first — see
+[Proposing a metric change](metric/README.md#proposing-a-metric-change) and the
+[versioning policy](metric/README.md#versioning-policy). All contributors must
+abide by our [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ---
 
