@@ -546,7 +546,36 @@ layout — that carry no version of their own. Recorded by month, newest first.
 
 ## 2026-08
 
+### Changed
+- `metric/src/scripts/release_metric_to_core.sh` publishes the metric's **JSON
+  rendering alongside its YAML**, as `airbds_metric.json` and
+  `airbds_metric.yaml` in one commit. The generator has written both files since
+  v1.0.0, but the release moved only the YAML, so the JSON reached `airbds-core`
+  by hand — and the copy that landed there was a different generation, carrying a
+  `source` block and an `instructions` field that its own `airbds_metric.yaml`
+  did not agree with. Publishing both from one commit is what stops the
+  publication repo holding two versions of one metric. From v1.0.0 the JSON is
+  required and a missing one aborts the release; the retained v0.3 and v0.4
+  metrics predate the rendering and still publish as YAML alone.
+
+- `scripts/publish-to-core.sh` accepts **repeated `--src`/`--dest` pairs**,
+  copying each source to the destination in the same position and committing them
+  together. A release was already more than one file — `--post-copy` exists
+  because the publication repo's prose has to move with the artifact — so this
+  generalises the engine along the axis it was already bending on, without
+  teaching it anything about metrics or skills. Unequal counts and a repeated
+  `--dest` are errors rather than guesses. Single-pair callers are unaffected:
+  the skill release passes the same arguments it always did.
+
 ### Added
+- `metric/src/scripts/check_metric_renderings_match.py` — confirms a metric's
+  YAML and JSON hold the same data before either is published, comparing them as
+  parsed objects so formatting and the YAML's comments cannot register as a
+  difference, and naming the differing top-level keys when they do disagree. The
+  two files cannot drift while they are generated together in one pass; this is
+  the guard for when they are not. Run as a preflight by the metric release, and
+  tested in `metric/src/tests/test_check_metric_renderings_match.py` (7 tests).
+
 - `scripts/stamp_core_versions.py` — restamps the version numbers `airbds-core`'s
   `skills/README.md` quotes, so a release updates the prose describing it in the
   same commit that lands the artifact. That sentence ("currently at version 0.8.0

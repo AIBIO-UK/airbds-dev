@@ -3,11 +3,19 @@
 # Publish one version of the AIRBDS metric to the publication repository.
 #
 # Takes a metric version from this development repository and publishes
-# metric/airbds_metric_v<VERSION>.yaml to the root of AIBIO-UK/airbds-core as the
-# unversioned airbds_metric.yaml, on a release branch, with a pull request left
-# open for working-group review. It never merges and never tags — because the
-# published filename carries no version, a tag or release in airbds-core is what
-# downstream consumers pin to, so tagging stays a deliberate step.
+# metric/airbds_metric_v<VERSION>.{yaml,json} to the root of AIBIO-UK/airbds-core
+# as the unversioned airbds_metric.yaml and airbds_metric.json, on a release
+# branch, with a pull request left open for working-group review. It never merges
+# and never tags — because the published filenames carry no version, a tag or
+# release in airbds-core is what downstream consumers pin to, so tagging stays a
+# deliberate step.
+#
+# Both renderings go in one commit. They are the same metric in two formats —
+# the YAML for readers, the JSON for consumers that must parse it without a YAML
+# library, the assessment skill among them — so publishing one without the other
+# would leave the publication repo asserting two different metrics at once. A
+# preflight confirms the pair actually matches before anything is cloned; see
+# check_metric_renderings_match.py.
 #
 # The same commit restamps the metric version quoted in that repo's
 # skills/README.md: the published YAML is unversioned, so that sentence is where
@@ -27,10 +35,18 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
 PUBLISH="${REPO_ROOT}/scripts/publish-to-core.sh"
 STAMP="${REPO_ROOT}/scripts/stamp_core_versions.py"
+CHECK_PAIR="${REPO_ROOT}/metric/src/scripts/check_metric_renderings_match.py"
 
-# The published filename is deliberately unversioned: downstream consumers pin a
-# git tag or release in airbds-core, not a filename.
-DEST_FILE="airbds_metric.yaml"
+# The published filenames are deliberately unversioned: downstream consumers pin
+# a git tag or release in airbds-core, not a filename.
+DEST_YAML="airbds_metric.yaml"
+DEST_JSON="airbds_metric.json"
+
+# The JSON rendering arrived with v1.0.0. The retained v0.3 and v0.4 metrics
+# predate it and are YAML-only; anything from 1.0.0 on must ship both, and a
+# missing JSON there means the generator was not rerun rather than that the
+# version is exempt.
+JSON_FROM_MAJOR=1
 
 die() { echo "error: $*" >&2; exit 1; }
 
@@ -38,8 +54,9 @@ usage() {
   cat <<EOF
 Usage: $(basename "$0") <version> [options]
 
-Publish metric/airbds_metric_v<version>.yaml to the root of the publication
-repository as ${DEST_FILE}, on a release branch, and open a pull request.
+Publish metric/airbds_metric_v<version>.{yaml,json} to the root of the
+publication repository as ${DEST_YAML} and ${DEST_JSON}, in one commit
+on a release branch, and open a pull request.
 
 Arguments:
   <version>          Metric version to publish, e.g. 1.0.0 or v1.0.0
@@ -78,53 +95,99 @@ VERSION="${VERSION#v}"
 [[ "$VERSION" =~ ^[0-9]+\.[0-9]+(\.[0-9]+)?$ ]] ||
   die "version must look like 1.0.0 or v1.0.0, got: ${VERSION}"
 
-SRC_FILE="${REPO_ROOT}/metric/airbds_metric_v${VERSION}.yaml"
-[ -f "$SRC_FILE" ] || die "no metric file for v${VERSION} at ${SRC_FILE#"$REPO_ROOT"/}"
+SRC_YAML="${REPO_ROOT}/metric/airbds_metric_v${VERSION}.yaml"
+SRC_JSON="${REPO_ROOT}/metric/airbds_metric_v${VERSION}.json"
+[ -f "$SRC_YAML" ] || die "no metric file for v${VERSION} at ${SRC_YAML#"$REPO_ROOT"/}"
+
+# Sources and destinations paired in order for publish-to-core.sh. The JSON is
+# only absent legitimately for the pre-1.0 metrics.
+SRC_FILES=("$SRC_YAML")
+DEST_FILES=("$DEST_YAML")
+if [ -f "$SRC_JSON" ]; then
+  SRC_FILES+=("$SRC_JSON")
+  DEST_FILES+=("$DEST_JSON")
+  echo "==> checking the YAML and JSON renderings match"
+  python3 "$CHECK_PAIR" "$SRC_YAML" "$SRC_JSON" ||
+    die "v${VERSION}'s renderings disagree — nothing published"
+elif [ "${VERSION%%.*}" -ge "$JSON_FROM_MAJOR" ]; then
+  die "no JSON rendering for v${VERSION} at ${SRC_JSON#"$REPO_ROOT"/} — rerun the generator so the YAML and JSON are written together"
+else
+  echo "note: v${VERSION} predates the JSON rendering — publishing ${DEST_YAML} only" >&2
+fi
 
 [ -n "$BRANCH" ] || BRANCH="release/metric-v${VERSION}"
 
-# Provenance for the PR body: which commit of this repo the YAML came from, and
-# whether it was clean at the time.
+# Provenance for the PR body: which commit of this repo the files came from, and
+# whether they were clean at the time.
 SRC_COMMIT="$(git -C "$REPO_ROOT" rev-parse --short HEAD 2>/dev/null || echo unknown)"
 SRC_DIRTY=""
-if ! git -C "$REPO_ROOT" diff --quiet -- "$SRC_FILE" 2>/dev/null ||
-   ! git -C "$REPO_ROOT" diff --cached --quiet -- "$SRC_FILE" 2>/dev/null; then
-  SRC_DIRTY="yes"
-  echo "warning: metric/airbds_metric_v${VERSION}.yaml has uncommitted changes — publishing the working-tree version" >&2
-fi
+for f in "${SRC_FILES[@]}"; do
+  if ! git -C "$REPO_ROOT" diff --quiet -- "$f" 2>/dev/null ||
+     ! git -C "$REPO_ROOT" diff --cached --quiet -- "$f" 2>/dev/null; then
+    SRC_DIRTY="yes"
+    echo "warning: ${f#"$REPO_ROOT"/} has uncommitted changes — publishing the working-tree version" >&2
+  fi
+done
 
 # Runs inside the publication clone — absolute path, values quoted for the shell
 # that re-parses this string. Only the metric version: the skill version in that
 # README is the skill release's to set.
 printf -v POST_COPY 'python3 %q --metric-version %q' "$STAMP" "$VERSION"
 
-BODY="Publishes **AIRBDS metric v${VERSION}** to the repository root as \`${DEST_FILE}\`.
+# One "Published" row per file, each linking the source it was copied from.
+PUBLISHED_ROWS=""
+for i in "${!SRC_FILES[@]}"; do
+  src_rel="${SRC_FILES[$i]#"$REPO_ROOT"/}"
+  PUBLISHED_ROWS+="| \`${DEST_FILES[$i]}\` | [\`${src_rel}\`](https://github.com/AIBIO-UK/airbds-dev/blob/${SRC_COMMIT}/${src_rel}) |
+"
+done
 
-| | |
+# Only worth explaining when both are going over.
+RENDERINGS_NOTE=""
+if [ "${#SRC_FILES[@]}" -gt 1 ]; then
+  RENDERINGS_NOTE="
+Both renderings are published together and carry the same data: the generator
+writes the JSON from the object it parsed the YAML into, rather than making a
+second pass over the sheet, and the release re-checks the pair before publishing.
+The JSON is there for consumers that parse the metric without a YAML library —
+the assessment skill bundles it as \`assets/airbds_metric.json\`.
+"
+fi
+
+BODY="Publishes **AIRBDS metric v${VERSION}** to the repository root.
+
+| Published as | Source |
 |---|---|
-| Metric version | v${VERSION} |
-| Source | [\`metric/airbds_metric_v${VERSION}.yaml\`](https://github.com/AIBIO-UK/airbds-dev/blob/${SRC_COMMIT}/metric/airbds_metric_v${VERSION}.yaml) |
-| Source commit | AIBIO-UK/airbds-dev@${SRC_COMMIT}${SRC_DIRTY:+ (plus uncommitted working-tree changes)} |
-
+${PUBLISHED_ROWS}
+Metric version v${VERSION}, from AIBIO-UK/airbds-dev@${SRC_COMMIT}${SRC_DIRTY:+ (plus uncommitted working-tree changes)}.
+${RENDERINGS_NOTE}
 \`skills/README.md\` is restamped in the same commit so the metric version it
 quotes reads v${VERSION}. That number sits inside HTML comment markers, so the
 diff touches the source and not how the page reads.
 
-The published filename is unversioned — pin a tag or release in this repository
+The published filenames are unversioned — pin a tag or release in this repository
 to depend on a specific metric version.
 
 Opened by \`metric/src/scripts/release_metric_to_core.sh\`."
 
+FILE_ARGS=()
+COPIED=""
+for i in "${!SRC_FILES[@]}"; do
+  FILE_ARGS+=(--src "${SRC_FILES[$i]}" --dest "${DEST_FILES[$i]}")
+  COPIED+="  metric/airbds_metric_v${VERSION}.${SRC_FILES[$i]##*.} -> ${DEST_FILES[$i]}
+"
+done
+
 exec "$PUBLISH" \
-  --src "$SRC_FILE" \
-  --dest "$DEST_FILE" \
+  "${FILE_ARGS[@]}" \
   --branch "$BRANCH" \
   --title "Release AIRBDS metric v${VERSION}" \
   --body "$BODY" \
   --post-copy "$POST_COPY" \
   --commit-message "release: publish AIRBDS metric v${VERSION}
 
-Copies metric/airbds_metric_v${VERSION}.yaml from AIBIO-UK/airbds-dev@${SRC_COMMIT}
-to ${DEST_FILE} in the repository root, and restamps the metric version quoted
-in skills/README.md." \
+Copies from AIBIO-UK/airbds-dev@${SRC_COMMIT} into the repository root:
+
+${COPIED}
+and restamps the metric version quoted in skills/README.md." \
   ${PASSTHROUGH[@]+"${PASSTHROUGH[@]}"}

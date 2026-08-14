@@ -135,9 +135,31 @@ block.
 
 `scripts/release_metric_to_core.sh` publishes one metric version to the
 publication repository, [AIBIO-UK/airbds-core][core]. It copies
-`metric/airbds_metric_v<version>.yaml` to that repository's **root** as the
-unversioned **`airbds_metric.yaml`**, commits it on a release branch, pushes, and
+`metric/airbds_metric_v<version>.yaml` and `metric/airbds_metric_v<version>.json`
+to that repository's **root** as the unversioned **`airbds_metric.yaml`** and
+**`airbds_metric.json`**, commits them together on a release branch, pushes, and
 opens a pull request for working-group review.
+
+Both renderings are one release. They describe the same metric in two formats —
+the YAML for readers, the JSON for consumers that parse it without a YAML
+library, the assessment skill among them — so a release that moved only one would
+leave the publication repo asserting two different metrics at once. Before
+anything is cloned, the script runs
+
+```bash
+python3 metric/src/scripts/check_metric_renderings_match.py \
+    metric/airbds_metric_v1.0.0.yaml metric/airbds_metric_v1.0.0.json
+```
+
+which compares the two as parsed objects — formatting and the YAML's comments are
+irrelevant — and names the differing top-level keys if they disagree. A mismatch
+aborts the release. The generator writes both files from one parsed object, so a
+failure here means one of them was edited or rebuilt on its own; regenerate the
+pair rather than patching either.
+
+From **v1.0.0 the JSON is required**, and a missing one is an error rather than a
+silent YAML-only release: it almost always means the generator was not rerun. The
+retained v0.3 and v0.4 metrics predate the JSON rendering and are exempt.
 
 ```bash
 ./metric/src/scripts/release_metric_to_core.sh 1.0.0             # branch, push, PR
@@ -162,8 +184,9 @@ Useful options — `--help` lists them all:
 The clone/branch/commit/push/PR mechanics live in the shared
 [`scripts/publish-to-core.sh`](../../scripts/publish-to-core.sh), which the skill
 release ([`skills/src/scripts/release_skill_to_core.sh`](../../skills/src/scripts/release_skill_to_core.sh))
-uses too; this script computes the file, destination, branch, and PR text and
-forwards the rest.
+uses too; this script computes the files, their destinations, the branch, and the
+PR text, and forwards the rest. The engine takes repeated `--src`/`--dest` pairs,
+which is how both renderings land in a single commit.
 
 The same commit also restamps the metric version quoted in `airbds-core`'s
 `skills/README.md`, via
@@ -189,17 +212,19 @@ Things it deliberately does **not** do:
 
 It refuses to run if the release branch already exists on the remote (pass
 `--branch` or delete it), and exits successfully without creating a branch or PR
-if the published file already matches the version being released. It warns if the
-source YAML has uncommitted changes, and publishes the working-tree version —
-the PR body records the `airbds-dev` commit the file came from, noting when it
-was dirty.
+if the published files *both* already match the version being released. It warns
+if either source has uncommitted changes, and publishes the working-tree version
+— the PR body records the `airbds-dev` commit the files came from, noting when
+they were dirty.
 
 Offline tests drive the whole script against a throwaway local repository with a
 stubbed `gh`, so they neither reach the network nor touch the real publication
 repository:
 
 ```bash
-python3 metric/src/tests/test_release_metric_to_core.py   # or: pytest metric/src/tests/
+python3 metric/src/tests/test_release_metric_to_core.py        # release script
+python3 metric/src/tests/test_check_metric_renderings_match.py # the preflight
+# or, for both: pytest metric/src/tests/
 ```
 
 [core]: https://github.com/AIBIO-UK/airbds-core

@@ -157,12 +157,21 @@ here is final, `metric/src/scripts/release_metric_to_core.sh` publishes it:
 ./metric/src/scripts/release_metric_to_core.sh 1.0.0
 ```
 
-It copies `metric/airbds_metric_v1.0.0.yaml` to the root of `airbds-core` as the
-**unversioned `airbds_metric.yaml`**, on a `release/metric-v1.0.0` branch, and
-opens a pull request. It does not merge and does not tag — because the published
-filename carries no version, tagging the merged release is what gives downstream
-consumers something to pin to, and that stays a deliberate manual step. See
-[`metric/src/README.md`](src/README.md) for the options and the full behaviour.
+It copies `metric/airbds_metric_v1.0.0.yaml` **and**
+`metric/airbds_metric_v1.0.0.json` to the root of `airbds-core` as the
+**unversioned `airbds_metric.yaml`** and **`airbds_metric.json`**, in one commit
+on a `release/metric-v1.0.0` branch, and opens a pull request. It does not merge
+and does not tag — because the published filenames carry no version, tagging the
+merged release is what gives downstream consumers something to pin to, and that
+stays a deliberate manual step. See [`metric/src/README.md`](src/README.md) for
+the options and the full behaviour.
+
+Both renderings go over together, and a preflight
+(`metric/src/scripts/check_metric_renderings_match.py`) refuses the release if
+they do not hold the same data. Publishing one without the other would leave
+`airbds-core` asserting two different metrics at once. From v1.0.0 the JSON is
+required; the retained v0.3 and v0.4 metrics predate it and publish as YAML
+alone.
 
 ### Why ALL Files Must Change Together
 
@@ -232,7 +241,7 @@ Use this as a checklist when implementing any metric change.
 - `skills/GF/GF-airbds-assessment-skill/SKILL.md` — update embedded templates, question table, file paths, skill version
 - `skills/testing/airbds-assessment-skill/SKILL.md` — update template filename **only if the XLSX is also regenerated**
 - `skills/versions.json` — per-channel update manifest the assessment skills read at runtime; bump a channel's `metric_version` only when that channel's skill is actually repointed to the new metric (leave channels intentionally kept on the old metric untouched). Validate with `skills/src/scripts/validate_skills_versions.py`
-- `skills/docs/DESIGN.md` — the bundle diagram spells out the `assets/airbds_metric.yaml` symlink target, so update it whenever a channel's symlink is repointed (same trigger as the `versions.json` bump above)
+- `skills/docs/DESIGN.md` — the bundle diagram spells out the `assets/airbds_metric.json` symlink target, so update it whenever a channel's symlink is repointed (same trigger as the `versions.json` bump above)
 - `reviews/docs/tutorial-yaml.md` — update all `vX.Y` path references
 - `reviews/docs/tutorial-csv.md` — update all `vX.Y` path references
 
