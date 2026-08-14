@@ -216,6 +216,10 @@ Each metric version is a separate YAML file (`metric/airbds_metric_vX.Y.yaml`).
 Completed reviews reference the metric version they were scored with via the
 `schema_version` field. See [CHANGELOG.md](CHANGELOG.md) for full history.
 
+**Publishing a new version** — the running order, from the Google Sheet through
+to the assessment skill that carries the new metric — is in
+[RELEASING.md](RELEASING.md).
+
 > **v1.0.0 is the current version.** The metric, the review templates, and the
 > sheet→YAML converter target v1.0.0. v0.4 and v0.3 are retained — the version-aware
 > review processor scores each review against the metric matching its

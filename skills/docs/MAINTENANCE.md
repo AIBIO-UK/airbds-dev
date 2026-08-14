@@ -125,9 +125,20 @@ bundled `assets/airbds_metric.json` symlink at a new `metric/airbds_metric_v*.js
 stays on the older metric. A stale entry will either suppress a needed update
 prompt or nag users who are already current.
 
-When a metric version bump is the trigger, follow the Coupled File Groups
-manifest in [`metric/README.md`](../../metric/README.md), which lists
-`versions.json` alongside every other coupled file.
+**A new metric is at least a MINOR skill bump — never a patch.** When a channel
+moves to a new metric, raise its `skill_version` by at least a minor: `0.8.1`
+becomes `0.9.0`, not `0.8.2`. The bundle's contents have changed and it now
+scores against a different metric, so two builds separated only by a patch number
+would look interchangeable when they are not. Raise it in **both** places that
+carry it — `versions.json` and that channel's `SKILL.md` `metadata.version` — and
+note that the runtime update prompt keys off `metric_version`, not
+`skill_version`, so the bump is about honest identity rather than triggering the
+prompt.
+
+When a metric version bump is the trigger, follow
+[`RELEASING.md`](../../RELEASING.md), which puts this step in order against the
+rest of the release — the metric is published first, and the skill channels are
+repointed at it afterwards.
 
 `channels.production` is the exception to "bump when the skill changes": nothing
 in this repo changes what production serves, so its entry moves only when a
@@ -174,12 +185,28 @@ Actions tab without a code change.
 which runs [`skills/src/scripts/validate_skills_versions.py`](../src/scripts/validate_skills_versions.py).
 It confirms the manifest is valid JSON, every channel has the required fields,
 and every advertised `metric_version` has a matching
-`metric/airbds_metric_v<version>.yaml`. Run it locally before committing a
+`metric/airbds_metric_v<version>.yaml`.
+
+It then **cross-checks each channel against the bundle it describes**, which is
+the part that catches the mistakes this page warns about: `skill_version` against
+that channel's `SKILL.md` `metadata.version`, `metadata.channel` against the
+directory the skill sits in, and `metric_version` against the `schema_version` of
+the metric its `assets/airbds_metric.json` symlink actually resolves to. A
+repointed symlink with an unbumped manifest — or a bumped manifest with an
+unmoved symlink — fails here rather than shipping a skill that misreports what it
+scored against. `production` is skipped, having no source directory.
+
+Given `--since <git-ref>` it also enforces the minor-bump rule above, comparing
+the manifest to its state at that ref. Run it locally before committing a
 manifest change:
 
 ```
-python3 skills/src/scripts/validate_skills_versions.py
+python3 skills/src/scripts/validate_skills_versions.py --since HEAD
 ```
+
+CI resolves the ref itself — the branch point for a pull request, the preceding
+commit for a push — and falls back to the stateless checks when there is no
+usable baseline.
 
 ## Promoting to production
 

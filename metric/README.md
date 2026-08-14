@@ -98,7 +98,12 @@ it in the comments. In the metric these questions carry
 
 > **Before editing any file in this folder, read this section.**
 
-Changes to this folder have a disproportionate downstream impact. Multiple files across the repository — scripts, GitHub Actions workflows, skills, tutorials, and documentation — all reference the exact metric version and file paths. A partial update (e.g. regenerating the metric YAML without updating the review template, or bumping the version without updating the workflow paths) creates silent failures that corrupt inter-rater reliability or break the CI/CD pipeline.
+Changes to this folder have a disproportionate downstream impact. The review
+template is generated from the metric, the assessment skill bundles it and
+reports the version it scored against, and several documents quote that version
+in prose. Regenerating the metric without carrying the rest along leaves those
+out of step, and nothing in CI will tell you. [`RELEASING.md`](../RELEASING.md)
+is the running order that keeps them together.
 
 ### Files in This Folder
 
@@ -112,8 +117,9 @@ Changes to this folder have a disproportionate downstream impact. Multiple files
 | `README.md` | Markdown | This file — contributor guide for the metric folder |
 
 The metric is **authored as YAML**, with the JSON a subsidiary rendering of it
-(introduced with v0.5, and carried into v1.0.0). (The *review template* under `reviews/` ships in both YAML
-and CSV — that is a separate file, see Group B below.)
+(introduced with v0.5, and carried into v1.0.0). (The *review template* under
+`reviews/` also ships in both YAML and CSV — a separate file, generated from the
+metric by [`reviews/src/scripts/build_review_template.py`](../reviews/src/scripts/build_review_template.py).)
 
 > **v1.0.0 is the current version.** `airbds_metric_v1.0.0.*` is generated from the working group's Google Sheet (see [How the v1.0.0 metric files are generated](#how-the-v100-metric-files-are-generated) and the `[1.0.0]` entry in [CHANGELOG.md](../CHANGELOG.md)). **v0.4 and v0.3 are retained** for reference and for re-scoring older reviews — the review processor auto-selects the metric matching each review's `schema_version`. **v0.5 was withdrawn**, not retained: v1.0.0 is the same metric under a stable version number, and no review ever carried `schema_version: "0.5"`, so there was nothing to re-score. Retention exists for reviews, not for completeness.
 
@@ -161,10 +167,11 @@ It copies `metric/airbds_metric_v1.0.0.yaml` **and**
 `metric/airbds_metric_v1.0.0.json` to the root of `airbds-core` as the
 **unversioned `airbds_metric.yaml`** and **`airbds_metric.json`**, in one commit
 on a `release/metric-v1.0.0` branch, and opens a pull request. It does not merge
-and does not tag — because the published filenames carry no version, tagging the
-merged release is what gives downstream consumers something to pin to, and that
-stays a deliberate manual step. See [`metric/src/README.md`](src/README.md) for
-the options and the full behaviour.
+and does not tag. `airbds-core` carries the **current** metric and only the
+current one; every version, superseded ones included, stays here under its own
+name — so anyone depending on a specific version references this repository, not
+a tag over there. See [`metric/src/README.md`](src/README.md) for the options and
+the full behaviour.
 
 Both renderings go over together, and a preflight
 (`metric/src/scripts/check_metric_renderings_match.py`) refuses the release if
@@ -173,96 +180,23 @@ they do not hold the same data. Publishing one without the other would leave
 required; the retained v0.3 and v0.4 metrics predate it and publish as YAML
 alone.
 
-### Why ALL Files Must Change Together
+### Changing the metric
 
-#### The review-template YAML ↔ CSV pair must always be identical in content
+A metric change is proposed on an issue before any YAML is written, and the size
+of the version bump follows from what changed. Both are documented in
+[`CONTRIBUTING.md`](../CONTRIBUTING.md):
 
-The **review template** ships in both formats (`reviews/review_template.{yaml,csv}`) and they are **not** derived from each other at read time — both are independent files that are read directly. The review processor (`reviews/src/scripts/review_processor.py`) loads whichever format the reviewer submitted; the human spreadsheet workflow reads the CSV. If one is updated without the other, a researcher using the spreadsheet workflow scores against a different template than one using the YAML workflow. This is **silent**, produces no error, and **invalidates inter-rater reliability**.
+- [Proposing metric changes](../CONTRIBUTING.md#proposing-metric-changes) — the
+  issue-first workflow, the `[Metric Change]` title prefix, and what the issue
+  needs to state.
+- [Versioning policy](../CONTRIBUTING.md#versioning-policy) — which kind of
+  change bumps which component, why all three components are always written out,
+  and what happens to the outgoing version.
 
-#### The downstream impact chain
-
-For any **MINOR** change (question additions, deletions, or rewordings) or **MAJOR** change (weight or grade threshold changes), the following files outside `metric/` must also be updated in the same commit or PR:
-
-| File | What breaks if not updated |
-|------|---------------------------|
-| `README.md` | Version badge, question table, download links, and processor command examples all reference the old version |
-| `CHANGELOG.md` | No record of the change; violates the project's versioning contract with users |
-| `CITATION.cff` | `version` and `date-released` fields are stale; published citations will reference the wrong version |
-| `LICENSE.md` | Its suggested-citation block names a version and year; if not updated it contradicts `CITATION.cff` and `README.md` |
-| `skills/GF/GF-airbds-assessment-skill/SKILL.md` | Embedded question table, YAML templates, `schema_version` value, and file paths all reference old version |
-| `skills/testing/airbds-assessment-skill/SKILL.md` | Template filename reference (update only if the XLSX is also regenerated) |
-| `reviews/docs/tutorial-yaml.md` | File path references to `v0.3` in instructions become broken |
-| `reviews/docs/tutorial-csv.md` | Same as above for spreadsheet tutorial |
-
-**PATCH** changes (guidance text only — no change to question meaning, weight, or ID) are lighter: regenerate the metric YAML and update the review-template pair. Downstream files are not required unless they quote guidance text verbatim.
-
-### Recommended Workflow for Proposing Changes
-
-1. **Check existing Issues** at [github.com/AIBIO-UK/airbds-dev/issues](https://github.com/AIBIO-UK/airbds-dev/issues) before opening a new one — the change may already be under discussion.
-
-2. **Open a GitHub Issue** before writing any code or YAML. Use the title prefix `[Metric Change]`. In the body, state:
-   - Which question(s) are affected (e.g. ABC-12, ABC-16)
-   - The rationale for the change
-   - Whether this is a guidance-only change (**PATCH**), a question rewording/addition/deletion (**MINOR**), or a weight/threshold change (**MAJOR**)
-
-   See [CONTRIBUTING.md](../CONTRIBUTING.md) for the full versioning policy.
-
-3. **Discuss on the Issue** until working-group consensus is reached. A maintainer will label the issue `metric-change-pending`.
-
-4. **Fork the repository** and create a branch named `metric/<issue-number>-brief-description` (e.g. `metric/42-add-abc-29-reproducibility`).
-
-5. **Update ALL coupled files** as described in the Coupled File Groups manifest below. This is **not optional** — a partial update silently corrupts inter-rater reliability, and there is no automated check for it. Review carefully before merging.
-
-6. **Open a pull request** referencing the original Issue (e.g. `Closes #42`).
-
-7. **Working-group review** and merge by a maintainer.
-
-### Coupled File Groups Manifest
-
-Use this as a checklist when implementing any metric change.
-
-#### Group A — Core metric *(generated, never hand-edited)*
-- `metric/airbds_metric_vX.Y.yaml`
-- `metric/airbds_metric_vX.Y.json` *(from v0.5 onwards — the same document as the
-  YAML, for consumers that cannot use a YAML parser; written by the same run)*
-
-> Never hand-edit these files. v1.0.0 (current) is generated from the working group's Google Sheet by `metric/src/scripts/build_metric_from_google_sheet_v1.0.0.py` (v0.4 by the `…_v0.4.py` script); v0.3 by `metric/src/scripts/build_metric_yaml_from_spreadsheet_v0.3.py`. See [How the v1.0.0 metric files are generated](#how-the-v100-metric-files-are-generated).
-
-#### Group B — Review template pair *(always change together)*
-- `reviews/review_template.yaml`
-- `reviews/review_template.csv`
-
-#### Group C — Downstream version-carrying files *(MINOR or MAJOR changes only)*
-- `README.md` — version badge, question table, download links, processor command examples
-- `CHANGELOG.md` — add a new entry at the top of the **Metric** section, referencing the originating Issue
-- `CITATION.cff` — update `version:` and `date-released:` fields
-- `LICENSE.md` — update the version and year in the suggested-citation block (not the copyright year, which is the year of first publication). Keep it consistent with `CITATION.cff` and the Citation section of `README.md`
-- The review processor needs **no update** — it auto-selects `metric/airbds_metric_v<schema_version>.yaml` per review. Its workflows need none either, and neither runs automatically now: `review-check.yml` is disabled (the manual review process is not live) and `review-test.yml` is `workflow_dispatch`-only.
-- `skills/GF/GF-airbds-assessment-skill/SKILL.md` — update embedded templates, question table, file paths, skill version
-- `skills/testing/airbds-assessment-skill/SKILL.md` — update template filename **only if the XLSX is also regenerated**
-- `skills/versions.json` — per-channel update manifest the assessment skills read at runtime; bump a channel's `metric_version` only when that channel's skill is actually repointed to the new metric (leave channels intentionally kept on the old metric untouched). Validate with `skills/src/scripts/validate_skills_versions.py`
-- `skills/docs/DESIGN.md` — the bundle diagram spells out the `assets/airbds_metric.json` symlink target, so update it whenever a channel's symlink is repointed (same trigger as the `versions.json` bump above)
-- `reviews/docs/tutorial-yaml.md` — update all `vX.Y` path references
-- `reviews/docs/tutorial-csv.md` — update all `vX.Y` path references
-
-> `metric/README.md` is a documentation file. Update its version references — including the question counts and maximum score under [How Scoring Works](#how-scoring-works) in Part 1 — when implementing MINOR or MAJOR changes.
-
-### Versioning Quick Reference
-
-| Change type | Description | Version bump | Files to update |
-|-------------|-------------|-------------|-----------------|
-| **PATCH** | Guidance text clarification only — no change to question meaning, weights, or IDs | `1.0.0` → `1.0.1` | Groups A, B |
-| **MINOR** | Question added, removed, or reworded | `1.0.0` → `1.1.0` | Groups A, B, C |
-| **MAJOR** | Weight point value or grade threshold changed | `1.0.0` → `2.0.0` | Groups A, B, C |
-
-All three components are written out, trailing zeros included: the version is
-`1.0.0`, never `1.0`. That string is a path component
-(`airbds_metric_v1.0.0.yaml`) and a key in `skills/versions.json`, both resolved
-by exact match, so its shape is load-bearing rather than cosmetic. The retained
-v0.4 and v0.3 files keep their two-part names, since committed reviews carry
-those exact strings.
-
-The canonical versioning policy is defined in [CONTRIBUTING.md](../CONTRIBUTING.md).
+Once a change is agreed, [`RELEASING.md`](../RELEASING.md) is the running order
+for getting it out: regenerating the metric, the files that have to move with it,
+publishing to `airbds-core`, and repointing the assessment skill at the new
+version.
 
 ---
 

@@ -546,7 +546,70 @@ layout — that carry no version of their own. Recorded by month, newest first.
 
 ## 2026-08
 
+### Added
+- **`validate_skills_versions.py` now cross-checks the manifest against the
+  bundles it describes**, and enforces that a channel moving to a new metric
+  bumps its `skill_version` by at least a MINOR. The manifest restates facts the
+  bundles already carry — a channel's skill version is also in its `SKILL.md`
+  `metadata.version`, and the metric it scores against is whatever its
+  `assets/airbds_metric.json` symlink resolves to — and every copy was
+  hand-maintained with nothing comparing them. The validator previously checked
+  only that an advertised `metric_version` had a matching file *somewhere*, so it
+  would have passed a channel advertising v1.0.1 while still bundling v1.0.0:
+  exactly the mistake the repoint step invites. It now compares `skill_version`
+  to `SKILL.md`, `metadata.channel` to the directory, and `metric_version` to the
+  bundled metric's `schema_version`; `production` is exempt, having no source
+  directory. `--since <git-ref>` adds the bump rule by reading the manifest at an
+  earlier commit — a new metric changes what the bundle contains and what it
+  scores against, so it is never a patch-level change to the skill. CI resolves
+  that ref itself (a PR's branch point, a push's preceding commit) and falls back
+  to the stateless checks when there is no usable baseline. Tested in
+  `skills/src/tests/test_validate_skills_versions.py` (14 tests), which had none
+  before.
+
+- `RELEASING.md` — the running order for a release, top level, covering the
+  metric and the assessment skill that carries it. The steps themselves stay in
+  the READMEs that own them; what this adds is the *order*, and the things that
+  fall between documents: that the skill channels are repointed after the metric
+  is published rather than before, that a release *overwrites* what
+  `airbds-core` publishes because the filenames there are unversioned, and which
+  files quote a version in prose and go quietly stale.
+
+- **Stated that neither repository tags metric releases**, in
+  `CONTRIBUTING.md`'s versioning policy. Both release scripts and three READMEs
+  said the opposite — that "a tag or release in `airbds-core` is what downstream
+  consumers pin to" — written when the release script was built and never acted
+  on: `airbds-core` has no tags and no releases, across five publications. The
+  pinning story it described did not exist. The real one, now written down, is
+  that `airbds-core` carries the current metric under an unversioned filename
+  while this repository retains every version under its own name, which is what
+  anything depending on a specific version references.
+
 ### Changed
+- **Marked the `skills/GF/` variant dormant.** It scores against metric v0.3 and
+  was never carried forward to v0.4 or v1.0.0, so its embedded question table,
+  weights, and grading describe a metric three versions old — while the
+  coupled-file manifest still listed it as something to update on every release.
+  Banners now say so in `skills/GF/README.md`, in the skill's own `SKILL.md` and
+  its frontmatter `note` (so an assistant reading the file is warned too), and in
+  `skills/README.md`. Nothing is deleted: the variant is kept as a record of the
+  ideas it prototyped.
+
+- **Removed the Coupled File Groups manifest from `metric/README.md`** (~90
+  lines: *Why ALL Files Must Change Together*, the downstream impact chain,
+  *Recommended Workflow for Proposing Changes*, the manifest itself, and the
+  *Versioning Quick Reference*). It arrived in May 2026 as the written spec for
+  the `metric-alignment-check` workflow and the propagation skill, both deleted
+  in July, and had drifted accordingly: it told readers to update a template
+  filename "only if the XLSX is also regenerated" when the XLSX had been removed
+  from the skill long before, and its group letters had already been reshuffled
+  once by the retirement of `metric/scoring_schema`. The people running releases
+  had never read it. The parts with no other home — the version-carrying files,
+  including the `LICENSE.md` citation block and its copyright-year trap — moved
+  into `RELEASING.md`; the rest was already covered better by
+  `CONTRIBUTING.md`'s versioning policy and metric-change workflow, which
+  `metric/README.md` now points at.
+
 - `metric/src/scripts/release_metric_to_core.sh` publishes the metric's **JSON
   rendering alongside its YAML**, as `airbds_metric.json` and
   `airbds_metric.yaml` in one commit. The generator has written both files since

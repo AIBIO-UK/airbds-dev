@@ -15,6 +15,7 @@ for their channel.
 
 ```bash
 python3 skills/src/scripts/validate_skills_versions.py
+python3 skills/src/scripts/validate_skills_versions.py --since HEAD
 ```
 
 It confirms the manifest is valid JSON with a non-empty `channels` map, that each
@@ -23,14 +24,37 @@ channel carries non-empty `metric_version`, `skill_version`, and
 matching `metric/airbds_metric_v<version>.yaml`. It exits 0 when valid, or 1
 listing every problem found.
 
-A stale manifest fails silently in the worst way — it either suppresses an update
-prompt users need or nags users who are already current — so it is also checked
-in CI by
-[`validate-skills-versions.yml`](../../.github/workflows/validate-skills-versions.yml),
-which runs this same script whenever the manifest, the metric YAMLs, or the
-script itself change.
+The manifest restates facts the bundles already carry, and both copies are
+hand-maintained, so the rest of the checks are cross-checks. For each channel
+with a source directory here — `development` and `testing`; `production` has none
+— it compares:
 
-Needs only the Python 3 standard library.
+| Manifest field | Against |
+|---|---|
+| `skill_version` | that channel's `SKILL.md` `metadata.version` |
+| `metric_version` | the `schema_version` of the metric `assets/airbds_metric.json` resolves to |
+| *(channel identity)* | `SKILL.md` `metadata.channel` vs the directory it sits in |
+
+The middle row is the one that matters most: it means a symlink repointed at a
+new metric without a manifest bump — or a manifest bump without the repoint —
+fails instead of publishing a skill that misreports the metric it scored against.
+
+With `--since <git-ref>` it additionally enforces that a channel whose
+`metric_version` changed has had its `skill_version` raised by at least a MINOR.
+See [`skills/docs/MAINTENANCE.md`](../docs/MAINTENANCE.md#keeping-the-manifest-in-step)
+for that rule.
+
+A stale manifest fails silently in the worst way — it either suppresses an update
+prompt users need or nags users who are already current — so all of this is also
+checked in CI by
+[`validate-skills-versions.yml`](../../.github/workflows/validate-skills-versions.yml),
+which runs this same script whenever the manifest, a skill bundle, the metric
+YAMLs, or the script itself change. CI resolves the `--since` ref itself and
+falls back to the stateless checks when there is no usable baseline.
+
+Needs only the Python 3 standard library. Tested in
+[`src/tests/test_validate_skills_versions.py`](tests/test_validate_skills_versions.py)
+(14 tests).
 
 ## Publishing the skill to `airbds-core` (the push to production)
 
@@ -93,8 +117,9 @@ release. See [MAINTENANCE.md](../docs/MAINTENANCE.md#the-readme-stamp).
 | `--draft` | Open the pull request as a draft |
 
 Like the metric release it never merges and never tags. The published filename
-carries neither channel nor version, so a tag or GitHub release in `airbds-core`
-is what downstream consumers pin to.
+carries neither channel nor version: `airbds-core` holds the current production
+skill, and an installed skill tracks its channel through
+[`skills/versions.json`](../versions.json) rather than pinning a build.
 
 Offline tests drive the script against a throwaway local repository with a
 stubbed `gh` and a synthesised zip, so they neither reach the network nor touch
