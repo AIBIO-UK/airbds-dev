@@ -2,20 +2,32 @@ name: Validate Skills Versions Manifest
 
 # Validates skills/versions.json — the per-channel skill update manifest the
 # assessment skills read at runtime. Confirms it is well-formed JSON with the
-# required per-channel fields, and that every advertised metric_version has a
-# matching metric/airbds_metric_v<version>.yaml file.
-# Runs when the manifest, the metric YAMLs, or the validator script change.
+# required per-channel fields, that every advertised metric_version has a
+# matching metric/airbds_metric_v<version>.yaml file, and that each channel's
+# entry agrees with the skill bundle it describes (SKILL.md's version and
+# channel, and the schema_version of the metric its assets/ symlink resolves to).
+#
+# It also compares the manifest against its previous state to enforce that a
+# channel moving to a new metric bumps its skill_version by at least a MINOR.
+# That check needs a baseline commit, so the checkout is unshallowed and the ref
+# is resolved below; where no usable baseline exists (a brand-new branch, a
+# force-push) the step falls back to the stateless checks rather than failing.
+#
+# Runs when the manifest, the metric YAMLs, the skill bundles, or the validator
+# script change.
 
 on:
   push:
     paths:
       - 'skills/versions.json'
+      - 'skills/*/airbds-assessment-skill/**'
       - 'metric/airbds_metric_v*.yaml'
       - 'skills/src/scripts/validate_skills_versions.py'
       - '.github/workflows/validate-skills-versions.yml'
   pull_request:
     paths:
       - 'skills/versions.json'
+      - 'skills/*/airbds-assessment-skill/**'
       - 'metric/airbds_metric_v*.yaml'
       - 'skills/src/scripts/validate_skills_versions.py'
       - '.github/workflows/validate-skills-versions.yml'
@@ -29,11 +41,39 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # Full history: the skill-version bump check reads the manifest at an
+          # earlier commit.
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
+      - name: Resolve the baseline to compare the manifest against
+        id: baseline
+        env:
+          # For a PR, the branch point; for a push, the commit before it.
+          CANDIDATE: ${{ github.event_name == 'pull_request'
+            && github.event.pull_request.base.sha
+            || github.event.before }}
+        run: |
+          ref=""
+          # github.event.before is all-zeros for a newly created branch, and a
+          # force-push can leave a sha that is no longer reachable.
+          if [ -n "$CANDIDATE" ] && [ "${CANDIDATE//0/}" != "" ] \
+             && git cat-file -e "${CANDIDATE}^{commit}" 2>/dev/null; then
+            ref="$CANDIDATE"
+          fi
+          echo "ref=${ref}" >> "$GITHUB_OUTPUT"
+          if [ -z "$ref" ]; then
+            echo "No usable baseline commit — running the stateless checks only."
+          else
+            echo "Comparing the manifest against ${ref}."
+          fi
+
       - name: Validate skills/versions.json
-        run: python3 skills/src/scripts/validate_skills_versions.py
+        run: |
+          python3 skills/src/scripts/validate_skills_versions.py \
+            ${{ steps.baseline.outputs.ref && format('--since {0}', steps.baseline.outputs.ref) || '' }}
