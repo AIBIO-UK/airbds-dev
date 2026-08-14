@@ -180,24 +180,6 @@ they do not hold the same data. Publishing one without the other would leave
 required; the retained v0.3 and v0.4 metrics predate it and publish as YAML
 alone.
 
-### Proposing a metric change
-
-A metric change is proposed on a GitHub Issue before any YAML is written, so the
-working group can discuss and reach consensus first.
-
-- Check open and closed Issues to avoid duplicates.
-- Use the title prefix `[Metric Change]`.
-- State which question(s) are affected (e.g. `ABC-12`), the rationale, and any
-  evidence or references.
-- Indicate whether the change is guidance-only (PATCH), a question rewording
-  (MINOR), or a weight/threshold change (MAJOR) — see the versioning policy
-  below.
-
-Once a change is agreed, [`RELEASING.md`](../RELEASING.md) is the running order
-for getting it out: regenerating the metric, the files that have to move with it,
-publishing to `airbds-core`, and repointing the assessment skill at the new
-version.
-
 ### Versioning policy
 
 The metric follows [Semantic Versioning](https://semver.org/)
