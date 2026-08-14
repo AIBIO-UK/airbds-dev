@@ -182,20 +182,34 @@ metric is published. What matters by the end of this stage is that every channel
 you intend to move is consistent.
 
 Work through the channels in order — `development`, then `testing` — skipping any
-already on the new metric. For each one that still needs moving:
+already on the new metric.
 
-- Repoint `skills/<channel>/airbds-assessment-skill/assets/airbds_metric.json`
+**Move `development` first, by hand.** There is no automated step feeding it from
+the metric, so:
+
+- Repoint `skills/development/airbds-assessment-skill/assets/airbds_metric.json`
   at the new `metric/airbds_metric_v<version>.json`. The skill reads its
   `schema_version` from that file and never hard-codes a version, so the symlink
   *is* the update — no change to `SKILL.md`'s body is needed.
-- Bump that channel's `metric_version` in [`skills/versions.json`](skills/versions.json).
+- Bump `development`'s `metric_version` in [`skills/versions.json`](skills/versions.json).
 - Bump its `skill_version` **by at least a MINOR** — in `versions.json` *and* in
-  that channel's `SKILL.md` `metadata.version`, which must agree. See the rule
+  `development`'s `SKILL.md` `metadata.version`, which must agree. See the rule
   below.
 - Update the bundle diagram in [`skills/docs/DESIGN.md`](skills/docs/DESIGN.md),
   which spells out the symlink target.
-- Add an entry under the **Assessment skill** section of `CHANGELOG.md`, naming
-  the version and the channels it applies to.
+
+**Then promote `development` → `testing` with the script**, which does the symlink
+repoint, the channel-token rewrite, and the `testing` manifest bump in one step:
+
+```bash
+./skills/src/scripts/promote_skill_channel.py --dry-run   # rehearse
+./skills/src/scripts/promote_skill_channel.py
+```
+
+→ [`skills/docs/MAINTENANCE.md#promoting-development-to-testing`](skills/docs/MAINTENANCE.md#promoting-development-to-testing).
+
+Finally, add an entry under the **Assessment skill** section of `CHANGELOG.md`,
+naming the version and the channels it applies to.
 
 ### A new metric is at least a MINOR skill bump
 

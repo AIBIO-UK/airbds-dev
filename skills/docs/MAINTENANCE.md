@@ -208,6 +208,39 @@ CI resolves the ref itself — the branch point for a pull request, the precedin
 commit for a push — and falls back to the stateless checks when there is no
 usable baseline.
 
+## Promoting development to testing
+
+`development` is the working copy; `testing` is a snapshot of it taken when a
+build is judged ready to test. A channel bundle carries its channel *inside* it —
+`metadata.channel` in `SKILL.md`, plus the update-check prose naming which
+`channels.<name>` entry to read — so promoting is not a plain copy: the channel
+token has to be substituted, the symlinked metric and template must stay symlinks
+(so `testing` keeps tracking the current files rather than freezing a copy), and
+`skills/versions.json`'s `testing` entry has to be moved to describe what was just
+promoted. This was done by hand, and every part of it was easy to get subtly
+wrong.
+
+One script does the whole thing and prints exactly what it changed:
+
+```bash
+./skills/src/scripts/promote_skill_channel.py --dry-run   # rehearse
+./skills/src/scripts/promote_skill_channel.py             # do it
+./skills/src/scripts/promote_skill_channel.py --check     # is testing already this promotion?
+```
+
+It reuses `rechannel_skill_zip.rewrite_text`, so the channel substitution carries
+the same reversibility proof used when the production zip is derived at release
+time — only the channel changed. `--from`/`--to` default to
+`development`/`testing` but take any pair of existing channels.
+
+Then review the diff, run `validate_skills_versions.py`, and commit. Pushing to
+`main` triggers the `testing` build workflow, which republishes the release the
+`skill_update_url` points at. The script does **not** commit, build, or push —
+those stay deliberate, as everywhere else in the release path.
+
+`--check` exits 0 whether or not a promotion is pending: `testing` is *meant* to
+lag `development` between promotions, so a difference is information, not a fault.
+
 ## Promoting to production
 
 The `testing` and `development` channels are staging: their zips are published as
@@ -227,8 +260,9 @@ out of step with the one in `airbds-core`:
 
 Order of operations, because the script enforces it:
 
-1. Promote `development` → `testing` as usual and let the `testing` build
-   workflow republish the release.
+1. Promote `development` → `testing` (see
+   [Promoting development to testing](#promoting-development-to-testing)) and let
+   the `testing` build workflow republish the release.
 2. Set `channels.production` in `versions.json` to the version being promoted,
    and commit it. The script gates on **that** entry, not on `testing`, because
    `channels.production` is what an installed production skill polls; publishing

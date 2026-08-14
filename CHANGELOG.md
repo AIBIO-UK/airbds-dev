@@ -547,6 +547,21 @@ layout — that carry no version of their own. Recorded by month, newest first.
 ## 2026-08
 
 ### Added
+- **`skills/src/scripts/promote_skill_channel.py` — promotes one channel's bundle
+  to another** (`development` → `testing` by default), a step that was a manual
+  directory copy plus a hand-edit of the channel token in `SKILL.md`. A bundle
+  carries its channel inside it, so the manual version was easy to get wrong: a
+  copy that dereferenced the symlinked metric and template into real files (so the
+  channel silently stopped tracking them), a missed mention of the old channel in
+  the update-check prose, or a promotion that left `skills/versions.json`
+  describing the previous bundle. The script substitutes the channel token —
+  reusing `rechannel_skill_zip.rewrite_text`, so it carries the same reversibility
+  proof as the production channel rewrite — recreates symlinks as symlinks, and
+  moves the target channel's manifest entry to describe what was promoted. It
+  writes the working tree and stops: no commit, build, or push. `--dry-run`,
+  `--check`, and `--from`/`--to` are provided. Tested in
+  `skills/src/tests/test_promote_skill_channel.py` (13 tests).
+
 - **`validate_skills_versions.py` now cross-checks the manifest against the
   bundles it describes**, and enforces that a channel moving to a new metric
   bumps its `skill_version` by at least a MINOR. The manifest restates facts the

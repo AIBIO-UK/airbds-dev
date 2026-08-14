@@ -56,6 +56,31 @@ Needs only the Python 3 standard library. Tested in
 [`src/tests/test_validate_skills_versions.py`](tests/test_validate_skills_versions.py)
 (14 tests).
 
+## Promoting a channel (`development` → `testing`)
+
+`scripts/promote_skill_channel.py` takes one channel's bundle and makes another
+channel a copy of it — by default `development` → `testing`. A bundle carries its
+channel inside it (`metadata.channel` and the update-check prose), so this is not
+a plain copy: it substitutes the channel token, keeps the symlinked metric and
+template as symlinks, and moves the target channel's `skills/versions.json` entry
+to describe what was promoted.
+
+```bash
+python3 skills/src/scripts/promote_skill_channel.py --dry-run   # rehearse
+python3 skills/src/scripts/promote_skill_channel.py             # do it
+python3 skills/src/scripts/promote_skill_channel.py --check     # already promoted?
+```
+
+The token substitution reuses `rechannel_skill_zip.rewrite_text`, so it carries
+the same reversibility proof as the production channel rewrite — only the channel
+changed. It writes the working tree and stops: review, run
+`validate_skills_versions.py`, and commit yourself; pushing to `main` rebuilds the
+target channel's release. `--from`/`--to` override the default pair.
+
+Needs only the Python 3 standard library. Tested in
+[`src/tests/test_promote_skill_channel.py`](tests/test_promote_skill_channel.py)
+(13 tests). See [`skills/docs/MAINTENANCE.md`](../docs/MAINTENANCE.md#promoting-development-to-testing).
+
 ## Publishing the skill to `airbds-core` (the push to production)
 
 `scripts/release_skill_to_core.sh` promotes the **testing** channel's skill zip
