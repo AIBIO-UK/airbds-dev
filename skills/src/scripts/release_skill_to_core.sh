@@ -34,7 +34,9 @@
 #
 # The published filename carries neither channel nor version: the testing channel
 # is this repo's staging area, and what lands in airbds-core is simply "the
-# skill". Pin a tag or release there to depend on a specific build.
+# skill" — the current production build. Nothing there is tagged; an installed
+# skill tracks its channel through skills/versions.json rather than pinning a
+# version, and earlier builds survive only in git history.
 #
 # The clone/branch/commit/push/PR mechanics live in scripts/publish-to-core.sh.
 # Needs git, unzip, python3, and gh (authenticated) — gh is required even for
@@ -259,8 +261,9 @@ skills/src/scripts/rechannel_skill_zip.py \\
 match what this PR ships — skill ${zip_version}${manifest_metric:+, metric ${manifest_metric}}. Those numbers sit inside
 HTML comment markers, so the diff touches the source and not how the page reads.
 
-The published filename carries neither channel nor version; pin a tag or release
-in this repository to depend on a specific build.
+The published filename carries neither channel nor version — this is simply the
+current production skill. Installed skills track their channel through
+\`skills/versions.json\` in AIBIO-UK/airbds-dev rather than pinning a build.
 
 Opened by \`skills/src/scripts/release_skill_to_core.sh\`."
 

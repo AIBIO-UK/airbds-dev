@@ -200,15 +200,17 @@ the release rather than publishing a stale version. See
 
 Things it deliberately does **not** do:
 
-- **It never merges and never tags.** The PR is left open; tagging the release in
-  `airbds-core` is a separate step after merge. Since the published filename
-  carries no version, a tag or GitHub release is what downstream consumers pin
-  to.
+- **It never merges and never tags.** The PR is left open for working-group
+  review. Nothing in `airbds-core` is tagged: it carries the *current* metric at
+  an unversioned filename, and a specific version is depended on from **this**
+  repository, where every version keeps its own name
+  (`metric/airbds_metric_v<X.Y.Z>.{yaml,json}`) and superseded versions are
+  retained.
 - **It never touches a local `airbds-core` checkout.** The publication repo is
   cloned into a temporary directory each run and removed afterwards, so the
   release can never pick up unrelated local state.
-- **It publishes only the YAML** — not the subsidiary `.json`, the
-  `.upstream.json` provenance sidecar, or any surrounding repo file.
+- **It publishes only the two renderings** — not the `.upstream.json` provenance
+  sidecar, and no surrounding repo file.
 
 It refuses to run if the release branch already exists on the remote (pass
 `--branch` or delete it), and exits successfully without creating a branch or PR

@@ -6,9 +6,9 @@
 # metric/airbds_metric_v<VERSION>.{yaml,json} to the root of AIBIO-UK/airbds-core
 # as the unversioned airbds_metric.yaml and airbds_metric.json, on a release
 # branch, with a pull request left open for working-group review. It never merges
-# and never tags — because the published filenames carry no version, a tag or
-# release in airbds-core is what downstream consumers pin to, so tagging stays a
-# deliberate step.
+# and never tags: airbds-core carries the current metric and only the current
+# one, while every version — superseded ones included — stays here under its own
+# name, which is what anyone depending on a specific version references.
 #
 # Both renderings go in one commit. They are the same metric in two formats —
 # the YAML for readers, the JSON for consumers that must parse it without a YAML
@@ -37,8 +37,8 @@ PUBLISH="${REPO_ROOT}/scripts/publish-to-core.sh"
 STAMP="${REPO_ROOT}/scripts/stamp_core_versions.py"
 CHECK_PAIR="${REPO_ROOT}/metric/src/scripts/check_metric_renderings_match.py"
 
-# The published filenames are deliberately unversioned: downstream consumers pin
-# a git tag or release in airbds-core, not a filename.
+# The published filenames are deliberately unversioned: airbds-core answers "what
+# is the current AIRBDS metric?", and airbds-dev answers "what was v1.0.0?".
 DEST_YAML="airbds_metric.yaml"
 DEST_JSON="airbds_metric.json"
 
@@ -165,8 +165,10 @@ ${RENDERINGS_NOTE}
 quotes reads v${VERSION}. That number sits inside HTML comment markers, so the
 diff touches the source and not how the page reads.
 
-The published filenames are unversioned — pin a tag or release in this repository
-to depend on a specific metric version.
+The published filenames are unversioned: this repository carries the *current*
+metric. To depend on a specific version, reference it in
+[AIBIO-UK/airbds-dev](https://github.com/AIBIO-UK/airbds-dev), where every
+version keeps its own name and superseded versions are retained.
 
 Opened by \`metric/src/scripts/release_metric_to_core.sh\`."
 

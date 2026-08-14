@@ -254,13 +254,24 @@ The canonical metric file is versioned in its filename
 3. The **Metric** section of `CHANGELOG.md` is updated
 4. `CITATION.cff` is updated with the new version
 
-Metric versions are not tagged as GitHub Releases for now — the version lives
-in the filename and in each review's `schema_version`. (The only release tags in
-this repository are the assessment skill build tags,
+Metric versions are not tagged as GitHub Releases, in **either** repository —
+the version lives in the filename and in each review's `schema_version`. (The
+only release tags in this repository are the assessment skill build tags,
 `assessment-skill-development` and `assessment-skill-testing`.)
+
+That is why superseded metric files are retained here rather than deleted. The
+publication repository, [`airbds-core`](https://github.com/AIBIO-UK/airbds-core),
+publishes the current metric under an unversioned filename and answers "what is
+the AIRBDS metric?"; this repository answers "what was v0.4?". Anything that
+needs to depend on a specific version references the versioned file here.
 
 Existing dataset reviews reference the metric version they were scored against
 via the `schema_version` field.
+
+This section decides *which* number a change gets. Actually cutting the release —
+regenerating the metric, moving everything that has to move with it, publishing
+to `airbds-core`, and getting the assessment skill onto the new metric — is
+[`RELEASING.md`](RELEASING.md).
 
 ---
 
