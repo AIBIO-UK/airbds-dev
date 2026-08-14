@@ -190,13 +190,6 @@ The metric follows [Semantic Versioning](https://semver.org/)
 | Guidance-only clarifications (no change to question meaning) | PATCH |
 | Question additions, deletions, or rewordings that change meaning | MINOR |
 | Changes to scoring weights or grade thresholds | MAJOR |
-| Declaring the metric stable at 1.0.0, with no content change | MAJOR |
-
-That last row is how v1.0.0 came about: it is v0.5 unchanged, released under a
-stable version number. A bump with no content change is legitimate, but say so
-explicitly in the `CHANGELOG.md` entry — a version that differs from its
-predecessor in nothing but its number is otherwise indistinguishable from one
-where a change was missed.
 
 **Write all three components**, trailing zeros included: the metric is `1.0.0`,
 not `1.0`. This is not cosmetic. The version string is a path component
