@@ -12,7 +12,9 @@ with its release channel rewritten, promoted by a maintainer — so it exists in
 exactly one place and cannot drift from a copy kept here. Install that one
 unless you specifically want the staging build.
 
-For information on Gavin's skill under test please see `GF/README.md`
+Gavin's personal variant in [`GF/`](GF/README.md) is **dormant**: it is pinned to
+AIRBDS metric v0.3, is not updated on a metric release, and should not be used
+for an assessment.
 
 We recommend you use the most capable model you have to perform the assessment.
 

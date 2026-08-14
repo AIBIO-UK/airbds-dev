@@ -14,10 +14,20 @@ metadata:
     tags: [science]
     category: science
   author: GF
-  note: Personal variant — YAML-based scoring, writes review file to reviews/testing/. Not yet agreed with team.
+  note: >
+    DORMANT — personal variant, pinned to AIRBDS metric v0.3 and not maintained.
+    Superseded by the team skill in skills/testing/. Do not use for assessments.
 ---
 
 # AIRBDS Assessment Skill (GF personal variant)
+
+> **⚠️ Dormant — do not use this for an assessment.** This variant scores against
+> **AIRBDS metric v0.3** (28 questions, `ACM-*` ids), which is superseded: the
+> current metric is v1.0.0 (25 questions, `ABC-*` ids), with different weights and
+> grading. The question table, templates, and `schema_version` below are all v0.3
+> and are not updated on a metric release — see [`RELEASING.md`](../../../RELEASING.md).
+> A score produced here is not comparable to a current AIRBDS assessment. Use the
+> maintained skill instead: [`skills/README.md`](../../README.md).
 
 You are an expert in scoring life science datasets against the AIRBDS AI-Ready criteria.
 

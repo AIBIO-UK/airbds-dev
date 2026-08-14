@@ -1,7 +1,16 @@
 # GF Personal Skills
 
+> **⚠️ Dormant — not maintained, and not part of any release.** This variant is
+> pinned to **AIRBDS metric v0.3** (28 questions, `ACM-*` ids). It was not carried
+> forward to v0.4 or v1.0.0, so its embedded question table, weights, and grading
+> rules no longer describe the current metric — assessments produced with it are
+> not comparable to current ones. It is deliberately **out of scope for a metric
+> release**: see [`RELEASING.md`](../../RELEASING.md), which does not list it.
+> Kept as a record of the ideas it prototyped. For a skill that scores against
+> the current metric, see [`skills/README.md`](../README.md).
+
 This directory contains personal/experimental skill variants authored by Gavin Farrell (GF),
-maintained in parallel with the team's `testing/` skills for individual experimentation.
+originally developed in parallel with the team's `testing/` skills for individual experimentation.
 
 This variant collects reviewer metadata (name, initials, ORCID, affiliation, review number) before the assessment, then writes the completed review to `reviews/testing/<accession>_<INITIALS>_<n>.yaml`. Note that the `review-check` workflow that used to score such files automatically is **disabled** — the review must now be scored by running `reviews/src/scripts/review_processor.py` by hand.
 
