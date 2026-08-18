@@ -61,15 +61,25 @@ canonical rules are the **versioning policy** at
 
 | Bump | Means | What has to move |
 |---|---|---|
-| **PATCH** (`1.0.0` → `1.0.1`) | Guidance text only — no question meaning, weight, or ID changed | Stages 1–7 |
-| **MINOR** (`1.0.0` → `1.1.0`) | A question added, removed, or reworded | Stages 1–7, **plus Stage 3b** |
-| **MAJOR** (`1.0.0` → `2.0.0`) | A weight value or grade threshold changed | Stages 1–7, **plus Stage 3b** |
+| **PATCH** (`1.0.0` → `1.0.1`) | Guidance text only — no question meaning, weight, or ID changed | Stages 1–7, **plus Stage 3b** |
+| **MINOR** (`1.0.0` → `1.1.0`) | A question added, removed, or reworded | Stages 1–7, **plus Stages 3b and 3c** |
+| **MAJOR** (`1.0.0` → `2.0.0`) | A weight value or grade threshold changed | Stages 1–7, **plus Stages 3b and 3c** |
 
-Stage 3b is the version-carrying files — the ones that quote a version number in
-prose rather than consume it. Skipping it on a MINOR or MAJOR leaves the
-repository advertising a version that no longer exists, and **nothing checks for
-this** — no CI, no script. It is the easiest stage to skip and the least likely
-to announce itself.
+Stages 3b and 3c are the version-carrying files — the ones that quote the metric
+in prose rather than consume it. Nothing checks either, so a miss doesn't fail a
+release, it just leaves the repository telling readers something untrue. They are
+the easiest stages to skip and the least likely to announce themselves.
+
+They split by *what* they quote, because the two kinds go stale on different bumps:
+
+- **Stage 3b — the version string itself** (badge, download links, versioned file
+  paths, `version:`/`date-released:` fields). This changes on **every** release,
+  PATCH included, because every bump produces a new version number and a new
+  versioned metric file.
+- **Stage 3c — quoted metric *content*** (the question table, the question counts,
+  the maximum score). This only moves when a question is added, removed, or
+  reworded (**MINOR**) or a weight or threshold changes (**MAJOR**). A guidance-only
+  PATCH leaves all of it accurate, so Stage 3c is skipped.
 
 Write all three components: the version is `1.0.1`, never `1.0`. It is a path
 component, a JSON key in `skills/versions.json`, and each review's
@@ -129,30 +139,42 @@ carries no content change — as v1.0.0 did, being v0.5 under a stable number �
 so explicitly, or it is indistinguishable from a release where something was
 missed.
 
-## Stage 3b — Version-carrying files *(MINOR and MAJOR only)*
+## Stage 3b — Version-string references *(every bump, PATCH included)*
 
-These quote the metric version in prose. Nothing consumes them, so nothing fails
-when they go stale — they simply start telling readers something untrue.
+These quote the metric *version number* in prose or in a path. Every release —
+PATCH included — mints a new version and a new versioned metric file, so every one
+of these goes stale unless updated.
 
-- **`README.md`** — version badge, question table, download links, and the
-  processor command examples.
+- **`README.md`** — version badge, download links, versioned file paths, and the
+  version named in the processor command examples and the "current metric (vX.Y.Z)"
+  prose.
 - **`CITATION.cff`** — `version:` and `date-released:`. Published citations
   otherwise reference the wrong version.
 - **`LICENSE.md`** — the version and year in the **suggested-citation block**.
   Not the copyright year, which is the year of first publication and does not
   move. Keep it consistent with `CITATION.cff` and the Citation section of
   `README.md`.
-- **`metric/README.md`** — its own version references, including the question
-  counts and maximum score under *How Scoring Works*.
+- **`metric/README.md`** — its own version-number references.
 - **`reviews/docs/tutorial-yaml.md`** and **`tutorial-csv.md`** — `vX.Y.Z` path
   references. The human review workflow is dormant, so these are lower priority
   than the rest.
+
+## Stage 3c — Quoted metric content *(MINOR and MAJOR only)*
+
+These restate the *substance* of the metric — how many questions, what they ask,
+what the top score is. A guidance-only PATCH changes none of it, so this stage is
+skipped for a PATCH; a MINOR (questions change) or MAJOR (weights/thresholds
+change) makes it stale.
+
+- **`README.md`** — the question table.
+- **`metric/README.md`** — the question counts and the maximum score under
+  *How Scoring Works*.
 
 The review processor needs no update: it selects
 `metric/airbds_metric_v<schema_version>.yaml` per review, so older reviews stay
 scorable against the metric they were scored with.
 
-Commit stages 1–3b and push to `main`.
+Commit stages 1–3c and push to `main`.
 
 ## Stage 4 — Publish the metric to `airbds-core`
 
@@ -288,7 +310,8 @@ is done. Installed production skills pick the new bundle up through
 | 1 | Bump `schema_version` in the sheet; regenerate the metric YAML + JSON | `metric/src/README.md` |
 | 2 | Archive the old review template pair; regenerate the new one | `reviews/src/README.md` |
 | 3 | `CHANGELOG.md` (Metric) | — this file |
-| 3b | MINOR/MAJOR only: `README.md`, `CITATION.cff`, `LICENSE.md`, `metric/README.md`, tutorials. Commit and push | — this file |
+| 3b | Every bump: version-string references in `README.md`, `CITATION.cff`, `LICENSE.md`, `metric/README.md`, tutorials | — this file |
+| 3c | MINOR/MAJOR only: quoted content — `README.md` question table, `metric/README.md` counts + max score. Commit and push | — this file |
 | 4 | `release_metric_to_core.sh` → **merge the PR** | `metric/src/README.md` |
 | 5 | Repoint the skill symlinks; `versions.json`; `DESIGN.md`; `CHANGELOG.md` (Skill) | `skills/docs/MAINTAINING.md` |
 | 6 | Confirm the channel build republished the release | `skills/docs/MAINTAINING.md` |
