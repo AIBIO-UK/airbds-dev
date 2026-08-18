@@ -288,6 +288,31 @@ workflows here; `production` is published to `airbds-core` by
 `skills/src/scripts/release_skill_to_core.sh`. See
 [`skills/docs/MAINTAINING.md`](skills/docs/MAINTAINING.md).
 
+## [0.9.0] — `development`, `testing` (2026-08-18)
+
+- **Repointed at AIRBDS metric v1.0.1** (was 1.0.0), by moving the `development`
+  channel's `assets/airbds_metric.json` symlink to
+  `metric/airbds_metric_v1.0.1.json`. The skill reads `schema_version` out of the
+  bundle, so the version users are told they are assessed against follows the
+  symlink.
+- **Promoted `development` → `testing`** with `promote_skill_channel.py`:
+  `SKILL.md` copied across with only the channel token swapped, the metric symlink
+  kept pointing at v1.0.1 (a symlink, so `testing` tracks the file rather than
+  freezing a copy), and `versions.json`'s `testing` entry moved to describe the
+  promotion. The two channels' `SKILL.md` now differ only in the channel word.
+- **Grading is now by total score alone**, matching metric v1.0.1. The bundled
+  `scripts/score.py` (a symlink to `reviews/src/scripts/airbds_scoring.py`) already
+  grades this way, so the scorer changed once; this release brings the skill's
+  *prose* into line — `SKILL.md`'s fallback/manual-scoring path and
+  `skills/docs/DESIGN.md` no longer describe the per-tier `min_proportion_yes` gate
+  v1.0.0 carried. A dataset earns the highest grade whose `min_score` its total
+  weighted score reaches; the per-tier `tiers` counts are still reported, now purely
+  as context for where points were lost.
+- `skills/versions.json` `channels.development` and `channels.testing` bumped to
+  `metric_version` 1.0.1 / `skill_version` 0.9.0. A MINOR bump, not a patch: the
+  skill now scores against a different metric. `production` stays at metric 1.0.0 /
+  skill 0.8.1 until promoted (Stage 7).
+
 ## [0.8.1] — all channels (2026-08-04)
 
 - **Expanded AIRBDS correctly.** `SKILL.md` glossed the acronym as "AI-Ready

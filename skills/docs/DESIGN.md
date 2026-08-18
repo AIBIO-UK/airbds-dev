@@ -22,7 +22,7 @@ given URL. Its body is the instructions the assistant follows once invoked.
 airbds-assessment-skill/
 ├── SKILL.md
 ├── assets/
-│   ├── airbds_metric.json     → ../../../../metric/airbds_metric_v1.0.0.json
+│   ├── airbds_metric.json     → ../../../../metric/airbds_metric_v1.0.1.json
 │   └── review_template.yaml   → ../../../../reviews/review_template.yaml
 └── scripts/
     └── score.py               → ../../../../reviews/src/scripts/airbds_scoring.py
@@ -33,7 +33,7 @@ skill reads lives in `assets/`, executables in `scripts/`. `score.py` therefore
 looks for its metric in `../assets/` rather than beside itself.
 
 Both source channels — `development/` and `testing/` — have this layout and
-currently point at v1.0.0; a channel may sit on an older metric, so read the
+currently point at v1.0.1; a channel may sit on an older metric, so read the
 symlink rather than this diagram if you need a channel's actual version. The
 `production` bundle is derived from the `testing` one at release time and so has
 the same layout by construction (see
@@ -85,10 +85,10 @@ accompany it.
 Turning answers into a grade is arithmetic plus a threshold rule, and asking a
 model to do it invites non-determinism in the one part of an assessment that has
 a single correct answer. The grading rule is the sharp edge: a dataset earns the
-highest grade for which *every* per-tier proportion clears a minimum **and** the
-total clears a score floor. That is a conjunction over three tiers plus a floor,
-evaluated highest-grade-first — much easier to get subtly wrong than a sum, and
-weaker models get it wrong more often.
+highest grade whose `min_score` its total weighted score reaches. That total is a
+weighted sum over all 25 answers (Critical 80, Important 5, Optional 2), then a
+highest-grade-first threshold comparison — easy to get subtly wrong across that
+many terms, and weaker models get it wrong more often.
 
 So the skill bundles `scripts/score.py`. The model supplies a flat
 `{question-id: "Yes"|"No"}` document — the judgements only it can make — and the

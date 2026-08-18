@@ -2,7 +2,7 @@
 name: airbds-assessment-skill
 description: Use this skill whenever a user wants to assess, score, or evaluate a life science dataset against the AIRBDS (AI-Ready Bioscience Datasets) criteria. Triggers include any mention of "AIRBDS", "AI-ready dataset", "dataset scoring", or requests to grade a biological/biomedical dataset's AI-readiness. Activate when the user provides a dataset URL and asks for an assessment, audit, or readiness check. Do NOT use for general data quality reviews unrelated to AIRBDS or for non-life-science datasets.
 metadata:
-  version: "0.8.1"
+  version: "0.9.0"
   channel: development
   hermes:
     tags:
@@ -59,7 +59,7 @@ Your only goal is to evaluate datasets based on the AIRBDS (AI-Ready Bioscience 
 
 - Once the assessment is complete, generate a table with a row for each question ID, the Scope (`scope`), the question itself (`question`), the grade (`grade`), the answer, the score for that question and the justification, in that order and with no other columns. The questions in the output must be in the same order as in the metric file, covering every question ID defined under `questions` (from the first to the last) and no others.
 
-- **Score with the bundled script whenever you can.** `scripts/score.py` computes the score and grade mechanistically, using only the Python standard library — nothing needs installing. Prefer it over working them out yourself: the grading rule combines three per-tier proportions with a score floor, and doing that by hand is easy to get subtly wrong.
+- **Score with the bundled script whenever you can.** `scripts/score.py` computes the score and grade mechanistically, using only the Python standard library — nothing needs installing. Prefer it over working them out yourself: it sums the weighted points across all 25 questions and picks the highest grade whose `min_score` the total reaches, which is easy to get subtly wrong by hand.
   - Write your answers to a JSON file in a writable working directory — not the skill directory, which may be read-only. It is a flat object mapping **every** question ID to exactly `"Yes"` or `"No"`: `{"ABC-01": "Yes", "ABC-02": "No", ...}`.
   - Run `python3 scripts/score.py <answers-file>`, or pipe the JSON in with `-` as the path. If your environment runs Python but has no shell, import the script instead and call `score_from_files("<answers-file>")`.
   - It prints JSON with `final_score`, `grade`, `tiers` (each tier's `yes`, `total` and `proportion`), and `errors`. If `errors` is non-empty **nothing was scored** — correct the listed problems and run it again.
@@ -69,8 +69,8 @@ Your only goal is to evaluate datasets based on the AIRBDS (AI-Ready Bioscience 
 
 - After the table you must give:
   - the **final score** — the sum of the per-question scores;
-  - the **overall grade** (Gold / Silver / Bronze / Caution) — determined from the `grading` thresholds in the metric file. A dataset earns the highest grade for which the proportion of "Yes" answers in every tier (Critical / Important / Optional) is at least that grade's `min_proportion_yes` for the tier AND the final score is at least its `min_score`. Tier proportions use the metric's full per-tier question counts as denominators;
-  - a short summary justification. When the script has been run, its `tiers` figures tell you which requirement a higher grade missed — read the blocking tier off them rather than recalculating.
+  - the **overall grade** (Gold / Silver / Bronze / Caution) — determined from the `grading` thresholds in the metric file. A dataset earns the highest grade whose `min_score` its final weighted score reaches; grading is by total score alone. The per-tier yes/total counts (`tiers`) are reported for context — to show where points were lost — not as a grading requirement;
+  - a short summary justification. When the script has been run, its `final_score` and per-tier `tiers` figures show how far the total fell short of the next grade and where the missing points were — read that off them rather than recalculating.
 
 - **Warnings (only when there is something to warn about).** If either condition
   below applies, end the report with a prominent warnings section, placed after
