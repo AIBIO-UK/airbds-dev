@@ -6,7 +6,7 @@ artifacts, plus a body of work that carries no version at all:
 
 | Section | Versioned by | Released as |
 |---|---|---|
-| [Metric](#metric) | `schema_version` — 0.3, 0.4, 1.0.0 | a new `metric/airbds_metric_v<version>.yaml` |
+| [Metric](#metric) | `schema_version` — 0.3, 0.4, 1.0.0, 1.0.1 | a new `metric/airbds_metric_v<version>.yaml` |
 | [Assessment skill](#assessment-skill) | `skills/versions.json`, per channel | the `assessment-skill-development` / `assessment-skill-testing` release builds |
 | [Repository](#repository) | nothing | nothing — recorded by date |
 
@@ -30,14 +30,71 @@ Nothing yet.
 
 ---
 
-## [1.0.0] — current
+## [1.0.1] — current
 
-> **v1.0.0 is now the current version, and the metric is declared stable.** It is
-> [0.5] unchanged — the same 25 questions, the same Critical/Important/Optional
-> weights, the same grade thresholds — released under a stable version number.
-> The metric, the review template (`reviews/review_template.{yaml,csv}`), and the
-> sheet→YAML converter target v1.0.0, as do all three assessment skill channels
-> (see [Assessment skill](#assessment-skill)).
+> **Grading is now by total score alone.** v1.0.1 clarifies a scoring rule that
+> v1.0.0 encoded too strictly. The per-tier "Yes" proportions that v1.0.0 carried
+> as `min_proportion_yes` — and applied as a hard gate alongside each grade's
+> `min_score` — were only ever the working the metric author used to *derive*
+> those score thresholds, not an independent requirement. The source sheet now
+> labels them "Threshold calculation proportions" to say so, and the metric drops
+> them: a dataset earns the highest grade whose `min_score` its total score
+> reaches. **The 25 questions, the Critical/Important/Optional weights, and every
+> numeric `min_score` threshold are unchanged from [1.0.0].**
+>
+> This is a change in scored outcomes, not only in wording: where the proportion
+> gate — and not the score — was the binding constraint, a dataset can now earn a
+> higher grade than it would have under v1.0.0. It is released as a PATCH because
+> it corrects the published metric to the author's intended definition rather than
+> changing that definition: the proportions were never meant to be a rule.
+
+### Changed
+- **Grading is by total score alone.** The scorer
+  (`reviews/src/scripts/airbds_scoring.py`, shared with `review_processor.py` and
+  bundled by the assessment skill as `score.py`) no longer evaluates the per-tier
+  proportion gate; it returns the highest grade whose `min_score` the total
+  weighted score reaches. This applies to *every* metric version the scorer runs
+  against: a retained metric that still carries `min_proportion_yes` (v1.0.0 and
+  earlier) is now graded the same way, with the proportions ignored. The per-tier
+  yes/total/proportion counts are still reported alongside the grade as context —
+  they just no longer gate it.
+- **The source sheet was reorganised**, so v1.0.1 has its own generator
+  (`metric/src/scripts/build_metric_from_google_sheet_v1.0.1.py`): the reviewer
+  instructions moved from a dedicated Instructions tab onto a Header tab (an
+  `Instructions:` cell above a `Review information` data-entry block), and the
+  Lookups grading table was retitled from "Required proportions" to "Threshold
+  calculation proportions". The tab classifiers and the instructions reader were
+  adapted to match; the grade-points and grading-threshold readers are unchanged,
+  since they key off the pivot's column headers rather than those titles.
+- Two grade descriptions were reworded in the sheet (Gold and Silver), and the
+  `instructions:` block drops the redundant "AIRBDS Dataset Metric v1.0.0" title
+  line the old Instructions tab carried. Question text, weights, and every
+  threshold are byte-identical to [1.0.0].
+- The outgoing v1.0.0 review-template pair was archived to
+  `reviews/archived_templates/review_template_v1.0.0.{yaml,csv}` before the live
+  `reviews/review_template.{yaml,csv}` pair was regenerated to v1.0.1 (version
+  strings only — the questions are unchanged).
+
+### Removed
+- **`min_proportion_yes`** from the metric's `grading` block. Each grade now
+  carries only `name`, `description`, and `min_score`.
+
+### Added
+- `metric/airbds_metric_v1.0.1.{yaml,json,upstream.json}`, generated from the
+  v1.0.1 Google Sheet. As with v1.0.0 the JSON is written by the same build run
+  as the YAML and covered by `--check`; the YAML remains canonical.
+
+---
+
+## [1.0.0] — superseded by [1.0.1]
+
+> **v1.0.0 has been superseded by [1.0.1] and is retained.** It declared the
+> metric stable — [0.5] unchanged, the same 25 questions, the same
+> Critical/Important/Optional weights, the same grade thresholds — released under
+> a stable version number. While current it was the target of the metric, the
+> review template (`reviews/review_template.{yaml,csv}`), the sheet→YAML
+> converter, and all three assessment skill channels
+> (see [Assessment skill](#assessment-skill)); [1.0.1] is now current.
 >
 > **v0.5 was withdrawn rather than retained.** Retention exists so a review can
 > be re-scored against the metric it was scored with, and no review ever carried
