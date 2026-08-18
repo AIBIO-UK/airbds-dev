@@ -129,7 +129,9 @@ python3 metric/src/tests/test_build_metric_yaml_v100.py   # or: pytest metric/sr
 ```
 
 As with v0.4, editorial metadata not in the sheet lives in the script's `CONFIG`
-block.
+block. The `schema_version` written into the metric comes from the script's
+`VERSION` constant, **not** from the sheet — so the version number is set here in
+code, and a new version is a new generator carrying the new `VERSION`.
 
 ## Releasing a version to `airbds-core`
 

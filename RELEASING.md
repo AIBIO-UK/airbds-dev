@@ -53,9 +53,11 @@ The two artifacts still have separate version numbers and separate `CHANGELOG.md
 sections — a skill release can happen without a metric release, just not the
 other way round.
 
-## Before you start: decide the bump
+## Before you start: which bump is this?
 
-Settle this *first*, because it decides how much of the work below applies. The
+The version and what changed in it are decided and authored **upstream**, in the
+working group's Google Sheet — not here. You don't choose the bump; you need to
+know which one it is, because it decides how much of the work below applies. The
 canonical rules are the **versioning policy** at
 [`metric/README.md#versioning-policy`](metric/README.md#versioning-policy).
 
@@ -110,8 +112,11 @@ another reason to rehearse.
 ## Stage 1 — Generate the metric
 
 The metric is authored in the working group's Google Sheet and **generated, never
-hand-edited**. Bump `schema_version` in the sheet, then regenerate: one run writes
-the YAML, the JSON, and the `.upstream.json` provenance sidecar together.
+hand-edited**. The bump and its content are settled upstream in the sheet; Stage 1
+just regenerates. The version number is stamped from the generator's `VERSION`
+constant, not read from the sheet, so a new version is carried by its own generator
+(below) — not by editing the sheet. One run writes the YAML, the JSON, and the
+`.upstream.json` provenance sidecar together.
 
 → [`metric/src/README.md#v100--from-the-public-google-sheet`](metric/src/README.md#v100--from-the-public-google-sheet)
 for the generator, its `--check` drift mode, and offline use.
@@ -306,8 +311,8 @@ is done. Installed production skills pick the new bundle up through
 
 | # | Stage | Owner doc |
 |---|---|---|
-| 0 | Decide PATCH / MINOR / MAJOR | `metric/README.md` |
-| 1 | Bump `schema_version` in the sheet; regenerate the metric YAML + JSON | `metric/src/README.md` |
+| 0 | Confirm which bump was decided upstream (PATCH / MINOR / MAJOR) | `metric/README.md` |
+| 1 | Regenerate the metric YAML + JSON for the new version | `metric/src/README.md` |
 | 2 | Archive the old review template pair; regenerate the new one | `reviews/src/README.md` |
 | 3 | `CHANGELOG.md` (Metric) | — this file |
 | 3b | Every bump: version-string references in `README.md`, `CITATION.cff`, `LICENSE.md`, `metric/README.md`, tutorials | — this file |
