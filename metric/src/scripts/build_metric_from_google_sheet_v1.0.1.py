@@ -1,0 +1,675 @@
+#!/usr/bin/env python3
+"""Build the canonical v1.0.1 metric files from the AIRBDS Google Sheet.
+
+Like v0.4, v0.5, and v1.0.0 before it, v1.0.1 is authored in a public Google
+Sheet (the working group's live doc). This script pulls the Scoring, Lookups, and
+Instructions tabs via the public CSV export (the sheet's own export format, not
+this script's output format) and regenerates the metric files from them.
+
+Two renderings of the same metric are written:
+
+  * airbds_metric_v1.0.1.yaml — the canonical, human-readable form. Carries the
+    explanatory comments and is what people read and review.
+  * airbds_metric_v1.0.1.json — the same content for consumers that must run
+    without a YAML parser, notably the assessment skill's bundled scoring
+    script (see skills/docs/DESIGN.md). Produced by parsing the YAML this
+    script just rendered and re-serialising it, so the two cannot disagree:
+    the JSON is the YAML, minus the comments. Every field the skill reads
+    (schema_version, questions, grade_points, grading, instructions) survives;
+    only maintainer commentary is lost.
+
+Usage:
+    # Regenerate metric/airbds_metric_v1.0.1.yaml from the live sheet
+    python3 metric/src/scripts/build_metric_from_google_sheet_v1.0.1.py
+
+    # Verify the committed file still matches the live sheet (the drift check)
+    python3 metric/src/scripts/build_metric_from_google_sheet_v1.0.1.py --check
+
+    # Work offline from exported CSVs instead of fetching
+    python3 metric/src/scripts/build_metric_from_google_sheet_v1.0.1.py \
+        --scoring-csv scoring.csv --lookups-csv lookups.csv \
+        --instructions-csv instructions.csv
+
+Schema notes (v1.0.1):
+  * v1.0.1 clarifies the scoring rule and reorganises the source sheet; the 25
+    questions, their scopes/grades/guidance, the weights, and the numeric score
+    thresholds are all unchanged from v1.0.0. It is authored in its own sheet (a
+    copy of the v1.0.0 sheet with the clarifications applied), so v1.0.0 stays
+    reproducible from its own source.
+  * Grading is now by total score alone. In v1.0.0 the per-category "Yes"
+    proportions were emitted as `min_proportion_yes` and applied as a hard gate
+    alongside min_score. The metric author has clarified those proportions were
+    only ever the working used to *derive* the score thresholds (the sheet now
+    labels them "Threshold calculation proportions"), not an independent rule, so
+    v1.0.1 drops `min_proportion_yes` from the grading block entirely. This can
+    raise a dataset's grade relative to v1.0.0 where the proportion gate, not the
+    score, was the binding constraint — see the CHANGELOG.
+  * 25 questions with ids ABC-NN, four scopes (Infrastructure/Metadata/Content/
+    Ethics), three grades (Critical/Important/Optional).
+  * Per-question points live in the Lookups tab's 'COUNTA of Grade' pivot, in
+    its 'Points per Question' column; the 'Required proportions' table below it
+    carries the grading thresholds.
+  * The v1.0.1 sheet is reorganised from v1.0.0: the generic reviewer
+    instructions moved from a dedicated Instructions tab onto the Header tab (in
+    an 'Instructions:' cell, above a 'Review information' data-entry block), and
+    the Lookups grading table's title changed from 'Required proportions' to
+    'Threshold calculation proportions'. The grading/points readers are unchanged
+    — they key off the pivot's column headers, not those titles — so only the tab
+    classifiers and the instructions reader differ from v1.0.0.
+  * The Header tab's 'Instructions:' cell is captured verbatim into a top-level
+    `instructions:` block, so downstream reviewers (human and AI) read the same
+    generic guidance the sheet shows. The 'Review information' data-entry section
+    below it is excluded.
+  * Document-level metadata (license, description, scope descriptions) is NOT in
+    the sheet — it is held in the CONFIG block below; edit it there.
+
+`--check` compares *metric content*, not raw bytes: the YAML's
+`# Source content sha256:` breadcrumb is set aside, because it hashes the source
+CSVs and so moves whenever the sheet's bytes move — including for edits the
+generator never reads (an unread pivot cell, a heading in the excluded
+data-entry block, trailing whitespace). Those are reported as a NOTE and pass;
+only a real change to the extracted metric fails.
+
+Exit codes:
+    0 — wrote the files (default), or --check found the metric content in sync
+        (possibly with a NOTE that the sheet moved outside the extracted regions)
+    1 — --check found a committed file's metric content differs from the sheet
+    2 — the sheet failed a sanity check (e.g. an unexpected scope)
+"""
+
+import argparse
+import hashlib
+import json
+import re
+import sys
+from datetime import datetime, timezone
+from pathlib import Path
+
+import yaml
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from sheet_source import (  # noqa: E402  (sibling module, after sys.path tweak)
+    CsvWorksheet,
+    extract_spreadsheet_id,
+    fetch_named_tabs,
+    recorded_source_sha,
+    strip_source_breadcrumb,
+)
+
+# Repo root is four levels up: <root>/metric/src/scripts/<this file>.
+REPO_ROOT = Path(__file__).resolve().parent.parent.parent.parent
+SCRIPT_PATH = f"metric/src/scripts/{Path(__file__).name}"
+
+# ── Editorial config (NOT in the sheet — edit here) ──────────────────────────
+
+VERSION = "1.0.1"
+
+DEFAULT_SHEET = "https://docs.google.com/spreadsheets/d/1l9FVM09YkHAmy6XzqGiSPutKdJnk0WD-EwZE8GXu6TY/edit"
+DEFAULT_OUTPUT = REPO_ROOT / "metric" / "airbds_metric_v1.0.1.yaml"
+
+METADATA = {
+    "metric_name": "AIRBDS AI-Readiness Dataset Scoring Metric",
+    "schema_version": VERSION,
+    "release_date": "2026",
+    "license": "CC-BY-4.0",
+    "repository": "https://github.com/AIBIO-UK/airbds-core",
+    "contact": "info@aibio.ac.uk",
+}
+
+DESCRIPTION_LINES = [
+    "A structured checklist for evaluating the AI-readiness of bioscience datasets.",
+    "Questions are grouped into four scopes (Infrastructure, Metadata, Content, Ethics)",
+    "and graded as Optional, Important, or Critical to produce a composite score",
+    "and grade (Caution / Bronze / Silver / Gold).",
+]
+
+SCOPES = [
+    ("Infrastructure", "Questions about how the dataset is hosted, accessed, and identified."),
+    ("Metadata", "Questions about the dataset's descriptive and contextual metadata."),
+    ("Content", "Questions about the quality, format, and consistency of the data itself."),
+    ("Ethics", "Questions about ethical, privacy, and security considerations. Applicable primarily to datasets containing human or animal subject data."),
+]
+
+# Scopes whose questions carry not_applicable_default: "Yes".
+NA_DEFAULT_SCOPES = {"Ethics"}
+
+QID_RE = re.compile(r"^ABC-\d+$")
+
+HEADER_COMMENT = f"""\
+# =============================================================================
+# {METADATA["metric_name"]} — v{VERSION}
+# AI-Ready Bioscience Datasets Working Group (AIRBDS), AIBIO-UK
+# https://aibio.ac.uk/about/working-groups/airbds/
+# License: {METADATA["license"]}
+# =============================================================================
+#
+# *** GENERATED FILE — DO NOT EDIT BY HAND. ***
+#
+# This file is generated from the AIRBDS scoring Google Sheet by the metric
+# build script (see metric/README.md). Any manual edit will be lost the next
+# time the file is regenerated. To change this file's contents — or the way it
+# is generated — edit the sheet (and/or that script) and re-run it.
+# Never edit this file directly.
+# =============================================================================
+#
+# Question definitions for a given metric version. For a version the scope and
+# grade of each question are fixed, so they are defined here as the source of
+# truth rather than trusted from uploaded assessments.
+#
+# This is a language-neutral data file: the question definitions can be read by
+# any tool (the review processor, the auto-airbds web frontend, etc.). The
+# `guidance` field explains how each question should be answered; it is guidance
+# for humans/LLMs."""
+
+INSTRUCTIONS_COMMENT = """\
+# Generic reviewer instructions, captured verbatim from the source sheet's
+# Instructions tab. This is guidance for whoever assesses a dataset (human or
+# AI agent) — how to interpret the metric and what is in/out of scope. It is
+# informational and does not affect scoring."""
+
+GRADE_POINTS_COMMENT = """\
+# Full points awarded for a question when its answer is "Yes", keyed by the
+# question's grade. A "No" answer always scores 0. A question's score is
+# therefore fixed by its grade and answer, not taken from the assessment."""
+
+GRADING_COMMENT = """\
+# Grading thresholds, highest grade first. A dataset earns the highest grade
+# whose min_score its total score reaches (compared with >=); the final entry is
+# the floor (min_score 0). Grading is by total score alone. The per-category
+# proportions in the source sheet ("Threshold calculation proportions") are the
+# author's working for deriving these thresholds, not a scoring rule, so they are
+# not part of the metric. Editing a min_score re-grades without any code change."""
+
+SCOPES_COMMENT = "# Top-level groupings of the questions."
+
+QUESTIONS_COMMENT = """\
+# Every question is a boolean "Yes"/"No". Ethics questions carry a
+# not_applicable_default of "Yes" — they are marked "Yes" for datasets with no
+# human or animal subject data."""
+
+
+# ── Tab classifiers ──────────────────────────────────────────────────────────
+
+def _first_cell(csv_text: str) -> str:
+    for line in csv_text.splitlines():
+        cell = line.split(",")[0].strip().strip('"')
+        if cell:
+            return cell
+    return ""
+
+
+# The instructions live on the "Header" tab (first cell "Version:"), which also
+# carries the sheet's version label and a per-review data-entry block; see
+# read_instructions. The Lookups tab is matched by its pivot header rather than
+# the "Threshold calculation proportions" title (v1.0.0's sheet called that block
+# "Required proportions"), since the grading reader keys off the column header.
+CLASSIFIERS = {
+    "scoring": lambda t: _first_cell(t) == "Q ID",
+    "lookups": lambda t: "Points per Question" in t and "COUNTA of Grade" in t,
+    "instructions": lambda t: _first_cell(t) == "Version:",
+}
+
+
+# ── Helpers ──────────────────────────────────────────────────────────────────
+
+def dq(text) -> str:
+    """Render a value as a YAML double-quoted scalar."""
+    escaped = str(text).replace("\\", "\\\\").replace('"', '\\"')
+    return f'"{escaped}"'
+
+
+def norm(text) -> str:
+    """Collapse internal whitespace runs and strip (fixes stray sheet spaces)."""
+    return " ".join(str(text or "").split())
+
+
+def normalize_newlines(text: str) -> str:
+    """Canonicalize line endings to LF.
+
+    A live fetch returns the sheet's CSV with CRLF, whereas an offline CSV read
+    through `Path.read_text` has already been normalized to LF. `source_sha256`
+    hashes this raw text, so without this the same sheet would hash differently
+    online vs offline (breaking both `--check` and the offline byte-for-byte
+    test). It also makes the hash independent of whether Google serves CRLF or
+    LF on a given day.
+    """
+    return text.replace("\r\n", "\n").replace("\r", "\n")
+
+
+def clean_multiline(text) -> str:
+    """Tidy a multi-paragraph cell: collapse intra-line whitespace but keep
+    paragraph breaks (blank lines). Runs of blank lines collapse to one, and
+    leading/trailing blank lines are dropped. Returns '' for an empty cell."""
+    if text is None:
+        return ""
+    lines = [" ".join(str(line).split()) for line in str(text).splitlines()]
+    out = []
+    for line in lines:
+        if line or (out and out[-1]):  # collapse runs of blank lines to one
+            out.append(line)
+    while out and not out[-1]:
+        out.pop()
+    while out and not out[0]:
+        out.pop(0)
+    return "\n".join(out)
+
+
+def fmt_score(value) -> str:
+    """min_score: keep integers integral (560, 703) and fractions as-is (667.5)."""
+    f = float(value)
+    return str(int(f)) if f.is_integer() else str(f)
+
+
+def source_sha256(scoring_csv: str, lookups_csv: str, instructions_csv: str) -> str:
+    """Content hash of the exact source tabs — the content-addressed "revision".
+
+    Deterministic given the source content, so it is safe to embed in the YAML.
+    Covers all three source tabs, so an edit to the Instructions tab is recorded
+    too. Note this hashes the *raw* CSV, so it also moves for edits that change
+    nothing the readers extract — which is why `--check` compares content with
+    this value set aside and reports a bare hash change as informational.
+    """
+    h = hashlib.sha256()
+    h.update(scoring_csv.encode("utf-8"))
+    h.update(b"\n--LOOKUPS--\n")
+    h.update(lookups_csv.encode("utf-8"))
+    h.update(b"\n--INSTRUCTIONS--\n")
+    h.update(instructions_csv.encode("utf-8"))
+    return h.hexdigest()
+
+
+# ── Sheet readers (operate on a CsvWorksheet / openpyxl worksheet) ───────────
+
+def read_questions(ws) -> list[dict]:
+    """Read the question table from the Scoring tab, in sheet order."""
+    header = {norm(ws.cell(1, c).value): c
+              for c in range(1, ws.max_column + 1) if ws.cell(1, c).value}
+    required = ["Q ID", "Scope", "Question", "Notes", "Grade"]
+    missing = [h for h in required if h not in header]
+    if missing:
+        sys.exit(f"ERROR: Scoring tab is missing column(s): {missing}")
+
+    questions = []
+    for r in range(2, ws.max_row + 1):
+        qid = norm(ws.cell(r, header["Q ID"]).value)
+        if not QID_RE.match(qid):
+            continue
+        questions.append({
+            "id": qid,
+            "scope": norm(ws.cell(r, header["Scope"]).value),
+            "grade": norm(ws.cell(r, header["Grade"]).value),
+            "question": norm(ws.cell(r, header["Question"]).value),
+            "guidance": norm(ws.cell(r, header["Notes"]).value),
+        })
+    return questions
+
+
+def _find_row(ws, predicate):
+    for r in range(1, ws.max_row + 1):
+        if predicate(r):
+            return r
+    return None
+
+
+def read_grade_points(ws) -> dict:
+    """Read {grade: points} from the Lookups 'COUNTA of Grade' pivot.
+
+    The Lookups tab carries a pivot whose header row is `Grade | <scopes…> |
+    Grand Total | Points per Question | Points available`. The per-question
+    points live in the 'Points per Question' column; the following rows are the
+    three grades and a 'Grand Total' row (which ends the table). This layout
+    dates from v0.5, which replaced v0.4's flat 'Grade / Points' table.
+    """
+    hdr = _find_row(ws, lambda r: norm(ws.cell(r, 1).value) == "Grade"
+                    and any(norm(ws.cell(r, c).value) == "Points per Question"
+                            for c in range(1, ws.max_column + 1)))
+    if hdr is None:
+        sys.exit("ERROR: could not locate the 'Grade / Points per Question' table in Lookups")
+    points_col = next(c for c in range(1, ws.max_column + 1)
+                      if norm(ws.cell(hdr, c).value) == "Points per Question")
+    points = {}
+    for r in range(hdr + 1, ws.max_row + 1):
+        name = norm(ws.cell(r, 1).value)
+        val = ws.cell(r, points_col).value
+        if name in {"Optional", "Important", "Critical"} and isinstance(val, (int, float)):
+            points[name] = int(val)
+        elif name or val is not None:
+            break  # 'Grand Total' row or the next table
+    return points
+
+
+def read_grading(ws) -> list[dict]:
+    """Read the grading thresholds from the Lookups grading table.
+
+    v1.0.1 grades on the total score alone: a dataset earns the highest grade
+    whose min_score its score reaches. The per-category proportion columns in the
+    sheet (headed 'Threshold calculation proportions') are the author's working
+    for deriving those score thresholds — guidance, not a scoring rule — so they
+    are read past and not emitted into the metric. See GRADING_COMMENT.
+    """
+    hdr = _find_row(ws, lambda r: norm(ws.cell(r, 1).value) == "Optional"
+                    and norm(ws.cell(r, 4).value) == "Threshold"
+                    and norm(ws.cell(r, 5).value) == "Grade")
+    if hdr is None:
+        sys.exit("ERROR: could not locate the grading table in Lookups")
+    rows = []
+    for r in range(hdr + 1, ws.max_row + 1):
+        grade = norm(ws.cell(r, 5).value)
+        if not grade:
+            break
+        rows.append({
+            "name": grade,
+            "description": norm(ws.cell(r, 6).value),
+            "min_score": float(ws.cell(r, 4).value or 0),  # may be fractional
+        })
+    rows.sort(key=lambda g: g["min_score"], reverse=True)  # highest grade first
+    return rows
+
+
+def read_instructions(ws) -> str:
+    """Read the generic reviewer instructions from the Header tab.
+
+    In v1.0.1 the instructions moved from a dedicated Instructions tab onto the
+    Header tab, in a cell labelled 'Instructions:' in column 1 with the guidance
+    prose in a content column to its right. A per-review data-entry section
+    (headed 'Review information') follows below and is NOT part of the generic
+    instructions. Everything from the label row down to that next labelled row is
+    captured, with paragraph breaks preserved.
+    """
+    r0 = _find_row(ws, lambda r: norm(ws.cell(r, 1).value) == "Instructions:")
+    if r0 is None:
+        sys.exit("ERROR: could not locate the 'Instructions:' label on the Header tab")
+    # Content column: the rightmost non-empty cell in the header row.
+    content_col = max((c for c in range(1, ws.max_column + 1)
+                       if norm(ws.cell(r0, c).value)), default=1)
+    blocks = []
+    for r in range(r0, ws.max_row + 1):
+        if r > r0 and norm(ws.cell(r, 1).value):
+            break  # next labelled section (e.g. the review data-entry block)
+        text = clean_multiline(ws.cell(r, content_col).value)
+        if text:
+            blocks.append(text)
+    instructions = "\n\n".join(blocks)
+    if not instructions:
+        sys.exit("ERROR: the Instructions tab yielded no text")
+    return instructions
+
+
+# ── YAML / CSV rendering ─────────────────────────────────────────────────────
+
+def render_footer(questions: list[dict], grade_points: dict) -> str:
+    def num(qid):
+        return int(qid.split("-")[1])
+
+    lines = [
+        "# =============================================================================",
+        "# QUESTION SUMMARY",
+        f"# Total questions: {len(questions)}",
+    ]
+    for scope_id, _ in SCOPES:
+        ids = [q["id"] for q in questions if q["scope"] == scope_id]
+        if not ids:
+            continue
+        ids.sort(key=num)
+        rng = f"({ids[0]} – {ids[-1]})"
+        lines.append(f"# {(scope_id + ':').ljust(17)}{len(ids):>2}  {rng}")
+
+    lines.append("#")
+    lines.append(f"# Grade breakdown (all {len(questions)} questions):")
+    total = 0
+    for grade in ("Critical", "Important", "Optional"):
+        count = sum(1 for q in questions if q["grade"] == grade)
+        pts = grade_points[grade]
+        subtotal = count * pts
+        total += subtotal
+        lines.append(
+            f"#   {(grade + ':').ljust(10)}{count:>3}   × {str(pts):<2} pts = {str(subtotal):<3} pts maximum"
+        )
+    lines.append(f"#   TOTAL maximum (incl. Ethics): {total} pts")
+    lines.append("# =============================================================================")
+    return "\n".join(lines)
+
+
+def render_yaml(questions, grade_points, grading, instructions,
+                sheet_url, content_sha256) -> str:
+    out = [HEADER_COMMENT, ""]
+    out.append(f"# Source: {sheet_url}")
+    out.append(f"# Source content sha256: {content_sha256}")
+    out.append("")
+
+    for key, val in METADATA.items():
+        out.append(f"{key}: {dq(val)}")
+    out.append("")
+
+    out.append("description: >")
+    out.extend(f"  {line}" for line in DESCRIPTION_LINES)
+    out.append("")
+
+    out.append(INSTRUCTIONS_COMMENT)
+    out.append("instructions: |")
+    for line in instructions.split("\n"):
+        out.append(f"  {line}" if line else "")
+    out.append("")
+
+    out.append(GRADE_POINTS_COMMENT)
+    out.append("grade_points:")
+    for grade in sorted(grade_points, key=grade_points.get, reverse=True):
+        out.append(f"  {grade}: {grade_points[grade]}")
+    out.append("")
+
+    out.append(GRADING_COMMENT)
+    out.append("grading:")
+    for g in grading:
+        out.append(f"  - name: {g['name']}")
+        out.append(f"    description: {dq(g['description'])}")
+        out.append(f"    min_score: {fmt_score(g['min_score'])}")
+    out.append("")
+
+    out.append(SCOPES_COMMENT)
+    out.append("scopes:")
+    for i, (scope_id, desc) in enumerate(SCOPES, start=1):
+        out.append(f"  - id: {scope_id}")
+        out.append(f"    sort_order: {i}")
+        out.append(f"    description: {dq(desc)}")
+    out.append("")
+
+    out.append(QUESTIONS_COMMENT)
+    out.append("questions:")
+    for q in questions:
+        out.append(f"  {q['id']}:")
+        out.append(f"    scope: {q['scope']}")
+        out.append(f"    grade: {q['grade']}")
+        out.append(f"    question: {dq(q['question'])}")
+        out.append(f"    guidance: {dq(q['guidance'])}")
+        out.append('    answer: { type: boolean, options: ["Yes", "No"] }')
+        if q["scope"] in NA_DEFAULT_SCOPES:
+            out.append('    not_applicable_default: "Yes"')
+    out.append("")
+
+    out.append(render_footer(questions, grade_points))
+    return "\n".join(out) + "\n"
+
+
+def _read_text(path: Path) -> str:
+    """A committed file's text, or "" if it does not exist yet."""
+    return path.read_text(encoding="utf-8") if path.exists() else ""
+
+
+def json_path_for(yaml_path: Path) -> Path:
+    """The JSON rendering sits beside the YAML: <stem>.json."""
+    return yaml_path.parent / f"{yaml_path.stem}.json"
+
+
+def render_json(parsed_yaml: dict) -> str:
+    """Serialise the parsed metric YAML as JSON.
+
+    Takes the object `yaml.safe_load` produced from the YAML this run rendered,
+    so the JSON is a rendering of the *same* data rather than a second pass over
+    the sheet — there is no path by which the two files can drift apart.
+    `sort_keys=False` keeps the sheet's question order, which reviewers and the
+    report table both rely on.
+    """
+    return json.dumps(parsed_yaml, indent=2, ensure_ascii=False,
+                      sort_keys=False) + "\n"
+
+
+# ── Validation ───────────────────────────────────────────────────────────────
+
+def validate(questions, grade_points, grading) -> None:
+    if not questions:
+        sys.exit("ERROR: no questions (ABC-N rows) were found in the Scoring tab")
+    configured_scopes = {s for s, _ in SCOPES}
+    unknown = {q["scope"] for q in questions} - configured_scopes
+    if unknown:
+        sys.exit(f"ERROR: sheet uses scope(s) not in CONFIG.SCOPES: {sorted(unknown)}\n"
+                 f"       Add them (with a description) to the SCOPES list.")
+    for grade in {q["grade"] for q in questions}:
+        if grade not in grade_points:
+            sys.exit(f"ERROR: question grade {grade!r} has no entry in grade_points")
+    if not grading:
+        sys.exit("ERROR: no grading thresholds were read from the Lookups tab")
+
+
+# ── Main ─────────────────────────────────────────────────────────────────────
+
+def load_worksheets(args) -> tuple:
+    """Return (scoring_ws, lookups_ws, instructions_ws, src) from files or the sheet.
+
+    `src` carries the raw tab CSVs (for hashing) and provenance: the sheet id/url
+    when fetched, or None/the files when working offline.
+    """
+    offline = args.scoring_csv or args.lookups_csv or args.instructions_csv
+    if offline:
+        if not (args.scoring_csv and args.lookups_csv and args.instructions_csv):
+            sys.exit("ERROR: pass all of --scoring-csv, --lookups-csv, and "
+                     "--instructions-csv, or none.")
+        scoring = normalize_newlines(args.scoring_csv.read_text(encoding="utf-8"))
+        lookups = normalize_newlines(args.lookups_csv.read_text(encoding="utf-8"))
+        instructions = normalize_newlines(args.instructions_csv.read_text(encoding="utf-8"))
+        src = {
+            "label": f"{args.scoring_csv.name} + {args.lookups_csv.name} "
+                     f"+ {args.instructions_csv.name}",
+            "sheet_id": None,
+            "sheet_url": args.sheet,
+            "scoring_csv": scoring,
+            "lookups_csv": lookups,
+            "instructions_csv": instructions,
+        }
+        return (CsvWorksheet(scoring), CsvWorksheet(lookups),
+                CsvWorksheet(instructions), src)
+
+    sheet_id = extract_spreadsheet_id(args.sheet)
+    tabs = fetch_named_tabs(sheet_id, CLASSIFIERS)
+    scoring = normalize_newlines(tabs["scoring"])
+    lookups = normalize_newlines(tabs["lookups"])
+    instructions = normalize_newlines(tabs["instructions"])
+    src = {
+        "label": f"Google Sheet {sheet_id}",
+        "sheet_id": sheet_id,
+        "sheet_url": args.sheet,
+        "scoring_csv": scoring,
+        "lookups_csv": lookups,
+        "instructions_csv": instructions,
+    }
+    return (CsvWorksheet(scoring), CsvWorksheet(lookups),
+            CsvWorksheet(instructions), src)
+
+
+def write_manifest(path: Path, src: dict, content_sha256: str, generated_at: str) -> None:
+    """Write the provenance sidecar (JSON): which sheet and which revision (hash)."""
+    manifest = {
+        "metric_version": VERSION,
+        "sheet_url": src["sheet_url"],
+        "sheet_id": src["sheet_id"],
+        "content_sha256": content_sha256,
+        "generated_at": generated_at,
+        "generator": SCRIPT_PATH,
+    }
+    path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+
+
+def main() -> None:
+    ap = argparse.ArgumentParser(description="Build the v1.0.1 metric YAML + JSON from the Google Sheet.")
+    ap.add_argument("--sheet", default=DEFAULT_SHEET, help="sheet URL or id (default: the canonical sheet)")
+    ap.add_argument("--scoring-csv", type=Path, help="local Scoring tab CSV (offline; with --lookups-csv/--instructions-csv)")
+    ap.add_argument("--lookups-csv", type=Path, help="local Lookups tab CSV (offline)")
+    ap.add_argument("--instructions-csv", type=Path, help="local Instructions tab CSV (offline)")
+    ap.add_argument("--output", type=Path, default=DEFAULT_OUTPUT, help="path to write the metric YAML (the JSON is written beside it)")
+    ap.add_argument("--check", action="store_true",
+                    help="do not write; exit 1 if the output differs from what the sheet produces")
+    args = ap.parse_args()
+
+    scoring_ws, lookups_ws, instructions_ws, src = load_worksheets(args)
+    questions = read_questions(scoring_ws)
+    grade_points = read_grade_points(lookups_ws)
+    grading = read_grading(lookups_ws)
+    instructions = read_instructions(instructions_ws)
+    validate(questions, grade_points, grading)
+
+    content_sha256 = source_sha256(src["scoring_csv"], src["lookups_csv"],
+                                   src["instructions_csv"])
+    generated_yaml = render_yaml(questions, grade_points, grading, instructions,
+                                 src["sheet_url"], content_sha256)
+    # Confirms the YAML is valid before trusting it, and is the payload the JSON
+    # rendering is built from — one parse, two uses.
+    parsed_yaml = yaml.safe_load(generated_yaml)
+    generated_json = render_json(parsed_yaml)
+    json_output = json_path_for(args.output)
+
+    if args.check:
+        # Drift means the *metric* changed, not that the sheet's bytes moved. The
+        # YAML is compared with its source-hash breadcrumb set aside, because that
+        # line tracks the raw CSV and shifts for edits the generator never reads —
+        # an unread pivot cell, a heading in the excluded data-entry block,
+        # trailing whitespace. Comparing it would report drift for a metric that
+        # is unchanged, which is how this check came to be disbelieved.
+        #
+        # The JSON needs no such exemption: it carries no comments, so it is a
+        # pure content rendering and any difference in it is a real one. It is
+        # checked because it ships in the skill bundle, where a stale copy would
+        # score assessments against a superseded metric.
+        drifted = []
+        if strip_source_breadcrumb(_read_text(args.output)) != \
+                strip_source_breadcrumb(generated_yaml):
+            drifted.append(args.output)
+        if _read_text(json_output) != generated_json:
+            drifted.append(json_output)
+
+        if drifted:
+            for path in drifted:
+                print(f"DRIFT: {path} differs from {src['label']}.", file=sys.stderr)
+            print(f"Regenerate with: python3 {SCRIPT_PATH}", file=sys.stderr)
+            sys.exit(1)
+
+        print(f"OK: {args.output.name} and {json_output.name} are in sync "
+              f"with {src['label']} ({len(questions)} questions)")
+
+        # Informational, not a failure: the sheet has been edited somewhere the
+        # metric does not reach. Reported so it is visible and auditable, but the
+        # committed files are left alone rather than churning a commit whose only
+        # change is a hash line.
+        recorded = recorded_source_sha(_read_text(args.output))
+        if recorded and recorded != content_sha256:
+            print(f"NOTE: the sheet has been edited outside the regions the metric "
+                  f"extracts — recorded source sha256 {recorded[:12]}, live "
+                  f"{content_sha256[:12]}. No metric content changed, so nothing "
+                  f"needs regenerating.")
+        sys.exit(0)
+
+    manifest_path = args.output.parent / f"{args.output.stem}.upstream.json"
+    generated_at = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    write_manifest(manifest_path, src, content_sha256, generated_at)
+
+    args.output.write_bytes(generated_yaml.encode("utf-8"))
+    json_output.write_bytes(generated_json.encode("utf-8"))
+    print(f"Wrote: {args.output}\n"
+          f"Wrote: {json_output}\n"
+          f"Wrote: {manifest_path}\n"
+          f"{len(questions)} questions, "
+          f"{sum(q['scope'] in NA_DEFAULT_SCOPES for q in questions)} ethics, "
+          f"instructions captured ({len(instructions)} chars)\n"
+          f"Source: {src['label']} (sha256 {content_sha256[:12]})")
+
+
+if __name__ == "__main__":
+    main()
