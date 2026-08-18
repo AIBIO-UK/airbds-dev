@@ -143,11 +143,13 @@ def load_metric_profile(metric_path: str) -> dict:
         if q.get("not_applicable_default") is not None:
             ethics_ids.add(qid)
 
+    # Grading is by score alone (see airbds_scoring.score_review): only name and
+    # min_score are needed. A metric that still carries min_proportion_yes
+    # (v1.0.0 and earlier) is loaded the same way — the proportions are ignored.
     grading = []
     for entry in data.get("grading", []):
         grading.append({
             "name": entry["name"],
-            "min_proportion_yes": dict(entry.get("min_proportion_yes", {})),
             "min_score": entry.get("min_score", 0),  # may be fractional (v0.4)
         })
 

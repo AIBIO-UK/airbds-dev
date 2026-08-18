@@ -23,6 +23,7 @@ REPO_ROOT = TESTS_DIR.parent.parent.parent
 SCRIPTS_DIR = REPO_ROOT / "reviews" / "src" / "scripts"
 METRIC_JSON = REPO_ROOT / "metric" / "airbds_metric_v1.0.0.json"
 METRIC_YAML = REPO_ROOT / "metric" / "airbds_metric_v1.0.0.yaml"
+METRIC_JSON_V101 = REPO_ROOT / "metric" / "airbds_metric_v1.0.1.json"
 SCORE_PY = SCRIPTS_DIR / "airbds_scoring.py"
 
 sys.path.insert(0, str(SCRIPTS_DIR))
@@ -85,13 +86,35 @@ def test_tier_counts_reflect_the_answers(metric, profile):
     assert tiers["Critical"]["proportion"] == 1.0
 
 
-def test_gold_is_lost_when_an_important_question_fails(metric, profile):
-    """Gold demands every Important question; the score alone is not enough."""
+def test_an_important_no_no_longer_costs_gold(metric, profile):
+    """v1.0.1 clarification: grading is by total score alone. A single Important
+    'No' drops the Important tier proportion below 1.0 but leaves the score above
+    Gold's threshold, so Gold holds — the old proportion gate is gone. (Run
+    against the v1.0.0 metric, which still carries the proportions: the scorer
+    ignores them for every version.)"""
+    gold_min = next(g["min_score"] for g in profile["grading"] if g["name"] == "Gold")
+    full = sum(metric["grade_points"][q["grade"]] for q in metric["questions"].values())
     answers = answers_all(metric)
     answers[ids_with_grade(metric, "Important")[0]] = "No"
     result = scoring.score_payload(answers, profile)
-    assert result["grade"] != "Gold"
-    assert result["tiers"]["Important"]["proportion"] < 1.0
+    assert result["final_score"] == full - metric["grade_points"]["Important"]
+    assert result["final_score"] >= gold_min             # score still clears Gold…
+    assert result["tiers"]["Important"]["proportion"] < 1.0  # …despite an imperfect tier
+    assert result["grade"] == "Gold"
+
+
+def test_gold_is_lost_only_when_the_score_drops_below_threshold(metric, profile):
+    """Gold falls only when the total score itself drops under its min_score, not
+    on any per-tier proportion."""
+    gold_min = next(g["min_score"] for g in profile["grading"] if g["name"] == "Gold")
+    full = sum(metric["grade_points"][q["grade"]] for q in metric["questions"].values())
+    answers = answers_all(metric)
+    for qid in ids_with_grade(metric, "Important")[:2]:   # -2×Important points
+        answers[qid] = "No"
+    result = scoring.score_payload(answers, profile)
+    assert result["final_score"] == full - 2 * metric["grade_points"]["Important"]
+    assert result["final_score"] < gold_min
+    assert result["grade"] == "Silver"
 
 
 def test_the_highest_qualifying_grade_wins(metric, profile):
@@ -100,6 +123,17 @@ def test_the_highest_qualifying_grade_wins(metric, profile):
     for qid in ids_with_grade(metric, "Optional")[:4]:
         answers[qid] = "No"
     assert scoring.score_payload(answers, profile)["grade"] == "Silver"
+
+
+def test_v101_metric_without_proportions_scores_cleanly():
+    """The v1.0.1 metric carries no min_proportion_yes at all; the scorer must
+    grade it on score alone, not KeyError on the absent key."""
+    profile = scoring.load_metric_profile_json(METRIC_JSON_V101)
+    metric = json.loads(METRIC_JSON_V101.read_text(encoding="utf-8"))
+    assert profile["schema_version"] == "1.0.1"
+    assert all("min_proportion_yes" not in g for g in profile["grading"])
+    assert scoring.score_payload(answers_all(metric), profile)["grade"] == "Gold"
+    assert scoring.score_payload(answers_all(metric, "No"), profile)["grade"] == "Caution"
 
 
 # ── Validation ────────────────────────────────────────────────────────────────

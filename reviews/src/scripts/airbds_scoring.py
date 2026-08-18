@@ -53,26 +53,24 @@ VALID_ANSWERS = ("Yes", "No")
 def score_review(answers: dict, question_meta: dict, grading: list) -> tuple:
     """Return (weighted_score: int, grade: str).
 
-    Grades identically to the auto-airbds frontend: the dataset earns the
-    highest grade for which the proportion of "Yes" answers in every grade tier
-    is at least the tier minimum AND the total weighted score is at least the
-    grade's min_score. Proportions use the metric's full per-tier question
-    counts as denominators, so a missing answer counts against the proportion.
+    The dataset earns the highest grade whose min_score its total weighted score
+    reaches. Grading is by score alone. The per-tier "Yes" proportions a metric
+    may carry are the working used to *derive* those score thresholds, not an
+    independent requirement, so they are not applied here — see the metric YAML's
+    grading block. `grading` is ordered highest grade first, so the first entry
+    whose min_score is met is the highest achievable.
+
+    (`tier_proportions` is still reported alongside the grade for context — see
+    `score_payload` — it just no longer gates the result.)
     """
     score = 0
     for qid, qm in question_meta.items():
         if answers.get(qid, {}).get("answer") == "Yes":
             score += qm.get("weight_points", 0)
 
-    proportions = tier_proportions(answers, question_meta)
-
     grade = ""
     for g in grading:
-        proportions_met = all(
-            proportions.get(tier, {}).get("proportion", 1.0) >= minimum
-            for tier, minimum in g["min_proportion_yes"].items()
-        )
-        if proportions_met and score >= g["min_score"]:
+        if score >= g["min_score"]:
             grade = g["name"]
             break
 
@@ -125,10 +123,12 @@ def load_metric_profile_json(metric_path) -> dict:
             "weight_points": grade_points.get(grade, WEIGHT_POINTS.get(grade, 0)),
         }
 
+    # Only name + min_score are needed: grading is by score alone. A metric that
+    # still carries min_proportion_yes (v1.0.0) is read the same way — the
+    # proportions are simply ignored.
     grading = [
         {
             "name": entry["name"],
-            "min_proportion_yes": dict(entry.get("min_proportion_yes", {})),
             "min_score": entry.get("min_score", 0),
         }
         for entry in data.get("grading", [])
