@@ -331,8 +331,12 @@ Two consequences worth knowing:
   still opens a PR if the prose has drifted.
 
 The metric release ([`metric/src/scripts/release_metric_to_core.sh`](../../metric/src/scripts/release_metric_to_core.sh))
-stamps the same file, but only the metric version — each release moves the
-number it actually published and leaves the other alone.
+does **not** touch this file. It stamps the metric version into `airbds-core`'s
+**top-level `README.md`** instead (its "current version" line), with
+`--file README.md` — so the metric and skill PRs edit different files and never
+collide. That collision is what once let a skill PR slip through unmerged behind
+a hand-resolved README conflict. Each release owns one README: the skill release
+this `skills/README.md`, the metric release the top-level one.
 
 > `versions.json` itself still lives in **this** repo and is still served from
 > the `raw_url` baked into every published skill, including the production one —

@@ -17,10 +17,11 @@
 # preflight confirms the pair actually matches before anything is cloned; see
 # check_metric_renderings_match.py.
 #
-# The same commit restamps the metric version quoted in that repo's
-# skills/README.md: the published YAML is unversioned, so that sentence is where
-# a reader learns which metric is current, and it has to move with the file.
-# The skill version there is left alone — that one belongs to the skill release.
+# The same commit restamps the metric version quoted in that repo's top-level
+# README.md: the published YAML is unversioned, so that "current version"
+# statement is where a reader learns which metric is current, and it has to move
+# with the file. The skill's own README (skills/README.md) is the skill release's
+# to set — keeping the two releases on separate files, so their PRs never collide.
 # See scripts/stamp_core_versions.py.
 #
 #   ./metric/src/scripts/release_metric_to_core.sh 1.0.0
@@ -130,9 +131,10 @@ for f in "${SRC_FILES[@]}"; do
 done
 
 # Runs inside the publication clone — absolute path, values quoted for the shell
-# that re-parses this string. Only the metric version: the skill version in that
-# README is the skill release's to set.
-printf -v POST_COPY 'python3 %q --metric-version %q' "$STAMP" "$VERSION"
+# that re-parses this string. Stamps the metric version in the top-level
+# README.md; skills/README.md is the skill release's to set, so the metric and
+# skill PRs touch different files and never conflict.
+printf -v POST_COPY 'python3 %q --file README.md --metric-version %q' "$STAMP" "$VERSION"
 
 # One "Published" row per file, each linking the source it was copied from.
 PUBLISHED_ROWS=""
@@ -161,9 +163,10 @@ BODY="Publishes **AIRBDS metric v${VERSION}** to the repository root.
 ${PUBLISHED_ROWS}
 Metric version v${VERSION}, from AIBIO-UK/airbds-dev@${SRC_COMMIT}${SRC_DIRTY:+ (plus uncommitted working-tree changes)}.
 ${RENDERINGS_NOTE}
-\`skills/README.md\` is restamped in the same commit so the metric version it
-quotes reads v${VERSION}. That number sits inside HTML comment markers, so the
-diff touches the source and not how the page reads.
+The top-level \`README.md\` is restamped in the same commit so the metric version
+it quotes reads v${VERSION}. That number sits inside HTML comment markers, so the
+diff touches the source and not how the page reads. (The skill's own
+\`skills/README.md\` is set by the skill release, not here.)
 
 The published filenames are unversioned: this repository carries the *current*
 metric. To depend on a specific version, reference it in
@@ -191,5 +194,5 @@ exec "$PUBLISH" \
 Copies from AIBIO-UK/airbds-dev@${SRC_COMMIT} into the repository root:
 
 ${COPIED}
-and restamps the metric version quoted in skills/README.md." \
+and restamps the metric version quoted in README.md." \
   ${PASSTHROUGH[@]+"${PASSTHROUGH[@]}"}

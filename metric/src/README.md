@@ -191,13 +191,15 @@ PR text, and forwards the rest. The engine takes repeated `--src`/`--dest` pairs
 which is how both renderings land in a single commit.
 
 The same commit also restamps the metric version quoted in `airbds-core`'s
-`skills/README.md`, via
-[`scripts/stamp_core_versions.py`](../../scripts/stamp_core_versions.py). Because
-the published YAML is unversioned, that sentence is where a reader learns which
-metric is current — it has to move with the file. The skill version in that
-README is left alone; it belongs to the skill release. The number sits inside
-HTML comment markers, which render as nothing, and a README missing them fails
-the release rather than publishing a stale version. See
+top-level `README.md`, via
+[`scripts/stamp_core_versions.py`](../../scripts/stamp_core_versions.py) with
+`--file README.md`. Because the published YAML is unversioned, that "current
+version" line is where a reader learns which metric is current — it has to move
+with the file. The skill's own `skills/README.md` is left untouched here; it
+belongs to the skill release, which keeps the metric and skill PRs on separate
+files so they never conflict. The number sits inside HTML comment markers, which
+render as nothing, and a README missing them fails the release rather than
+publishing a stale version. See
 [MAINTAINING.md](../../skills/docs/MAINTAINING.md#the-readme-stamp).
 
 Things it deliberately does **not** do:

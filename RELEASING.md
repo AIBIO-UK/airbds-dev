@@ -185,8 +185,10 @@ Commit stages 1–3c and push to `main`.
 
 Both renderings go over in one commit, as `airbds_metric.yaml` and
 `airbds_metric.json`, and the same commit restamps the metric version quoted in
-`airbds-core`'s `skills/README.md`. A preflight refuses the release if the local
-YAML and JSON disagree.
+`airbds-core`'s top-level `README.md` (its "current version" line). The skill's
+own `skills/README.md` is the skill release's to stamp (Stage 7), so the two
+releases touch different files and their PRs never collide. A preflight refuses
+the release if the local YAML and JSON disagree.
 
 → [`metric/src/README.md#releasing-a-version-to-airbds-core`](metric/src/README.md#releasing-a-version-to-airbds-core)
 for the options and the full behaviour.

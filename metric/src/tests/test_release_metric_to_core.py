@@ -52,9 +52,21 @@ printf '%s\\0' "$@" >> "$GH_CALLS"
 echo "https://github.com/fake/core/pull/1"
 """
 
-# The publication repo's skills/README.md, as the release script expects to find
-# it: version numbers wrapped in comment markers. The skill version is seeded
-# with a real-looking value because a metric release must leave it untouched.
+# The publication repo's top-level README.md, as the metric release expects to
+# find it: the current metric version wrapped in a comment marker. This is the
+# file the metric release stamps.
+CORE_README = """# AIRBDS metric
+
+**Current version: <!--metric-version-->0.0.1<!--/metric-version-->** — the
+machine-readable metric is [`airbds_metric.json`](airbds_metric.json).
+"""
+
+CORE_README_PATH = "README.md"
+
+# The skill's own README carries the skill version and the metric its bundled zip
+# scores against. A metric release must NOT touch it — that is the skill release's
+# file — so the two releases' PRs never collide on the same line. Seeded here only
+# so tests can assert a metric release leaves it byte-for-byte unchanged.
 CORE_SKILLS_README = """# AIRBDS assessment skills
 
 There is currently one skill at [`skills/airbds-assessment-skill.zip`](x),
@@ -79,7 +91,7 @@ def _git(*args, cwd):
 
 
 def _make_origin(
-    tmp_path, seed_metric=None, seed_metric_json=None, seed_readme=CORE_SKILLS_README
+    tmp_path, seed_metric=None, seed_metric_json=None, seed_readme=CORE_README
 ):
     """A bare repo with a main branch, standing in for airbds-core."""
     seed = tmp_path / "seed"
@@ -87,11 +99,13 @@ def _make_origin(
     _git("init", "--quiet", "--initial-branch=main", cwd=seed)
     _git("config", "user.name", "test", cwd=seed)
     _git("config", "user.email", "test@example.com", cwd=seed)
-    (seed / "README.md").write_text("# airbds-core\n", encoding="utf-8")
+    # The top-level README is the file the metric release stamps.
     if seed_readme is not None:
-        readme = seed / CORE_SKILLS_README_PATH
-        readme.parent.mkdir(parents=True, exist_ok=True)
-        readme.write_text(seed_readme, encoding="utf-8")
+        (seed / CORE_README_PATH).write_text(seed_readme, encoding="utf-8")
+    # The skill's README is always present; a metric release must leave it alone.
+    skills_readme = seed / CORE_SKILLS_README_PATH
+    skills_readme.parent.mkdir(parents=True, exist_ok=True)
+    skills_readme.write_text(CORE_SKILLS_README, encoding="utf-8")
     if seed_metric is not None:
         (seed / DEST_YAML).write_text(seed_metric, encoding="utf-8")
     if seed_metric_json is not None:
@@ -221,16 +235,19 @@ def test_dry_run_pushes_nothing(tmp_path):
     assert "not pushing" in proc.stdout
 
 
-def test_stamps_metric_version_and_leaves_the_skill_version_alone(tmp_path):
-    """The published YAML is unversioned, so the README sentence carries the version."""
+def test_stamps_metric_version_in_readme_and_leaves_skills_readme_alone(tmp_path):
+    """The published YAML is unversioned, so the top-level README's "current
+    version" line carries it. The skill's own README is the skill release's file
+    and must be left byte-for-byte unchanged — so the metric and skill PRs never
+    collide on the same line."""
     origin = _make_origin(tmp_path)
     _run(tmp_path, origin)
 
-    readme = _file_at(origin, f"release/metric-v{VERSION}", CORE_SKILLS_README_PATH)
+    readme = _file_at(origin, f"release/metric-v{VERSION}", CORE_README_PATH)
     assert f"<!--metric-version-->{VERSION}<!--/metric-version-->" in readme
-    # Not this release's number to set: a metric release that moved it would
-    # announce a skill version that was never published.
-    assert "<!--skill-version-->0.8.0<!--/skill-version-->" in readme
+    # The metric release does not touch the skill's README at all.
+    skills_readme = _file_at(origin, f"release/metric-v{VERSION}", CORE_SKILLS_README_PATH)
+    assert skills_readme == CORE_SKILLS_README
 
 
 def test_stale_readme_alone_is_still_a_release(tmp_path):
@@ -249,7 +266,7 @@ def test_stale_readme_alone_is_still_a_release(tmp_path):
 
 def test_refuses_a_readme_without_markers(tmp_path):
     """An unconverted README fails the release rather than silently skipping it."""
-    origin = _make_origin(tmp_path, seed_readme="# AIRBDS assessment skills\n\nv0.0.1.\n")
+    origin = _make_origin(tmp_path, seed_readme="# AIRBDS metric\n\nCurrent version: 0.0.1.\n")
     proc, gh_args = _run(tmp_path, origin, expect_ok=False)
 
     assert proc.returncode != 0
@@ -260,8 +277,8 @@ def test_refuses_a_readme_without_markers(tmp_path):
 
 
 def _current_readme():
-    """The core README already stamped with this release's metric version."""
-    return CORE_SKILLS_README.replace(
+    """The top-level README already stamped with this release's metric version."""
+    return CORE_README.replace(
         ">0.0.1<!--/metric-version", f">{VERSION}<!--/metric-version"
     )
 
