@@ -65,12 +65,7 @@ canonical rules are the **versioning policy** at
 | **MINOR** (`1.0.0` → `1.1.0`) | A question added, removed, or reworded | Stages 1–7, **plus Stages 3b and 3c** |
 | **MAJOR** (`1.0.0` → `2.0.0`) | A weight value or grade threshold changed | Stages 1–7, **plus Stages 3b and 3c** |
 
-Stages 3b and 3c are the version-carrying files — the ones that quote the metric
-in prose rather than consume it. Nothing checks either, so a miss doesn't fail a
-release, it just leaves the repository telling readers something untrue. They are
-the easiest stages to skip and the least likely to announce themselves.
-
-They split by *what* they quote, because the two kinds go stale on different bumps:
+Stages 3b and 3c are to update files that reference the metric.
 
 - **Stage 3b — the version string itself** (badge, download links, versioned file
   paths, `version:`/`date-released:` fields). This changes on **every** release,
