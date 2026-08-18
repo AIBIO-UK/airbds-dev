@@ -11,26 +11,26 @@ the contributor/maintainer guide for updating the metric files in this folder.
 ### What the Metric Is
 
 The AIRBDS metric is a versioned, machine-readable checklist for assessing how
-suitable a bioscience dataset is for AI/ML use. The current version (v1.0.0) is a
+suitable a bioscience dataset is for AI/ML use. The current version (v1.0.1) is a
 **25-question** set, grouped into scopes (Infrastructure, Metadata, Content,
 Ethics) and three weight tiers (Critical, Important, Optional), plus the
 `grade_points` and `grading` rules that turn a set of Yes/No answers into a
 weighted score and a grade.
 
-`metric/airbds_metric_v1.0.0.yaml` is the **source of truth**: the canonical
+`metric/airbds_metric_v1.0.1.yaml` is the **source of truth**: the canonical
 machine-readable artifact that everything in this repository (and downstream
 consumers) reads — the exact question text, guidance, scopes, and scoring rules.
 The working group's **Google Sheet** is the **editing interface** where the
 metric is authored; edits made there are pulled into the YAML by the build
-script, which also writes a subsidiary `airbds_metric_v1.0.0.json` rendering of
+script, which also writes a subsidiary `airbds_metric_v1.0.1.json` rendering of
 the same document.
 
 ### Use the Metric
 
-Two ways to use v1.0.0 directly:
+Two ways to use v1.0.1 directly:
 
-- **[Open the Google Sheet](https://docs.google.com/spreadsheets/d/13w-MiUQc2sLzRFqRQD_YT6BisE3Orv5Oj3i0YBw7r_M/edit)** — the live editing interface, with built-in formulas that calculate the weighted score and grade automatically as you fill in answers. **Recommended for scoring a dataset today.**
-- **[`airbds_metric_v1.0.0.yaml`](airbds_metric_v1.0.0.yaml)** — the source of truth, for anything programmatic (or [`airbds_metric_v1.0.0.json`](airbds_metric_v1.0.0.json), subsidiary to it, where a YAML parser is unavailable).
+- **[Open the Google Sheet](https://docs.google.com/spreadsheets/d/1l9FVM09YkHAmy6XzqGiSPutKdJnk0WD-EwZE8GXu6TY/edit)** — the live editing interface, with built-in formulas that calculate the weighted score and grade automatically as you fill in answers. **Recommended for scoring a dataset today.**
+- **[`airbds_metric_v1.0.1.yaml`](airbds_metric_v1.0.1.yaml)** — the source of truth, for anything programmatic (or [`airbds_metric_v1.0.1.json`](airbds_metric_v1.0.1.json), subsidiary to it, where a YAML parser is unavailable).
 
 To score a **filled-in YAML or CSV review** rather than the Sheet, use the review
 processor, which validates the file, computes the weighted score and grade, and
@@ -109,9 +109,10 @@ is the running order that keeps them together.
 
 | Filename | Format | Purpose |
 |----------|--------|---------|
-| `airbds_metric_v1.0.0.yaml` | YAML | **Canonical — current.** 25-question metric: question text, grades, guidance, scopes, `instructions`, and the `grade_points`/`grading` scoring rules |
-| `airbds_metric_v1.0.0.json` | JSON | **Subsidiary to the YAML.** The same v1.0.0 document, written by the same generator run, for consumers that cannot parse YAML — cite and change the YAML, not this |
-| `airbds_metric_v1.0.0.upstream.json` | JSON | v1.0.0 provenance: source sheet id/url + `content_sha256` "revision" + generation timestamp |
+| `airbds_metric_v1.0.1.yaml` | YAML | **Canonical — current.** 25-question metric: question text, grades, guidance, scopes, `instructions`, and the `grade_points`/`grading` scoring rules |
+| `airbds_metric_v1.0.1.json` | JSON | **Subsidiary to the YAML.** The same v1.0.1 document, written by the same generator run, for consumers that cannot parse YAML — cite and change the YAML, not this |
+| `airbds_metric_v1.0.1.upstream.json` | JSON | v1.0.1 provenance: source sheet id/url + `content_sha256` "revision" + generation timestamp |
+| `airbds_metric_v1.0.0.{yaml,json,upstream.json}` | YAML/JSON | **Previous version — retained.** 25-question metric; reviews carrying `schema_version: "1.0.0"` still score against it. Same questions/weights/thresholds as v1.0.1, but its grading block still carries the `min_proportion_yes` gate v1.0.1 removed |
 | `airbds_metric_v0.4.yaml` | YAML | **Previous version — retained.** 27-question metric; reviews carrying `schema_version: "0.4"` still score against it |
 | `airbds_metric_v0.3.yaml` | YAML | **Previous version — retained.** 28-question metric; reviews carrying `schema_version: "0.3"` still score against it |
 | `README.md` | Markdown | This file — contributor guide for the metric folder |
@@ -121,9 +122,9 @@ The metric is **authored as YAML**, with the JSON a subsidiary rendering of it
 `reviews/` also ships in both YAML and CSV — a separate file, generated from the
 metric by [`reviews/src/scripts/build_review_template.py`](../reviews/src/scripts/build_review_template.py).)
 
-> **v1.0.0 is the current version.** `airbds_metric_v1.0.0.*` is generated from the working group's Google Sheet (see [How the v1.0.0 metric files are generated](#how-the-v100-metric-files-are-generated) and the `[1.0.0]` entry in [CHANGELOG.md](../CHANGELOG.md)). **v0.4 and v0.3 are retained** for reference and for re-scoring older reviews — the review processor auto-selects the metric matching each review's `schema_version`. **v0.5 was withdrawn**, not retained: v1.0.0 is the same metric under a stable version number, and no review ever carried `schema_version: "0.5"`, so there was nothing to re-score. Retention exists for reviews, not for completeness.
+> **v1.0.1 is the current version.** `airbds_metric_v1.0.1.*` is generated from the working group's Google Sheet (see [How the v1.0.1 metric files are generated](#how-the-v101-metric-files-are-generated) and the `[1.0.1]` entry in [CHANGELOG.md](../CHANGELOG.md)). **v1.0.0, v0.4, and v0.3 are retained** for reference and for re-scoring older reviews — the review processor auto-selects the metric matching each review's `schema_version`. **v0.5 was withdrawn**, not retained: v1.0.0 was the same metric as v0.5 under a stable version number, and no review ever carried `schema_version: "0.5"`, so there was nothing to re-score. Retention exists for reviews, not for completeness.
 
-> **Note on versioning:** the **current** `review_template` pair (under `reviews/`) is **not** versioned in its filename — `reviews/review_template.{yaml,csv}` always tracks the current metric (now v1.0.0), so non-technical reviewers always download the right file. It carries a `schema_version` field that must match the current metric version, so it is updated on every bump. On a bump, the outgoing pair is first copied to `reviews/archived_templates/review_template_v<old>.{yaml,csv}` (e.g. `review_template_v0.4.{yaml,csv}`) before the unversioned pair is overwritten — so previous versions stay retrievable as files, not just in git history.
+> **Note on versioning:** the **current** `review_template` pair (under `reviews/`) is **not** versioned in its filename — `reviews/review_template.{yaml,csv}` always tracks the current metric (now v1.0.1), so non-technical reviewers always download the right file. It carries a `schema_version` field that must match the current metric version, so it is updated on every bump. On a bump, the outgoing pair is first copied to `reviews/archived_templates/review_template_v<old>.{yaml,csv}` (e.g. `review_template_v0.4.{yaml,csv}`) before the unversioned pair is overwritten — so previous versions stay retrievable as files, not just in git history.
 
 > **Note on new metric versions:** A version bump creates a new file (e.g. `airbds_metric_v1.1.0.yaml`). Old versions are **retained** for archival — reviews carry `schema_version` to record which version they were scored against. The exception is a version nothing was ever scored against, which may be withdrawn instead (as v0.5 was on the move to v1.0.0) — a retained file that duplicates its successor only invites the question of which to use.
 
@@ -148,9 +149,9 @@ metric/src/scripts/build_metric_yaml_from_spreadsheet_v0.3.py
 
 > The YAML carries a **GENERATED FILE — DO NOT EDIT BY HAND** banner. Edit the spreadsheet (or the script's `CONFIG`) and regenerate rather than editing the YAML directly.
 
-### How the v1.0.0 metric files are generated
+### How the v1.0.1 metric files are generated
 
-From v0.4 the metric is authored in the working group's **public Google Sheet** rather than a committed `.xlsx`. `metric/src/scripts/build_metric_from_google_sheet_v1.0.0.py` pulls the Scoring, Lookups, and Instructions tabs and regenerates `airbds_metric_v1.0.0.yaml`, recording which sheet and a content-hash "revision" in `airbds_metric_v1.0.0.upstream.json` plus a `# Source:` breadcrumb in the YAML. (From v0.5 the sheet's Instructions tab is also captured into a top-level `instructions:` block.) See [`metric/src/README.md`](src/README.md) for the commands, the `--check` drift check, and offline use. A weekly workflow (`.github/workflows/metric-upstream-drift-check.yml`) confirms each committed YAML still matches its Sheet, opening an issue if it has drifted. Each committed version keeps its own generator (`…_v0.4.py`, `…_v1.0.0.py` — the last being the v0.5 generator renamed); the v0.3 `.xlsx` chain stays in place unchanged.
+From v0.4 the metric is authored in the working group's **public Google Sheet** rather than a committed `.xlsx`. `metric/src/scripts/build_metric_from_google_sheet_v1.0.1.py` pulls the Scoring, Lookups, and Header tabs and regenerates `airbds_metric_v1.0.1.yaml`, recording which sheet and a content-hash "revision" in `airbds_metric_v1.0.1.upstream.json` plus a `# Source:` breadcrumb in the YAML. (The reviewer instructions are captured verbatim into a top-level `instructions:` block — from a dedicated Instructions tab in v0.5–v1.0.0, and from the reorganised sheet's Header tab in v1.0.1.) See [`metric/src/README.md`](src/README.md) for the commands, the `--check` drift check, and offline use. A weekly workflow (`.github/workflows/metric-upstream-drift-check.yml`) confirms each committed YAML still matches its Sheet, opening an issue if it has drifted. Each committed version keeps its own generator (`…_v0.4.py`, `…_v1.0.0.py`, `…_v1.0.1.py`); the v0.3 `.xlsx` chain stays in place unchanged.
 
 ### Publishing a Version to `airbds-core`
 
@@ -159,14 +160,14 @@ This is the **development** repository; the canonical metric is published from
 here is final, `metric/src/scripts/release_metric_to_core.sh` publishes it:
 
 ```bash
-./metric/src/scripts/release_metric_to_core.sh 1.0.0 --dry-run   # rehearse first
-./metric/src/scripts/release_metric_to_core.sh 1.0.0
+./metric/src/scripts/release_metric_to_core.sh 1.0.1 --dry-run   # rehearse first
+./metric/src/scripts/release_metric_to_core.sh 1.0.1
 ```
 
-It copies `metric/airbds_metric_v1.0.0.yaml` **and**
-`metric/airbds_metric_v1.0.0.json` to the root of `airbds-core` as the
+It copies `metric/airbds_metric_v1.0.1.yaml` **and**
+`metric/airbds_metric_v1.0.1.json` to the root of `airbds-core` as the
 **unversioned `airbds_metric.yaml`** and **`airbds_metric.json`**, in one commit
-on a `release/metric-v1.0.0` branch, and opens a pull request. It does not merge
+on a `release/metric-v1.0.1` branch, and opens a pull request. It does not merge
 and does not tag. `airbds-core` carries the **current** metric and only the
 current one; every version, superseded ones included, stays here under its own
 name — so anyone depending on a specific version references this repository, not

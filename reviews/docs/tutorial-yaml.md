@@ -100,7 +100,7 @@ Rules:
 - `comments` is optional — leave as `""` if you have nothing to add.
 - Do not delete any question block, even if you answer `"No"`.
 
-The question text and guidance for each ID are in [`metric/airbds_metric_v1.0.0.yaml`](../../metric/airbds_metric_v1.0.0.yaml).
+The question text and guidance for each ID are in [`metric/airbds_metric_v1.0.1.yaml`](../../metric/airbds_metric_v1.0.1.yaml).
 
 ---
 
@@ -158,7 +158,7 @@ Important pass rate = (number of Important "Yes" answers) / 11
 Optional pass rate  = (number of Optional "Yes" answers) / 8
 ```
 
-See [`metric/airbds_metric_v1.0.0.yaml`](../../metric/airbds_metric_v1.0.0.yaml) for which questions belong to each tier.
+See [`metric/airbds_metric_v1.0.1.yaml`](../../metric/airbds_metric_v1.0.1.yaml) for which questions belong to each tier.
 
 ---
 
