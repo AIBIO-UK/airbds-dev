@@ -288,7 +288,7 @@ workflows here; `production` is published to `airbds-core` by
 `skills/src/scripts/release_skill_to_core.sh`. See
 [`skills/docs/MAINTAINING.md`](skills/docs/MAINTAINING.md).
 
-## [0.9.0] — `development`, `testing` (2026-08-18)
+## [0.9.0] — all channels (2026-08-18)
 
 - **Repointed at AIRBDS metric v1.0.1** (was 1.0.0), by moving the `development`
   channel's `assets/airbds_metric.json` symlink to
@@ -308,10 +308,15 @@ workflows here; `production` is published to `airbds-core` by
   v1.0.0 carried. A dataset earns the highest grade whose `min_score` its total
   weighted score reaches; the per-tier `tiers` counts are still reported, now purely
   as context for where points were lost.
-- `skills/versions.json` `channels.development` and `channels.testing` bumped to
-  `metric_version` 1.0.1 / `skill_version` 0.9.0. A MINOR bump, not a patch: the
-  skill now scores against a different metric. `production` stays at metric 1.0.0 /
-  skill 0.8.1 until promoted (Stage 7).
+- **Promoted to `production`**, published to `airbds-core` as
+  `skills/airbds-assessment-skill.zip` — the `testing` build with its channel
+  token rewritten to `production` by `rechannel_skill_zip.py` (verified reversible,
+  so what ships is provably the tested artifact modulo the channel). The same
+  commit stamps `airbds-core`'s `skills/README.md` with skill 0.9.0 / metric 1.0.1.
+- `skills/versions.json` bumped to `metric_version` 1.0.1 / `skill_version` 0.9.0
+  on all three channels. A MINOR bump, not a patch: the skill now scores against a
+  different metric. `production` is bumped before the release script runs, since
+  that entry is what an installed production skill polls.
 
 ## [0.8.1] — all channels (2026-08-04)
 
