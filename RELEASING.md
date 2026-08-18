@@ -47,7 +47,7 @@ publication repo is not the place to pin.
 
 **A metric release is not finished when the metric is published.** The assessment
 skill bundles the metric as `assets/airbds_metric.json` and reports the version it
-scored against, so the skill also always needs to be updated and release when a new metric version is released. Treat stages 1–7 as one release.
+scored against, so the skill also always needs to be updated and released when a new metric version is released. Treat stages 1–7 as one release.
 
 The two artifacts still have separate version numbers and separate `CHANGELOG.md`
 sections — a skill release can happen without a metric release, just not the
