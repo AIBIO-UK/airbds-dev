@@ -54,17 +54,18 @@ A dataset's weighted score is the sum of points for its `Yes` answers.
 
 ## Grades
 
-A dataset earns the **highest** grade for which it meets *both* the per-tier
-pass-rate criteria *and* that grade's minimum total score (`min_score`). The
-exact `min_score` and pass-rate values are in the metric YAML's `grading` block
-and can differ between metric versions.
+A dataset earns the **highest** grade whose minimum total score (`min_score`) its
+weighted score reaches — grading is by total score alone. The exact `min_score`
+values are in the metric YAML's `grading` block and can differ between metric
+versions. (Metric versions through v1.0.0 also required per-tier pass-rate
+thresholds; v1.0.1 grades by score alone.)
 
 | Grade | Badge colour | Means |
 |-------|--------------|-------|
-| 🟡 **Gold** | `#ffc107` | Passes all Critical and Important questions, plus ≥ 50% of Optional. |
-| ⚪ **Silver** | `#c0c0c0` | Passes all Critical, plus ≥ 50% of Important. |
-| 🟤 **Bronze** | `#cd7f32` | Passes most Critical questions. |
-| 🔴 **Caution** | `#dc3545` | May have serious issues — fails one or more Critical criteria. |
+| 🟡 **Gold** | `#ffc107` | All Critical and Important, plus ≥ 50% of Optional — or an equivalent weighted score. |
+| ⚪ **Silver** | `#c0c0c0` | All Critical, plus ≥ 50% of Important — or equivalent. |
+| 🟤 **Bronze** | `#cd7f32` | Most Critical questions — or equivalent. |
+| 🔴 **Caution** | `#dc3545` | Below the Bronze threshold — may have serious issues. |
 
 The badge colours are a presentation reference only — no tool reads them from
 the repo.

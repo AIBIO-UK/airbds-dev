@@ -32,10 +32,10 @@ grades:
 
 | Grade | Description |
 |---|---|
-| 🔴 **Caution** | May have serious issues — fails one or more Critical criteria |
-| 🟤 **Bronze** | Passes most Critical questions (≥ 8/9) |
-| ⚪ **Silver** | Passes all Critical + ≥ 50% of Important questions |
-| 🟡 **Gold** | Passes all Critical and Important + ≥ 50% of Optional questions |
+| 🔴 **Caution** | Below the Bronze threshold — may have serious issues |
+| 🟤 **Bronze** | Most Critical questions (all but one) — or an equivalent weighted score |
+| ⚪ **Silver** | All Critical + ≥ 50% of Important — or equivalent |
+| 🟡 **Gold** | All Critical and Important + ≥ 50% of Optional — or equivalent |
 
 Questions are grouped into **four scopes** and **three weight tiers**:
 

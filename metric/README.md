@@ -61,7 +61,7 @@ answered `Yes` (a `No` always scores 0):
 | **Important** | 5 | Important questions represent best practices affecting reproducibility, interoperability, or usability. |
 | **Optional** | 2 | Optional questions capture desirable but non-essential characteristics. |
 
-A dataset's weighted score is the sum of points for its `Yes` answers. In v1.0.0
+A dataset's weighted score is the sum of points for its `Yes` answers. In v1.0.1
 the 25 questions split into 9 Critical, 10 Important, and 6 Optional, giving a
 maximum score of **782**. These point values are the human-readable rationale —
 the **authoritative, machine-readable** numbers live in the metric YAML's
@@ -69,17 +69,20 @@ the **authoritative, machine-readable** numbers live in the metric YAML's
 
 ### Grades
 
-A dataset earns the **highest** grade for which it meets *both* the per-tier
-pass-rate criteria *and* that grade's minimum total score (`min_score`). The
-exact `min_score` and pass-rate values live in the metric YAML's `grading` block
-and can differ between metric versions — the summaries below are v1.0.0.
+A dataset earns the **highest** grade whose minimum total score (`min_score`) its
+weighted score reaches. **Grading is by total score alone.** The exact `min_score`
+values live in the metric YAML's `grading` block and can differ between metric
+versions — the summaries below are v1.0.1. (Through v1.0.0 a grade *also* had to
+clear per-tier pass-rate thresholds; v1.0.1 removed that gate — those proportions
+were only ever the working used to derive the score thresholds. See the `[1.0.1]`
+entry in [CHANGELOG.md](../CHANGELOG.md#metric).)
 
 | Grade | Badge colour | Means |
 |-------|--------------|-------|
-| 🟡 **Gold** | `#ffc107` | Passes all Critical and Important questions, plus ≥ 50% of Optional. |
-| ⚪ **Silver** | `#c0c0c0` | Passes all Critical, plus ≥ 50% of Important. |
-| 🟤 **Bronze** | `#cd7f32` | Passes most Critical questions (≥ 88.9%). |
-| 🔴 **Caution** | `#dc3545` | May have serious issues — fails one or more Critical criteria. |
+| 🟡 **Gold** | `#ffc107` | All Critical and Important, plus ≥ 50% of Optional — or an equivalent weighted score. |
+| ⚪ **Silver** | `#c0c0c0` | All Critical, plus ≥ 50% of Important — or equivalent. |
+| 🟤 **Bronze** | `#cd7f32` | Most Critical questions (all but one) — or equivalent. |
+| 🔴 **Caution** | `#dc3545` | Below the Bronze threshold — may have serious issues. |
 
 The badge colours are a presentation reference only — no tool reads them from
 the repo. Further rationale for the weighting and grades is in
