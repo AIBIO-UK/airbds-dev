@@ -219,6 +219,38 @@ the metric, so:
 - Update the bundle diagram in [`skills/docs/DESIGN.md`](skills/docs/DESIGN.md),
   which spells out the symlink target.
 
+**Validate `development` before promoting it.** `testing` inherits whatever you
+promote, so get it right here first — two checks:
+
+- **Automated — score against the new metric with the bundled script.** Confirm
+  the repointed bundle reads the new `schema_version` and grades correctly. Build
+  an all-`Yes` answer set and score it; the output should name the new version and
+  earn the top grade:
+
+  ```bash
+  python3 - <<'PY'
+  import json
+  m = json.load(open("metric/airbds_metric_v<version>.json"))
+  json.dump({q: "Yes" for q in m["questions"]}, open("/tmp/all_yes.json", "w"))
+  PY
+  python3 skills/development/airbds-assessment-skill/scripts/score.py /tmp/all_yes.json
+  ```
+
+- **Interactive — run the skill on a real dataset.** Build an installable bundle
+  and try it in an assistant end to end, so the `SKILL.md` prose and the delivered
+  report read correctly, not just the arithmetic — a metric change most often
+  leaves stale *wording*, the grading-rule prose above all, which only a real run
+  surfaces:
+
+  ```bash
+  python3 skills/src/scripts/build_skill_zip.py development   # -> ./airbds-assessment-skill-development.zip
+  ```
+
+  The script zips the channel's skill with its bundled symlinks (metric, review
+  template, scorer) dereferenced into real files — the same content CI ships — so
+  the installed bundle carries the new metric. Install the zip and assess a known
+  dataset. (Pass `testing` to build that channel instead, `-o` to choose the path.)
+
 **Then promote `development` → `testing` with the script**, which does the symlink
 repoint, the channel-token rewrite, and the `testing` manifest bump in one step:
 
@@ -313,7 +345,8 @@ is done. Installed production skills pick the new bundle up through
 | 3b | Every bump: version-string references in `README.md`, `CITATION.cff`, `LICENSE.md`, `metric/README.md`, tutorials | — this file |
 | 3c | MINOR/MAJOR only: quoted content — `README.md` question table, `metric/README.md` counts + max score. Commit and push | — this file |
 | 4 | `release_metric_to_core.sh` → **merge the PR** | `metric/src/README.md` |
-| 5 | Repoint the skill symlinks; `versions.json`; `DESIGN.md`; `CHANGELOG.md` (Skill) | `skills/docs/MAINTAINING.md` |
+| 5 | Repoint `development`; `versions.json`; `DESIGN.md`; `CHANGELOG.md` (Skill); then promote → `testing` | `skills/docs/MAINTAINING.md` |
+| 5b | Validate `development`: bundled `score.py` on the new metric, plus an interactive smoke test | — this file |
 | 6 | Confirm the channel build republished the release | `skills/docs/MAINTAINING.md` |
 | 7 | `channels.production` first, then `release_skill_to_core.sh` → **merge the PR** | `skills/docs/MAINTAINING.md` |
 

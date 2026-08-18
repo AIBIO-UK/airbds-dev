@@ -6,6 +6,27 @@ it serves — as [`metric/src/`](../../metric/src/) and
 
 All commands run from the repo root.
 
+## Building a channel zip locally
+
+`scripts/build_skill_zip.py` packages one channel's skill into an installable zip
+for local testing — the interactive check in [`RELEASING.md`](../../RELEASING.md)
+Stage 5, run before a channel is promoted or published.
+
+```bash
+python3 skills/src/scripts/build_skill_zip.py development          # -> ./airbds-assessment-skill-development.zip
+python3 skills/src/scripts/build_skill_zip.py testing -o /tmp/s.zip
+```
+
+The bundled metric, review template, and scorer are symlinks in the repo, so the
+script **dereferences** them — storing each target's real bytes — exactly as the
+CI build (`zip` without `-y`) does; the archive root is the skill directory's
+contents, so it installs the same way. It is for local testing only: the
+production release promotes the CI-built `testing` zip (see below), never a local
+build.
+
+Needs only the Python 3 standard library. Tested in
+[`src/tests/test_build_skill_zip.py`](tests/test_build_skill_zip.py) (4 tests).
+
 ## Validating the update manifest
 
 `scripts/validate_skills_versions.py` checks
@@ -200,8 +221,9 @@ Needs only the Python 3 standard library.
 > clone/branch/commit/push/PR mechanics. Options it takes (`--base`, `--repo`,
 > `--remote`) are forwarded from here.
 
-> The skill **build** pipeline is not here: each channel is packaged by its own
-> workflow under [`.github/workflows/`](../../.github/workflows/). See
+> The skill's **release** build is not here: each channel's *published* zip is
+> packaged by its own workflow under [`.github/workflows/`](../../.github/workflows/)
+> (`build_skill_zip.py` above builds the same bundle locally, for testing). See
 > [`skills/docs/MAINTAINING.md`](../docs/MAINTAINING.md) for channels, the
 > version manifest, and release builds, and
 > [`skills/docs/DESIGN.md`](../docs/DESIGN.md) for how a skill bundle is put
