@@ -2,7 +2,7 @@
 name: airbds-assessment-skill
 description: Use this skill whenever a user wants to assess, score, or evaluate a life science dataset against the AIRBDS (AI-Ready Bioscience Datasets) criteria. Triggers include any mention of "AIRBDS", "AI-ready dataset", "dataset scoring", or requests to grade a biological/biomedical dataset's AI-readiness. Activate when the user provides a dataset URL and asks for an assessment, audit, or readiness check. Do NOT use for general data quality reviews unrelated to AIRBDS or for non-life-science datasets.
 metadata:
-  version: "0.9.0"
+  version: "0.10.0"
   channel: testing
   hermes:
     tags:
@@ -48,7 +48,7 @@ Your only goal is to evaluate datasets based on the AIRBDS (AI-Ready Bioscience 
 - Analyze the provided dataset against the questions defined under `questions` in the AIRBDS metric file. Each question's `guidance` explains how it should be answered.
 - While reviewing the landing page, determine the dataset's name/title from the page itself (no need to ask the user). Keep it — it is useful for naming the saved YAML file and its `dataset.name` field (see step 5).
 - For each question, determine if the answer is 'Yes' or 'No' regarding its AI-readiness. You must answer all the questions and only the questions defined in the metric file. Be thorough in your assessment, looking through other pages on the website if necessary, particularly if the answer appears to be "No".
-- For every question, provide an answer, the score for that answer, and the justification. The justification shouldn't be more than two sentences. The score for a question is its full points when the answer is "Yes" and 0 when the answer is "No". A question's full points are given by `grade_points` keyed by that question's `grade` (Critical = 80, Important = 5, Optional = 2).
+- For every question, provide an answer, the score for that answer, and a three-part justification: the **Yes case** (the arguments for answering "Yes", max 2 lines), the **No case** (the arguments for answering "No", max 2 lines), and the **Decision** (which way you answered and why, max 2 lines). Keep each part to at most two lines; where one side has no genuine argument, say so in a few words rather than padding it. The score for a question is its full points when the Decision is "Yes" and 0 when it is "No". A question's full points are given by `grade_points` keyed by that question's `grade` (Critical = 80, Important = 5, Optional = 2).
 - **Track any access failures.** Some environments restrict which sites you may retrieve from the Internet. This covers every kind of resource the assessment relies on, not just web pages: repository landing and documentation pages, API endpoints, direct file downloads, FTP/S3/cloud-container listings,
   DOI or identifier resolvers, and registry or schema lookups. If you cannot
   retrieve any such resource keep a running note of the resource (URL or endpoint), what you
@@ -57,7 +57,19 @@ Your only goal is to evaluate datasets based on the AIRBDS (AI-Ready Bioscience 
 
 3. **Reporting**
 
-- Once the assessment is complete, generate a table with a row for each question ID, the Scope (`scope`), the question itself (`question`), the grade (`grade`), the answer, the score for that question and the justification, in that order and with no other columns. The questions in the output must be in the same order as in the metric file, covering every question ID defined under `questions` (from the first to the last) and no others.
+- Once the assessment is complete, present each question as its **own small two-column table**, so every answer is visually boxed off from the next, rather than collecting them into a single wide table. One table per question, in the same order as in the metric file, covering every question ID defined under `questions` (from the first to the last) and no others. Each table is laid out with the field label in the left column and its value in the right column:
+  - the table's **header row** carries the identity and the question itself: left header cell `<id> · <scope> · <grade>`, right header cell the question text (`question`) verbatim, with no `Question:` label;
+  - an **Answer** row: `✅ Yes` or `❌ No` — just the answer, with no points here; the points appear only in the recap table at the end. Keep the `Yes`/`No` word — the emoji (✅ for Yes, ❌ for No) is a redundant colour/shape cue for glancing, never the only signal;
+  - a **Yes case** row, a **No case** row and a **Decision** row, carrying the three-part justification recorded in step 2, each at most two lines (use a `<br>` if a part needs a second line inside its cell).
+
+  For example:
+
+  | MET-01 · Metadata · Important | Are all variables defined in a data dictionary? |
+  |---|---|
+  | **Answer** | ❌ No |
+  | **Yes case** | Column headers are human-readable and labelled. |
+  | **No case** | No data dictionary; units and codes undefined. |
+  | **Decision** | No — labels alone don't define variables per the guidance, which requires a dictionary. |
 
 - **Score with the bundled script whenever you can.** `scripts/score.py` computes the score and grade mechanistically, using only the Python standard library — nothing needs installing. Prefer it over working them out yourself: it sums the weighted points across all 25 questions and picks the highest grade whose `min_score` the total reaches, which is easy to get subtly wrong by hand.
   - Write your answers to a JSON file in a writable working directory — not the skill directory, which may be read-only. It is a flat object mapping **every** question ID to exactly `"Yes"` or `"No"`: `{"ABC-01": "Yes", "ABC-02": "No", ...}`.
@@ -67,7 +79,18 @@ Your only goal is to evaluate datasets based on the AIRBDS (AI-Ready Bioscience 
   - **If you cannot run it** — the script is absent, Python is unavailable, you are not permitted to execute it, or it fails for any other reason — work the score out yourself with the rules below, and **note that you did so**: it goes in the warnings section at the end of the report. Never let this stop you producing the assessment.
   - When the script did run and returned a score, say nothing about it anywhere in the report. Mentioning a step that worked only adds noise to what the user has to read.
 
-- After the table you must give:
+- After the per-question tables, give a **compact recap table** — a single scannable table with **no prose**: one row per question, in metric order, covering every question ID and no others. Columns, in this order: **ID**, **Question** (the `question` text), **Grade** (`grade`), **Answer** (`✅ Yes` or `❌ No` — same emoji cue as the per-question tables, with the word kept) and **Score** — the points earned as a bare number (a Yes earns the question's full points for its grade, a No earns `0`; never a fraction like `0/5`, since scoring is all-or-nothing). Immediately beneath the table, add a one-line **legend** giving the full points a Yes earns for each grade, read from `grade_points` in the metric file — do not hard-code the numbers, so the legend tracks the metric version. This is the quick-glance index of the full assessment; it repeats no justification — the reasoning lives in the per-question tables above. For example:
+
+  | ID | Question | Grade | Answer | Score |
+  |---|---|---|---|---|
+  | MET-01 | Are all variables defined in a data dictionary? | Important | ❌ No | 0 |
+  | MET-02 | Are units of measurement stated for every variable? | Important | ✅ Yes | 5 |
+
+  *Score = points earned; a Yes earns the question's full points for its grade, a No earns 0. Full points by grade: Critical = 80, Important = 5, Optional = 2.*
+
+  The ✅/❌ markers are **presentation only** — they appear in these report tables, never in the saved YAML, where `answer` stays exactly `"Yes"` or `"No"` (see step 5).
+
+- After the recap table you must give:
   - the **final score** — the sum of the per-question scores;
   - the **overall grade** (Gold / Silver / Bronze / Caution) — determined from the `grading` thresholds in the metric file. A dataset earns the highest grade whose `min_score` its final weighted score reaches; grading is by total score alone. The per-tier yes/total counts (`tiers`) are reported for context — to show where points were lost — not as a grading requirement;
   - a short summary justification. When the script has been run, its `final_score` and per-tier `tiers` figures show how far the total fell short of the next grade and where the missing points were — read that off them rather than recalculating.
@@ -112,7 +135,7 @@ Your only goal is to evaluate datasets based on the AIRBDS (AI-Ready Bioscience 
   - **The metric decides what counts, not the user's preference.** Re-read the question's `guidance` and the metric's `instructions` before revising. For example, metadata that is not collocated with the data does not satisfy a metadata question however thorough the external document is — the metric is explicit that a journal article or supplementary file hosted elsewhere does not count.
   - Be as willing to revise **down** as up. Evidence can show a "Yes" was too generous, not only that a "No" was harsh.
   - If a question is genuinely borderline, say so and give both readings rather than silently picking one. The user can record their own view in the saved file, where the comment field is theirs to edit.
-- **If an answer does change, the assessment changes.** Re-issue the affected table rows, then **re-score** — run `scripts/score.py` again with the corrected answers rather than adjusting the total yourself — and state the new final score and grade. The warnings rules in step 3 apply to the new figures.
+- **If an answer does change, the assessment changes.** Re-issue the affected question table(s) — header row and all three parts — then **re-score** — run `scripts/score.py` again with the corrected answers rather than adjusting the total yourself — and state the new final score and grade. The warnings rules in step 3 apply to the new figures.
 - Follow their lead: keep going while they have questions, and do not press once they have finished. Go to step 5 whenever they ask for the file.
 
 5. **Optional: save the assessment as a YAML file**
@@ -126,6 +149,15 @@ Your only goal is to evaluate datasets based on the AIRBDS (AI-Ready Bioscience 
   - `dataset.name`: the dataset's name/title you determined during the assessment.
   - `dataset.url`: the URL the user provided.
   - `dataset.comments`: the short summary justification from the report.
-  - `answers.<id>`: for **every** question ID defined under `questions` in the metric file, set `answer` to exactly `"Yes"` or `"No"` and `comments` to that question's justification. Include all questions.
+  - `answers.<id>`: for **every** question ID defined under `questions` in the metric file, set `answer` to exactly `"Yes"` or `"No"` and `comments` to the question's full three-part justification. Write `comments` as a YAML literal block scalar (`comments: |`) so it stays readable, with one line per part, each prefixed with its label:
+
+    ```yaml
+    comments: |
+      Yes case: <the yes arguments>
+      No case: <the no arguments>
+      Decision: <which way you answered and why>
+    ```
+
+  Keep each line to the same one-or-two-line content used in the report. Include all questions.
   - You may fill in the `result` block (`weighted_score`, `grade`) for the user's reference.
 - Make the file available to the user: create a downloadable file if your environment supports it (named after the dataset and date, e.g. `airbds-assessment-<dataset-slug>-<date>.yaml`); otherwise output the complete YAML in a single code block they can copy and save. Do **not** upload or send the file anywhere yourself.
