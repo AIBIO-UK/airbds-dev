@@ -59,14 +59,14 @@ Your only goal is to evaluate datasets based on the AIRBDS (AI-Ready Bioscience 
 
 - Once the assessment is complete, present each question as its **own small two-column table**, so every answer is visually boxed off from the next, rather than collecting them into a single wide table. One table per question, in the same order as in the metric file, covering every question ID defined under `questions` (from the first to the last) and no others. Each table is laid out with the field label in the left column and its value in the right column:
   - the table's **header row** carries the identity and the question itself: left header cell `<id> · <scope> · <grade>`, right header cell the question text (`question`) verbatim, with no `Question:` label;
-  - an **Answer** row: `<Yes|No> (<score>/<full points>)`, where `<score>` is this question's score and `<full points>` its full points from `grade_points`;
+  - an **Answer** row: `✅ Yes` or `❌ No` — just the answer, with no points here; the points appear only in the recap table at the end. Keep the `Yes`/`No` word — the emoji (✅ for Yes, ❌ for No) is a redundant colour/shape cue for glancing, never the only signal;
   - a **Yes case** row, a **No case** row and a **Decision** row, carrying the three-part justification recorded in step 2, each at most two lines (use a `<br>` if a part needs a second line inside its cell).
 
   For example:
 
   | MET-01 · Metadata · Important | Are all variables defined in a data dictionary? |
   |---|---|
-  | **Answer** | No (0/5) |
+  | **Answer** | ❌ No |
   | **Yes case** | Column headers are human-readable and labelled. |
   | **No case** | No data dictionary; units and codes undefined. |
   | **Decision** | No — labels alone don't define variables per the guidance, which requires a dictionary. |
@@ -79,7 +79,18 @@ Your only goal is to evaluate datasets based on the AIRBDS (AI-Ready Bioscience 
   - **If you cannot run it** — the script is absent, Python is unavailable, you are not permitted to execute it, or it fails for any other reason — work the score out yourself with the rules below, and **note that you did so**: it goes in the warnings section at the end of the report. Never let this stop you producing the assessment.
   - When the script did run and returned a score, say nothing about it anywhere in the report. Mentioning a step that worked only adds noise to what the user has to read.
 
-- After the table you must give:
+- After the per-question tables, give a **compact recap table** — a single scannable table with **no prose**: one row per question, in metric order, covering every question ID and no others. Columns, in this order: **ID**, **Question** (the `question` text), **Grade** (`grade`), **Answer** (`✅ Yes` or `❌ No` — same emoji cue as the per-question tables, with the word kept) and **Score** — the points earned as a bare number (a Yes earns the question's full points for its grade, a No earns `0`; never a fraction like `0/5`, since scoring is all-or-nothing). Immediately beneath the table, add a one-line **legend** giving the full points a Yes earns for each grade, read from `grade_points` in the metric file — do not hard-code the numbers, so the legend tracks the metric version. This is the quick-glance index of the full assessment; it repeats no justification — the reasoning lives in the per-question tables above. For example:
+
+  | ID | Question | Grade | Answer | Score |
+  |---|---|---|---|---|
+  | MET-01 | Are all variables defined in a data dictionary? | Important | ❌ No | 0 |
+  | MET-02 | Are units of measurement stated for every variable? | Important | ✅ Yes | 5 |
+
+  *Score = points earned; a Yes earns the question's full points for its grade, a No earns 0. Full points by grade: Critical = 80, Important = 5, Optional = 2.*
+
+  The ✅/❌ markers are **presentation only** — they appear in these report tables, never in the saved YAML, where `answer` stays exactly `"Yes"` or `"No"` (see step 5).
+
+- After the recap table you must give:
   - the **final score** — the sum of the per-question scores;
   - the **overall grade** (Gold / Silver / Bronze / Caution) — determined from the `grading` thresholds in the metric file. A dataset earns the highest grade whose `min_score` its final weighted score reaches; grading is by total score alone. The per-tier yes/total counts (`tiers`) are reported for context — to show where points were lost — not as a grading requirement;
   - a short summary justification. When the script has been run, its `final_score` and per-tier `tiers` figures show how far the total fell short of the next grade and where the missing points were — read that off them rather than recalculating.
