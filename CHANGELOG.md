@@ -288,6 +288,29 @@ workflows here; `production` is published to `airbds-core` by
 `skills/src/scripts/release_skill_to_core.sh`. See
 [`skills/docs/MAINTAINING.md`](skills/docs/MAINTAINING.md).
 
+## [0.11.0] — development, testing (2026-08-31)
+
+- **New: optional process record.** Alongside the saved YAML the skill can now
+  produce a Markdown *process record* — a per-question audit trail of how each
+  answer was reached (the sources consulted and the checks performed), built from
+  `reviews/process_record_template.md` and bundled via a symlink like the other
+  assets. At the save step both files are offered by default. Every substantive
+  question carries at least one source and one check; the only block that
+  collapses to a bare answer is a not-applicable Ethics question. It is a
+  per-question snapshot of the final state, not a chronological log — a
+  post-assessment correction is revised in place in the affected block with a
+  `Revision` note, mirroring how the YAML answer is revised.
+- **The skill states its versions at startup.** Before any other action it now
+  tells the user both its own skill version (`metadata.version`) and the AIRBDS
+  metric version it assesses against (`schema_version`), read from the bundle
+  rather than hard-coded.
+- **Promoted `development` → `testing`** with `promote_skill_channel.py`:
+  `SKILL.md` copied across with only the channel token swapped, the metric and
+  the new process-record template kept as symlinks (so `testing` tracks the files
+  rather than freezing copies), and `versions.json`'s `testing` entry moved to
+  0.11.0. Both channels' build workflows now list `reviews/process_record_template.md`
+  in their `paths:` triggers so a template change rebuilds the published zip.
+
 ## [0.9.0] — all channels (2026-08-18)
 
 - **Repointed at AIRBDS metric v1.0.1** (was 1.0.0), by moving the `development`
