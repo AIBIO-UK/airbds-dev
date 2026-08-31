@@ -52,6 +52,7 @@ Your only goal is to evaluate datasets based on the AIRBDS (AI-Ready Bioscience 
 - While reviewing the landing page, determine the dataset's name/title from the page itself (no need to ask the user). Keep it — it is useful for naming the saved YAML file and its `dataset.name` field (see step 5).
 - For each question, determine if the answer is 'Yes' or 'No' regarding its AI-readiness. You must answer all the questions and only the questions defined in the metric file. Be thorough in your assessment, looking through other pages on the website if necessary, particularly if the answer appears to be "No".
 - For every question, provide an answer, the score for that answer, and a three-part justification: the **Yes case** (the arguments for answering "Yes", max 2 lines), the **No case** (the arguments for answering "No", max 2 lines), and the **Decision** (which way you answered and why, max 2 lines). Keep each part to at most two lines; where one side has no genuine argument, say so in a few words rather than padding it. The score for a question is its full points when the Decision is "Yes" and 0 when it is "No". A question's full points are given by `grade_points` keyed by that question's `grade` (Critical = 80, Important = 5, Optional = 2).
+- **Record the process behind each answer.** As you assess each question, keep a brief per-question note of *how* you reached the answer: the **sources** you consulted (each page, file, API endpoint, or record you accessed, and what you inspected in it) and the **checks** you performed (what you looked for and what you found). Keep it terse — one source or check per line. This is the raw material for the optional process log (step 5b), so capture it as you go rather than reconstructing it later. It is separate from the access-failure tracking below, which records only resources you could *not* reach.
 - **Track any access failures.** Some environments restrict which sites you may retrieve from the Internet. This covers every kind of resource the assessment relies on, not just web pages: repository landing and documentation pages, API endpoints, direct file downloads, FTP/S3/cloud-container listings,
   DOI or identifier resolvers, and registry or schema lookups. If you cannot
   retrieve any such resource keep a running note of the resource (URL or endpoint), what you
@@ -128,7 +129,7 @@ Your only goal is to evaluate datasets based on the AIRBDS (AI-Ready Bioscience 
 
 4. **Follow-up**
 
-- Once the report is complete, in a line or two invite the user both to explore it and to take the file: ask whether there is any part of the assessment they would like to look at more closely — a particular question's answer, the evidence behind it, why the dataset missed a higher grade, or what would most improve its score — or whether they would like it saved as a YAML file they can keep. Do not summarise the report again; they have just read it.
+- Once the report is complete, in a line or two invite the user both to explore it and to take the file: ask whether there is any part of the assessment they would like to look at more closely — a particular question's answer, the evidence behind it, why the dataset missed a higher grade, or what would most improve its score — or whether they would like the assessment saved as files they can keep. When you offer to save, offer **both files by default**: the YAML data file *and* a Markdown process log that records how each answer was reached (the sources consulted and checks performed). Make clear both are produced unless they want only one. Do not summarise the report again; they have just read it.
 - Answer what they raise from the assessment you performed. Where they ask why an answer is what it is, explain your reasoning and point to the `guidance` in the metric that governs it.
 - **Appraise what they tell you critically; do not simply accept it.** An answer changes only when the user identifies something specific that survives your own checking. That can be either of two things, and both are legitimate — your first answer is not privileged merely because you gave it:
   - **Evidence you did not account for** — material you never saw, could not reach, or had in front of you and overlooked.
@@ -139,13 +140,16 @@ Your only goal is to evaluate datasets based on the AIRBDS (AI-Ready Bioscience 
   - Be as willing to revise **down** as up. Evidence can show a "Yes" was too generous, not only that a "No" was harsh.
   - If a question is genuinely borderline, say so and give both readings rather than silently picking one. The user can record their own view in the saved file, where the comment field is theirs to edit.
 - **If an answer does change, the assessment changes.** Re-issue the affected question table(s) — header row and all three parts — then **re-score** — run `scripts/score.py` again with the corrected answers rather than adjusting the total yourself — and state the new final score and grade. The warnings rules in step 3 apply to the new figures.
-- Follow their lead: keep going while they have questions, and do not press once they have finished. Go to step 5 whenever they ask for the file.
+- Follow their lead: keep going while they have questions, and do not press once they have finished. Go to step 5 whenever they ask for the file(s).
 
-5. **Optional: save the assessment as a YAML file**
+5. **Optional: save the assessment (YAML data file + process log)**
 
-- Save the assessment as a YAML file the user can download and keep when they ask for it — whether in reply to the offer in step 4 or at any point after. If they never ask for it, do not produce one.
+- Save the assessment as files the user can download and keep when they ask for them — whether in reply to the offer in step 4 or at any point after. If they never ask, produce nothing.
+- **By default produce both files together**: the YAML data file (5a) and the Markdown process log (5b). Produce only one if the user asks for only one; otherwise generate both. Name them from the same dataset-and-date stem so they read as a pair, and give the process log the `-process` suffix (e.g. `airbds-assessment-<dataset-slug>-<date>.yaml` and `airbds-assessment-<dataset-slug>-<date>-process.md`). Use the **final** state of the assessment for both — the answers, scores, justifications, summary, score and grade as they stand after any corrections in step 4.
+
+**5a. The YAML data file**
+
 - Build a YAML document in the shape of `assets/review_template.yaml` (bundled with this skill), filled in from the assessment you produced:
-  - Use the **final** state of the assessment throughout — the answers, scores, justifications, summary, score and grade as they stand after any corrections made in step 4, not as first reported.
   - `schema_version`: the metric version — copy the `schema_version` value from `assets/airbds_metric.json`.
   - `reviewer.name`: your own model identifier (e.g. `claude-opus-4-8`) — the model that performed the assessment. Leave `reviewer.initials`, `reviewer.orcid`, and `reviewer.affiliation` blank. Tell the user they can edit these to record their own name/ORCID before using it anywhere that expects a named reviewer.
   - `reviewer.review_date`: the current date and time in ISO 8601, including a timezone (e.g. `2026-06-03T14:32:05Z`).
@@ -164,3 +168,16 @@ Your only goal is to evaluate datasets based on the AIRBDS (AI-Ready Bioscience 
   Keep each line to the same one-or-two-line content used in the report. Include all questions.
   - You may fill in the `result` block (`weighted_score`, `grade`) for the user's reference.
 - Make the file available to the user: create a downloadable file if your environment supports it (named after the dataset and date, e.g. `airbds-assessment-<dataset-slug>-<date>.yaml`); otherwise output the complete YAML in a single code block they can copy and save. Do **not** upload or send the file anywhere yourself.
+
+**5b. The process log**
+
+- Build a Markdown document in the shape of `assets/process_log_template.md` (bundled with this skill), filled in from the per-question process notes you recorded in step 2. It is the human-readable audit trail behind the YAML: the YAML remains authoritative for the answers and score; this log records how each was reached.
+- Fill the frontmatter: `schema_version` copied from `assets/airbds_metric.json`; `dataset.name` and `dataset.url` as in the YAML; `reviewer` as your own model identifier; `review_date` as the current date and time in ISO 8601 with a timezone; `pairs_with` as the filename of the YAML from 5a.
+- For **every** question ID defined under `questions` in the metric file, in metric order and no others, fill its block:
+  - **Answer** — echo the final `Yes`/`No` from the YAML verbatim, so the two files can be cross-checked for drift. Do not re-derive it here.
+  - **Sources** — the pages, files, endpoints, or records you consulted for that question and what you inspected in each, one per line.
+  - **Checks** — what you looked for and what you found, as `looked for → found`, one observation per line.
+  - **Rationale** — one or two lines tying the checks to the verdict (this is the same reasoning as the YAML's `Decision` line; keep it terse, do not expand it into prose).
+  - Every question carries at least one **Source** and one **Check** — including answers that follow from the metric's own `guidance` or from a property of the hosting repository/platform (cite the clause, and the record that establishes the repository). The only block you may collapse to a bare **Answer** line is an Ethics question that does not apply (no human or animal subject data): write `**Answer:** Yes — no human/animal subjects (not applicable)` and omit the sub-blocks.
+- The ✅/❌ markers are presentation only and never appear here as the authoritative answer; the YAML answer governs.
+- Make the file available to the user the same way as the YAML in 5a — a downloadable file (named `airbds-assessment-<dataset-slug>-<date>-process.md`, the YAML's stem plus `-process`) if your environment supports it, otherwise the complete Markdown in a single code block. Do **not** upload or send the file anywhere yourself.

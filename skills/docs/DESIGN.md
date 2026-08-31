@@ -22,8 +22,9 @@ given URL. Its body is the instructions the assistant follows once invoked.
 airbds-assessment-skill/
 ├── SKILL.md
 ├── assets/
-│   ├── airbds_metric.json     → ../../../../metric/airbds_metric_v<version>.json
-│   └── review_template.yaml   → ../../../../reviews/review_template.yaml
+│   ├── airbds_metric.json        → ../../../../metric/airbds_metric_v<version>.json
+│   ├── review_template.yaml      → ../../../../reviews/review_template.yaml
+│   └── process_log_template.md   → ../../../../reviews/process_log_template.md
 └── scripts/
     └── score.py               → ../../../../reviews/src/scripts/airbds_scoring.py
 ```
@@ -53,7 +54,16 @@ comment, so the bundle loses nothing by omitting it. See
 an answer slot and a free-text `comments` field for each question id, reviewer
 and dataset blocks, and a `result` block for the weighted score and grade.
 
-All three are **symlinks** into the canonical files elsewhere in this repository.
+`assets/process_log_template.md` is the structure the optional *process log* is
+recorded in — a Markdown companion to the YAML that captures how each answer was
+reached (the sources consulted and checks performed per question). It is
+generated per metric version and carries a fixed block for every question id, so
+it stays diffable and keyed to the metric. The YAML remains the authoritative
+record of answers and score; the process log is the human-readable audit trail
+behind them, and the skill offers both by default at the save step. See
+[The output is the shared review template](#the-output-is-the-shared-review-template).
+
+All four are **symlinks** into the canonical files elsewhere in this repository.
 The build workflows dereference them into real files when they package a skill
 zip, so a published skill is self-contained while the checked-in skill has no
 copy to drift out of date. Nothing under `skills/` is ever the source of truth
@@ -201,3 +211,15 @@ instructs the assistant to put its own model identifier (e.g.
 before using the file anywhere a named reviewer is expected. The template gains
 no model-specific field; the provenance rides in the existing one, and an
 unedited machine assessment is recognisable as such.
+
+Alongside the YAML the skill can emit an optional **process log** from
+`process_log_template.md` — a Markdown audit trail of how each answer was
+reached. The two are deliberately kept as separate artifacts with different
+jobs: the YAML is the lean, machine-scored record of contribution (validated,
+renamed, and scored by `review_processor.py`); the process log is the long-form,
+human-readable provenance behind it, keyed to the same question ids so the two
+cross-reference and can be checked for drift (its per-question `Answer` echoes
+the YAML). Prose does not belong in the YAML, and the machine record should stay
+the lightweight thing that travels through scoring — so the audit trail lives in
+its own file rather than bloating the YAML or being buried as its frontmatter.
+The skill offers both by default at the save step; the user can take only one.
