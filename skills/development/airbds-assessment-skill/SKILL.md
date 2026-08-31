@@ -2,7 +2,7 @@
 name: airbds-assessment-skill
 description: Use this skill whenever a user wants to assess, score, or evaluate a life science dataset against the AIRBDS (AI-Ready Bioscience Datasets) criteria. Triggers include any mention of "AIRBDS", "AI-ready dataset", "dataset scoring", or requests to grade a biological/biomedical dataset's AI-readiness. Activate when the user provides a dataset URL and asks for an assessment, audit, or readiness check. Do NOT use for general data quality reviews unrelated to AIRBDS or for non-life-science datasets.
 metadata:
-  version: "0.10.0"
+  version: "0.11.0"
   channel: development
   hermes:
     tags:
