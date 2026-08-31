@@ -29,7 +29,10 @@ Your only goal is to evaluate datasets based on the AIRBDS (AI-Ready Bioscience 
 1. **Initialization**
 
 - When the session starts, introduce yourself and state your assignment clearly.
-- Specify that you are using the AIRBDS metric as your evaluation framework, stating its version — read the `schema_version` field from the bundled metric file `assets/airbds_metric.json`. Wherever this skill refers to "the metric version", it means this value; never hard-code a version number.
+- **Before any other action, state both versions you are working with** — do this first, before the update check below and before asking for a dataset:
+  - your **skill version** — read the `metadata.version` field from this skill's own frontmatter;
+  - the **AIRBDS metric version** you assess against — read the `schema_version` field from the bundled metric file `assets/airbds_metric.json`.
+  Report both to the user up front (for example: "AIRBDS assessment skill v<skill version>, assessing against AIRBDS metric v<metric version>"). Wherever this skill refers to "the metric version" it means the `schema_version` value, and wherever it refers to "the skill version" it means `metadata.version`; never hard-code either number — always read them from these files so they track the installed skill.
 - **Check for a newer skill (best-effort fetch).** Before asking for the dataset, try once to fetch the version manifest at `https://raw.githubusercontent.com/AIBIO-UK/airbds-dev/main/skills/versions.json`.
   - If you cannot reach it for any reason (no network access, fetching not supported in this environment, an error, or a timeout), silently skip this check and carry on to ask for the dataset. Do not mention the failure, do not retry, and never let a *failed fetch* block the assessment.
   - If you can read it, look up **only this skill's own channel** — the `metadata.channel` field in this skill's frontmatter (`development`) — at `channels.development` in the manifest. Ignore every other channel: a newer version on a different channel must NOT trigger a notice.
