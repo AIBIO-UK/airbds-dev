@@ -14,7 +14,7 @@ on:
       # listed here a commit that changes the metric or the scorer leaves the
       # published zip holding the old content, silently. Keep this list in step
       # with those symlinks.
-      - 'metric/airbds_metric_v1.0.0.json'
+      - 'metric/airbds_metric_v1.0.1.json'
       - 'reviews/review_template.yaml'
       - 'reviews/src/scripts/airbds_scoring.py'
   workflow_dispatch:
