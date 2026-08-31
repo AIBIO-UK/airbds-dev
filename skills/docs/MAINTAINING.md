@@ -311,8 +311,8 @@ through `publish-to-core.sh`'s `--post-copy` hook.
 The numbers sit inside HTML comment markers in the README source:
 
 ```markdown
-currently at version <!--skill-version-->0.8.0<!--/skill-version--> and assessing
-against [AIRBDS metric](...) v<!--metric-version-->1.0.0<!--/metric-version-->
+currently at version <!--skill-version-->X.Y.Z<!--/skill-version--> and assessing
+against [AIRBDS metric](...) v<!--metric-version-->X.Y.Z<!--/metric-version-->
 ```
 
 Comments render as nothing, so the published page reads exactly as it always
