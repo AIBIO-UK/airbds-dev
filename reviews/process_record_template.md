@@ -1,21 +1,23 @@
 ---
-airbds_process_log: true
+airbds_process_record: true
 schema_version: "1.0.1"
 dataset:
   name: ""
   url: ""
 reviewer: ""        # model id that performed the assessment, e.g. claude-opus-4-8
 review_date: ""     # ISO 8601, e.g. 2026-08-31T14:32:05Z
-pairs_with: ""      # filename of the assessment YAML this log explains
+pairs_with: ""      # filename of the assessment YAML this record explains
 ---
 
 <!--
-AIRBDS assessment process log — template for metric v1.0.1
+AIRBDS assessment process record — template for metric v1.0.1
 
 Companion to the assessment YAML. It records HOW each answer was reached: the
 sources consulted, the checks performed, and the reasoning to the verdict. The
-YAML remains the authoritative record of the answers and score; this log is the
-human-readable audit trail behind them.
+YAML remains the authoritative record of the answers and score; this record is
+the human-readable audit trail behind them. It is a per-question snapshot of the
+final state — not a chronological log — so a later revision is made in the
+affected block (see **Revision** below), not appended to the end of the file.
 
 Fill in every question block below, in this order, covering every question id
 and no others. Keep it terse:
@@ -29,6 +31,12 @@ and no others. Keep it terse:
   - **Checks:** what you looked for and what you found, as `looked for → found`.
     One observation per line.
   - **Rationale:** one or two lines tying the checks to the verdict.
+  - **Revision:** add this line ONLY if an answer or its basis changed in
+    conversation after the first assessment. Name what changed, why, and the
+    trigger — e.g. `**Revision** — user pointed to the SDRF FactorValue columns;
+    re-examined → ABC-06 No → Yes`. Revise the block in place (Answer, Sources,
+    Checks, Rationale) to the new final state and record the change here; do not
+    append it to the end of the file.
 
 Every question carries at least one Source and one Check — including answers
 that follow from the metric's own guidance or from a property of the hosting
@@ -62,7 +70,7 @@ Worked example of a filled block:
   No metadata travels with the data and the external article does not count → No.
 -->
 
-# AIRBDS assessment process log
+# AIRBDS assessment process record
 
 - **Dataset:** <name>
 - **URL:** <url>

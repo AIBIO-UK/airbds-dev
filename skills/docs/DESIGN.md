@@ -22,9 +22,9 @@ given URL. Its body is the instructions the assistant follows once invoked.
 airbds-assessment-skill/
 ├── SKILL.md
 ├── assets/
-│   ├── airbds_metric.json        → ../../../../metric/airbds_metric_v<version>.json
-│   ├── review_template.yaml      → ../../../../reviews/review_template.yaml
-│   └── process_log_template.md   → ../../../../reviews/process_log_template.md
+│   ├── airbds_metric.json          → ../../../../metric/airbds_metric_v<version>.json
+│   ├── review_template.yaml        → ../../../../reviews/review_template.yaml
+│   └── process_record_template.md  → ../../../../reviews/process_record_template.md
 └── scripts/
     └── score.py               → ../../../../reviews/src/scripts/airbds_scoring.py
 ```
@@ -54,13 +54,16 @@ comment, so the bundle loses nothing by omitting it. See
 an answer slot and a free-text `comments` field for each question id, reviewer
 and dataset blocks, and a `result` block for the weighted score and grade.
 
-`assets/process_log_template.md` is the structure the optional *process log* is
-recorded in — a Markdown companion to the YAML that captures how each answer was
-reached (the sources consulted and checks performed per question). It is
-generated per metric version and carries a fixed block for every question id, so
-it stays diffable and keyed to the metric. The YAML remains the authoritative
-record of answers and score; the process log is the human-readable audit trail
-behind them, and the skill offers both by default at the save step. See
+`assets/process_record_template.md` is the structure the optional *process
+record* is recorded in — a Markdown companion to the YAML that captures how each
+answer was reached (the sources consulted and checks performed per question). It
+is generated per metric version and carries a fixed block for every question id,
+so it stays diffable and keyed to the metric. It is a per-question snapshot of
+the final state, not a chronological log — a later correction is folded into the
+affected block with a `Revision` note, not appended. The YAML remains the
+authoritative record of answers and score; the process record is the
+human-readable audit trail behind them, and the skill offers both by default at
+the save step. See
 [The output is the shared review template](#the-output-is-the-shared-review-template).
 
 All four are **symlinks** into the canonical files elsewhere in this repository.
@@ -212,14 +215,17 @@ before using the file anywhere a named reviewer is expected. The template gains
 no model-specific field; the provenance rides in the existing one, and an
 unedited machine assessment is recognisable as such.
 
-Alongside the YAML the skill can emit an optional **process log** from
-`process_log_template.md` — a Markdown audit trail of how each answer was
+Alongside the YAML the skill can emit an optional **process record** from
+`process_record_template.md` — a Markdown audit trail of how each answer was
 reached. The two are deliberately kept as separate artifacts with different
 jobs: the YAML is the lean, machine-scored record of contribution (validated,
-renamed, and scored by `review_processor.py`); the process log is the long-form,
-human-readable provenance behind it, keyed to the same question ids so the two
-cross-reference and can be checked for drift (its per-question `Answer` echoes
-the YAML). Prose does not belong in the YAML, and the machine record should stay
-the lightweight thing that travels through scoring — so the audit trail lives in
-its own file rather than bloating the YAML or being buried as its frontmatter.
+renamed, and scored by `review_processor.py`); the process record is the
+long-form, human-readable provenance behind it, keyed to the same question ids
+so the two cross-reference and can be checked for drift (its per-question
+`Answer` echoes the YAML). Both age the same way — a post-assessment correction
+is revised in place in the affected block (with a `Revision` note recording the
+change), just as the YAML answer is, rather than appended as a log entry. Prose
+does not belong in the YAML, and the machine record should stay the lightweight
+thing that travels through scoring — so the audit trail lives in its own file
+rather than bloating the YAML or being buried as its frontmatter.
 The skill offers both by default at the save step; the user can take only one.

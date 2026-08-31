@@ -16,7 +16,7 @@ on:
       # with those symlinks.
       - 'metric/airbds_metric_v1.0.1.json'
       - 'reviews/review_template.yaml'
-      - 'reviews/process_log_template.md'
+      - 'reviews/process_record_template.md'
       - 'reviews/src/scripts/airbds_scoring.py'
   workflow_dispatch:
 
