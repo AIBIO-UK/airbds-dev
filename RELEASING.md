@@ -214,6 +214,15 @@ the metric, so:
   at the new `metric/airbds_metric_v<version>.json`. The skill reads its
   `schema_version` from that file and never hard-codes a version, so the symlink
   *is* the update — no change to `SKILL.md`'s body is needed.
+- Restamp the version strings in
+  [`reviews/process_record_template.md`](reviews/process_record_template.md) —
+  its `schema_version` and the prose (`template for metric v<version>`, `fixed for
+  metric v<version>`, `Metric version:`). It is bundled into the skill via a
+  symlink (`assets/process_record_template.md`) and rebuilt into the published zip
+  by the channel build, so a stale version here ships a process record that
+  misreports the metric. Unlike the metric symlink this file carries the number
+  in its own text, so it does not follow automatically — grep the outgoing version
+  to confirm none is left.
 - Bump `development`'s `metric_version` in [`skills/versions.json`](skills/versions.json).
 - Bump its `skill_version` **by at least a MINOR** — in `versions.json` *and* in
   `development`'s `SKILL.md` `metadata.version`, which must agree. See the rule
@@ -347,7 +356,7 @@ is done. Installed production skills pick the new bundle up through
 | 3b | Every bump: version-string references in `README.md`, `CITATION.cff`, `LICENSE.md`, `metric/README.md`, tutorials | — this file |
 | 3c | MINOR/MAJOR only: quoted content — `README.md` question table, `metric/README.md` counts + max score. Commit and push | — this file |
 | 4 | `release_metric_to_core.sh` → **merge the PR** | `metric/src/README.md` |
-| 5 | Repoint `development`; `versions.json`; `DESIGN.md`; `CHANGELOG.md` (Skill); then promote → `testing` | `skills/docs/MAINTAINING.md` |
+| 5 | Repoint `development`; restamp `reviews/process_record_template.md`; `versions.json`; `DESIGN.md`; `CHANGELOG.md` (Skill); then promote → `testing` | `skills/docs/MAINTAINING.md` |
 | 5b | Validate `development`: bundled `score.py` on the new metric, plus an interactive smoke test | — this file |
 | 6 | Confirm the channel build republished the release | `skills/docs/MAINTAINING.md` |
 | 7 | `channels.production` first, then `release_skill_to_core.sh` → **merge the PR** | `skills/docs/MAINTAINING.md` |
