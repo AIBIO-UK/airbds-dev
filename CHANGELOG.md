@@ -330,6 +330,29 @@ workflows here; `production` is published to `airbds-core` by
 `skills/src/scripts/release_skill_to_core.sh`. See
 [`skills/docs/MAINTAINING.md`](skills/docs/MAINTAINING.md).
 
+## [0.12.0] — development, testing (2026-09-15)
+
+- **Repointed at AIRBDS metric v1.0.2** (was 1.0.1), by moving the `development`
+  channel's `assets/airbds_metric.json` symlink to
+  `metric/airbds_metric_v1.0.2.json`. The skill reads `schema_version` out of the
+  bundle, so the version users are told they are assessed against follows the
+  symlink. v1.0.2 is a guidance-only metric patch — it adds one sentence to the
+  reviewer `instructions` ("At least a sample of the dataset should be downloaded
+  for testing during this assessment"); the questions, weights, and grade
+  thresholds are unchanged, so no dataset's score or grade moves.
+- **The bundled process-record template was restamped to v1.0.2.**
+  `reviews/process_record_template.md` (bundled via a symlink) carries the metric
+  version in its `schema_version` and prose; it now reads v1.0.2.
+- **Promoted `development` → `testing`** with `promote_skill_channel.py`:
+  `SKILL.md` copied across with only the channel token swapped, the metric and the
+  process-record template kept as symlinks (so `testing` tracks the files rather
+  than freezing copies), and `versions.json`'s `testing` entry moved to 0.12.0 /
+  metric 1.0.2.
+- A **MINOR** bump, not a patch: the bundle now scores against a different metric
+  version and carries new procedural guidance (inspect a data sample), so
+  0.11.0 → 0.12.0 per the never-a-patch rule in
+  [`skills/docs/MAINTAINING.md`](skills/docs/MAINTAINING.md#keeping-the-manifest-in-step).
+
 ## [0.11.0] — development, testing (2026-08-31)
 
 - **New: optional process record.** Alongside the saved YAML the skill can now

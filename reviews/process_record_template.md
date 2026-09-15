@@ -1,6 +1,6 @@
 ---
 airbds_process_record: true
-schema_version: "1.0.1"
+schema_version: "1.0.2"
 dataset:
   name: ""
   url: ""
@@ -10,7 +10,7 @@ pairs_with: ""      # filename of the assessment YAML this record explains
 ---
 
 <!--
-AIRBDS assessment process record — template for metric v1.0.1
+AIRBDS assessment process record — template for metric v1.0.2
 
 Companion to the assessment YAML. It records HOW each answer was reached: the
 sources consulted, the checks performed, and the reasoning to the verdict. The
@@ -45,7 +45,7 @@ repository). The only block you may collapse to a bare Answer line is an Ethics
 question that does not apply (no human/animal subjects): write **Answer:** Yes —
 no human/animal subjects (not applicable).
 
-Do not add or remove question blocks — this list is fixed for metric v1.0.1.
+Do not add or remove question blocks — this list is fixed for metric v1.0.2.
 The ✅/❌ markers used in the report are presentation only; they are optional
 here and never override the YAML answer.
 
@@ -74,7 +74,7 @@ Worked example of a filled block:
 
 - **Dataset:** <name>
 - **URL:** <url>
-- **Metric version:** 1.0.1
+- **Metric version:** 1.0.2
 - **Reviewer:** <model id>
 - **Date:** <ISO 8601>
 - **Pairs with:** <assessment YAML filename>
