@@ -6,7 +6,7 @@ artifacts, plus a body of work that carries no version at all:
 
 | Section | Versioned by | Released as |
 |---|---|---|
-| [Metric](#metric) | `schema_version` — 0.3, 0.4, 1.0.0, 1.0.1 | a new `metric/airbds_metric_v<version>.yaml` |
+| [Metric](#metric) | `schema_version` — 0.3, 0.4, 1.0.0, 1.0.1, 1.0.2 | a new `metric/airbds_metric_v<version>.yaml` |
 | [Assessment skill](#assessment-skill) | `skills/versions.json`, per channel | the `assessment-skill-development` / `assessment-skill-testing` release builds |
 | [Repository](#repository) | nothing | nothing — recorded by date |
 
@@ -30,8 +30,50 @@ Nothing yet.
 
 ---
 
-## [1.0.1] — current
+## [1.0.2] — current
 
+> **Reviewer instructions now ask for a data sample to be downloaded.** v1.0.2 is
+> a guidance-only clarification. The metric's top-level reviewer `instructions:`
+> block gains one sentence — *"At least a sample of the dataset should be
+> downloaded for testing during this assessment."* — directing an assessor to
+> inspect the data itself, not only its documentation. **The 25 questions, their
+> ids, scopes, grades, and per-question guidance, the Critical/Important/Optional
+> weights, and every numeric `min_score` threshold are unchanged from [1.0.1].**
+> No dataset's score or grade changes as a result; only the guidance an assessor
+> reads before answering does. It is authored in its own Google Sheet — a copy of
+> the v1.0.1 sheet with the sentence added — so v1.0.1 stays reproducible from its
+> own source.
+
+### Changed
+- The top-level `instructions:` block gains the sample-download sentence, placed
+  before the retained "Review the Notes field…" guidance. This is the only
+  difference in metric content from [1.0.1]; questions, weights, and thresholds
+  are byte-identical.
+- The outgoing v1.0.1 review-template pair was archived to
+  `reviews/archived_templates/review_template_v1.0.1.{yaml,csv}` before the live
+  `reviews/review_template.{yaml,csv}` pair was regenerated to v1.0.2 (version
+  strings only — the questions are unchanged).
+
+### Added
+- `metric/airbds_metric_v1.0.2.{yaml,json,upstream.json}`, generated from the
+  v1.0.2 Google Sheet by
+  `metric/src/scripts/build_metric_from_google_sheet_v1.0.2.py` — a copy of the
+  v1.0.1 generator carrying `VERSION = "1.0.2"` and the new sheet. The sheet's
+  shape is unchanged, so the tab classifiers and readers are identical to v1.0.1.
+  As before the JSON is written by the same build run as the YAML and covered by
+  `--check`; the YAML remains canonical.
+
+---
+
+## [1.0.1] — superseded by [1.0.2]
+
+> **v1.0.1 has been superseded by [1.0.2] and is retained.** [1.0.2] adds one
+> sentence to the reviewer instructions and changes nothing else; reviews carrying
+> `schema_version: "1.0.1"` still score against it. While current it was the
+> target of the metric, the review template (`reviews/review_template.{yaml,csv}`),
+> the sheet→YAML converter, and all three assessment skill channels
+> (see [Assessment skill](#assessment-skill)); [1.0.2] is now current.
+>
 > **Grading is now by total score alone.** v1.0.1 clarifies a scoring rule that
 > v1.0.0 encoded too strictly. The per-tier "Yes" proportions that v1.0.0 carried
 > as `min_proportion_yes` — and applied as a hard gate alongside each grade's
@@ -94,7 +136,7 @@ Nothing yet.
 > a stable version number. While current it was the target of the metric, the
 > review template (`reviews/review_template.{yaml,csv}`), the sheet→YAML
 > converter, and all three assessment skill channels
-> (see [Assessment skill](#assessment-skill)); [1.0.1] is now current.
+> (see [Assessment skill](#assessment-skill)); [1.0.1] superseded it.
 >
 > **v0.5 was withdrawn rather than retained.** Retention exists so a review can
 > be re-scored against the metric it was scored with, and no review ever carried

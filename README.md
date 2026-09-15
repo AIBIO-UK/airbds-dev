@@ -1,7 +1,7 @@
 # AIRBDS Metric — Development Repository
 
 [![License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
-[![Version](https://img.shields.io/badge/metric%20version-v1.0.1-blue)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/metric%20version-v1.0.2-blue)](CHANGELOG.md)
 [![AIBIO-UK](https://img.shields.io/badge/AIBIO--UK-AIRBDS%20Working%20Group-green)](https://aibio.ac.uk/about/working-groups/airbds/)
 [![Metric Upstream Drift Check](https://github.com/AIBIO-UK/airbds-dev/actions/workflows/metric-upstream-drift-check.yml/badge.svg)](https://github.com/AIBIO-UK/airbds-dev/actions/workflows/metric-upstream-drift-check.yml)
 
@@ -56,12 +56,12 @@ Questions are grouped into **four scopes** and **three weight tiers**:
 
 ## Use the Metric
 
-Two ways to use the current metric (v1.0.1) directly — pick whichever suits you:
+Two ways to use the current metric (v1.0.2) directly — pick whichever suits you:
 
 | | Link | Best for |
 |---|---|---|
-| 📄 **YAML file** (source of truth) | [`metric/airbds_metric_v1.0.1.yaml`](metric/airbds_metric_v1.0.1.yaml) | Scripting, tooling, or anything that reads the metric programmatically |
-| 📊 **Google Sheet** (editing interface) | [Open the sheet](https://docs.google.com/spreadsheets/d/1l9FVM09YkHAmy6XzqGiSPutKdJnk0WD-EwZE8GXu6TY/edit) | Browsing, filtering, or copying into your own spreadsheet — no coding required |
+| 📄 **YAML file** (source of truth) | [`metric/airbds_metric_v1.0.2.yaml`](metric/airbds_metric_v1.0.2.yaml) | Scripting, tooling, or anything that reads the metric programmatically |
+| 📊 **Google Sheet** (editing interface) | [Open the sheet](https://docs.google.com/spreadsheets/d/1_ZO89HEnsqaxs7HTjnDD7hZR_55K0DlisWZ5vhuyj1M/edit) | Browsing, filtering, or copying into your own spreadsheet — no coding required |
 
 The committed **YAML is the source of truth**: it is what this repository and
 downstream consumers read, and what every review is scored against. The Google
@@ -220,14 +220,14 @@ Completed reviews reference the metric version they were scored with via the
 to the assessment skill that carries the new metric — is in
 [RELEASING.md](RELEASING.md).
 
-> **v1.0.1 is the current version.** The metric, the review templates, and the
-> sheet→YAML converter target v1.0.1; the assessment skill channels
+> **v1.0.2 is the current version.** The metric, the review templates, and the
+> sheet→YAML converter target v1.0.2; the assessment skill channels
 > (`development`, `testing`, `production`) are repointed to it as part of this
-> release. v1.0.0 is **retained** — superseded by v1.0.1 but kept so reviews
-> scored against it can be re-scored — as are v0.4 and v0.3; the version-aware
+> release. v1.0.1 and v1.0.0 are **retained** — superseded but kept so reviews
+> scored against them can be re-scored — as are v0.4 and v0.3; the version-aware
 > review processor scores each review against the metric matching its
 > `schema_version`. v0.5 was **withdrawn** when v1.0.0 superseded it: the two are
-> the same metric, and no review was ever scored against v0.5. See the `[1.0.1]`
+> the same metric, and no review was ever scored against v0.5. See the `[1.0.2]`
 > entry under **Metric** in [CHANGELOG.md](CHANGELOG.md#metric).
 
 ---
@@ -300,7 +300,7 @@ Example test files demonstrating compliant and non-compliant inputs are in
 If you use this metric, please cite it as:
 
 > AIRBDS Working Group, AIBIO-UK. (2026). *AIRBDS AI-Readiness Dataset
-> Scoring Metric* (v1.0.1). GitHub.
+> Scoring Metric* (v1.0.2). GitHub.
 > <https://github.com/AIBIO-UK/airbds-core>
 
 Full citation metadata (including all working group members) is available in
