@@ -726,6 +726,19 @@ change the grade it is reported as having earned.
 Changes to the repository itself — workflows, tooling, documentation, and
 layout — that carry no version of their own. Recorded by month, newest first.
 
+## 2026-09
+
+### Fixed
+- **`@airbds/converter-tools` 0.5.1 — detect the metric version from the current
+  spreadsheet template.** The assessment sheet moved its version out of the old
+  "AIRBDS … Metric v1.0.0" title cell into a labelled `Version:` field (the number
+  in the adjacent cell), which `detectSchemaVersion` did not recognise — so a
+  v1.0.2 sheet failed to import with "could not determine the metric version".
+  Detection now reads the labelled `Version:` cell (via `extractReviewInfo`), an
+  inline `Version: 1.0.2` cell, and the older title cell, with word-boundary
+  guards so it ignores words like "conversion", and captures the full patch
+  version. Covered by `reviews/src/google-sheet-converter/detect-schema-version.test.ts`.
+
 ## 2026-08
 
 ### Changed

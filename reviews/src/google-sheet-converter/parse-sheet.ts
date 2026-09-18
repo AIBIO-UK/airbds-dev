@@ -33,24 +33,44 @@ export function extractReviewInfo(rows: string[][]): Map<string, string> {
 }
 
 /**
- * Matches the "… Metric v1.0.0" version label on the Instructions tab.
- *
- * The patch component is optional but must be captured when present: without
- * it the pattern silently truncates "v1.0.0" to "1.0" and the caller then
- * looks for a metric file that does not exist. Retained v0.3 and v0.4 sheets
- * carry two-part labels, so it cannot be required.
+ * Matches an AIRBDS metric version wherever a single cell declares it, in either
+ * form the template has shipped: an old title cell ("AIRBDS … Metric v1.0.0") or
+ * an inline label ("Version: 1.0.2"). The `\b` anchors keep it from firing on
+ * words like "conversion". The patch component is optional but captured when
+ * present, so "v1.0.2" is never truncated to "1.0" (retained v0.3/v0.4 sheets
+ * carry two-part labels, so it cannot be required).
  */
-const METRIC_VERSION = /Metric\s+v\.?\s*(\d+\.\d+(?:\.\d+)?)/i;
+const METRIC_VERSION =
+  /(?:\bmetric\s+v\.?\s*|\bversion\b\s*:?\s*v?\.?\s*)(\d+\.\d+(?:\.\d+)?)/i;
+/** A cell holding only a version number — the value beside a "Version:" label. */
+const VERSION_NUMBER = /^v?\.?\s*(\d+\.\d+(?:\.\d+)?)\s*$/i;
 
 /**
  * Read the metric version the sheet declares for itself, from the review-info
- * (Instructions) tab — e.g. the "AIRBDS Dataset Metric v1.0.0" title cell. The
- * sheet is trusted for the version (it is only ever distrusted for the score),
- * so the right metric/airbds_metric_v<version>.yaml can be selected without a
- * flag. Returns the version string (e.g. "1.0.0") or null if no version is found.
+ * (Instructions) tab. The sheet is trusted for the version (it is only ever
+ * distrusted for the score), so the right metric/airbds_metric_v<version>.yaml
+ * can be selected without a flag. Handles every form the template has used:
+ *
+ *   - a "Version:" label cell with the number in the next cell   (current)
+ *   - a single "Version: 1.0.2" cell                             (inline)
+ *   - a "AIRBDS … Metric v1.0.0" title cell                      (older sheets)
+ *
+ * Returns the version string (e.g. "1.0.2") or null if none is found.
  */
 export function detectSchemaVersion(reviewCsv: string): string | null {
-  for (const row of parseCsv(reviewCsv)) {
+  const rows = parseCsv(reviewCsv);
+
+  // Current templates carry a labelled "Version:" field; the label/value reader
+  // picks up its value cell regardless of which column the label sits in.
+  const labelled = extractReviewInfo(rows).get("version");
+  if (labelled) {
+    const m = labelled.match(VERSION_NUMBER);
+    if (m) return m[1];
+  }
+
+  // Older templates carry the version inline in a title cell (this also catches
+  // a "Version: 1.0.2" written as a single cell rather than a label + value).
+  for (const row of rows) {
     for (const cell of row) {
       const m = (cell ?? "").match(METRIC_VERSION);
       if (m) return m[1];
