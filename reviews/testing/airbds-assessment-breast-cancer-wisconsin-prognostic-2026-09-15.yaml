@@ -1,0 +1,199 @@
+# AIRBDS AI-Readiness Dataset Scoring Metric — completed review
+# Metric schema version 1.0.1
+
+schema_version: "1.0.1"
+
+reviewer:
+  name: "claude-opus-5"
+  initials: ""
+  orcid: ""
+  affiliation: ""
+  review_date: "2026-09-15T12:55:49Z"
+
+dataset:
+  name: "Breast Cancer Wisconsin (Prognostic)"
+  url: "https://archive.ics.uci.edu/dataset/16/breast+cancer+wisconsin+prognostic"
+  hosting_resource: "UCI Machine Learning Repository"
+  accession: "10.24432/C5GK50 (DOI); uci_id 16"
+  comments: |
+    Final score 447 — Caution. Critical 5/9, Important 7/10, Optional 6/6. The dataset
+    is clean, open and well-identified: the payload passes every content check (no
+    duplicates, complete against its stated counts, internally consistent types), and it
+    carries a DOI and a CC BY 4.0 licence in an archive with a public metadata API. Four
+    Critical failures worth 320 points sink it. Three are ethics: human clinical oncology
+    data with no ethical review, no de-identification statement and no legal basis
+    recorded anywhere in the metadata. The fourth is ABC-11 — a bespoke repository schema
+    with null descriptions and units, and variable names (radius1/2/3) that do not explain
+    themselves. Bronze needs 640, so even a clean sweep of the three remaining Important
+    questions (15 points) would leave it far short; only the ethics documentation could
+    move the grade, and that is a property of the 1995 deposit rather than something the
+    repository can retrofit.
+
+process_comments: |
+  Assessed with the AIRBDS assessment skill v0.11.0 against metric v1.0.1. Evidence
+  gathered from the UCI landing page, the UCI dataset API (/api/dataset?id=16), the
+  downloaded distribution (wpbc.zip -> wpbc.data + wpbc.names, and data.csv), the
+  DataCite record for 10.24432/C5GK50, and the re3data and FAIRsharing records for the
+  UCI Machine Learning Repository. Content questions (ABC-17 to ABC-22) were answered by
+  programmatic checks on the downloaded files. Scored with the skill's scripts/score.py.
+  No access failures: every resource consulted was retrievable. A companion process
+  record documents the sources and checks per question.
+
+answers:
+  ABC-01:
+    answer: "Yes"
+    comments: |
+      Yes case: Full zip and data.csv downloaded anonymously over HTTPS; 198 records retrieved, matching the stated instance count.
+      No case: No genuine argument — no registration, approval process or access control of any kind.
+      Decision: Yes — every entry is directly downloadable, with no access-controlled layer.
+  ABC-02:
+    answer: "Yes"
+    comments: |
+      Yes case: The download zip packages wpbc.names beside wpbc.data; the landing page carries a variable table, abstract and citation.
+      No case: wpbc.names leans on cited journal papers for feature-computation detail, which the metric excludes.
+      Decision: Yes — metadata is collocated both in the package and on the repository page; the external papers are supplementary, not the whole record.
+  ABC-03:
+    answer: "Yes"
+    comments: |
+      Yes case: Served via the UCI JSON API (/api/dataset?id=16) and static files over HTTPS/TLS, whose transit integrity checks the guidance accepts.
+      No case: No MD5/SHA checksum is published for the zip, wpbc.data or data.csv.
+      Decision: Yes — the guidance explicitly allows HTTPS/TLS API delivery in place of per-file checksums.
+  ABC-04:
+    answer: "Yes"
+    comments: |
+      Yes case: Landing page states Creative Commons Attribution 4.0 International, linking to the CC BY 4.0 legal code.
+      No case: DataCite's record for the DOI carries an empty rightsList, so the licence is not asserted in the registry metadata.
+      Decision: Yes — an explicit, named licence is stated on the dataset's own repository page.
+  ABC-05:
+    answer: "Yes"
+    comments: |
+      Yes case: CC BY 4.0 is a standard licence, expressed on the page as a resolvable creativecommons.org/licenses/by/4.0/ URI.
+      No case: The licence appears in neither the API JSON nor the DataCite record, so a machine consuming only those sees nothing.
+      Decision: Yes — a standardised licence identified by its canonical URI; the API omission weakens but does not defeat it.
+  ABC-06:
+    answer: "Yes"
+    comments: |
+      Yes case: UCI ML Repository is registered in FAIRsharing (FAIRsharing.62dcc6) and re3data (r3d100010960), issues DataCite DOIs, and exposes machine-readable metadata via a public API.
+      No case: re3data records only "repository-developed metadata schemas" — no community standard — and it holds no trustworthy-repository certification.
+      Decision: Yes — it satisfies the guidance's registry test and clears the PID + machine-readable-metadata bar that excludes Kaggle/HuggingFace.
+  ABC-07:
+    answer: "No"
+    comments: |
+      Yes case: UCI tags the dataset "Health and Medicine" and offers subject-area facets.
+      No case: It is a general-purpose ML benchmark archive, not a biomedical/clinical repository (e.g. dbGaP, EGA, TCIA) with the tooling and standards for human-subject oncology data.
+      Decision: No — a subject-area tag on a general ML archive is not a domain-appropriate infrastructure for clinical follow-up data.
+  ABC-08:
+    answer: "Yes"
+    comments: |
+      Yes case: /datasets supports free-text search plus facets (Area, Associated Tasks, Attribute Type, # Instances); the API also returns filtered dataset lists.
+      No case: No genuine argument — direct lookup by ID and metadata-property search both work.
+      Decision: Yes — verified by running a faceted search and an API list query that both returned this dataset.
+  ABC-09:
+    answer: "Yes"
+    comments: |
+      Yes case: DOI 10.24432/C5GK50, resolvable and findable in DataCite; also accession uci_id 16.
+      No case: No genuine argument — the DOI is registered and current.
+      Decision: Yes — a registered DOI is exactly what the guidance asks for.
+  ABC-10:
+    answer: "Yes"
+    comments: |
+      Yes case: A closed 1995 deposit with a fixed 198-record cohort; nothing indicates the data is subject to updates.
+      No case: The API reports last_updated "Sun Jan 14 2024" with no version identifier, and DataCite records no version.
+      Decision: Yes — the 2024 timestamp reflects the repository's metadata migration, not data revision; with no likely updates the guidance directs "Yes".
+  ABC-11:
+    answer: "No"
+    comments: |
+      Yes case: The API returns structured JSON with a typed variable table (name, role, type, missing-values flag).
+      No case: It is a repository-developed schema (as re3data records), with no biomedical minimum-information standard; every description and units field is null and names like radius1/radius2/radius3 do not reveal mean/SE/worst.
+      Decision: No — machine-readable but bespoke and not domain-appropriate, and the variable names are not self-explanatory as the guidance requires.
+  ABC-12:
+    answer: "Yes"
+    comments: |
+      Yes case: The API response carries uci_id 16 and dataset_doi 10.24432/C5GK50 alongside data_url, so metadata retrieved with the data is identified.
+      No case: The packaged zip (wpbc.data, wpbc.names) contains no DOI or accession — only the title "WPBC" — so a detached download is unidentified.
+      Decision: Yes — the guidance explicitly accepts an identifier "included in the API response", which this meets.
+  ABC-13:
+    answer: "Yes"
+    comments: |
+      Yes case: The summary states features are "computed from a digitized image of a fine needle aspirate (FNA)" — an explicit imaging modality — and variable_info describes the clinical follow-up fields (outcome, time, tumour size, lymph-node count).
+      No case: The imaging modality is described only as the upstream source; the delivered records are derived tabular features.
+      Decision: Yes — both the image-derived and clinical components are named explicitly in collocated metadata, not merely implied.
+  ABC-14:
+    answer: "No"
+    comments: |
+      Yes case: wpbc.names states mean, standard error and "worst" were computed per image and values recoded to four significant digits.
+      No case: preprocessing_description is null, and nuclear-boundary segmentation and feature computation are deferred to journal articles, which the metric excludes.
+      Decision: No — the data is derived, not raw, and the collocated metadata lacks the tools and parameters needed to reproduce the derivation.
+  ABC-15:
+    answer: "Yes"
+    comments: |
+      Yes case: Creators are named with affiliations (Wolberg, General Surgery, UW Madison; Street and Mangasarian, UW Computer Sciences), donor and date given, and production described: FNA digitised images, features computed per cell nucleus.
+      No case: The image-analysis pipeline's specifics sit in cited papers rather than the record.
+      Decision: Yes — both who generated it and how it was produced are documented in collocated metadata, which is what this question asks.
+  ABC-16:
+    answer: "Yes"
+    comments: |
+      Yes case: Summary states "consecutive patients seen by Dr. Wolberg since 1984... only those cases exhibiting invasive breast cancer and no evidence of distant metastases at the time of diagnosis" — source population plus explicit inclusion criteria and exhaustive (consecutive) selection.
+      No case: No detail on catchment demographics, exclusions or loss to follow-up, and the demographics field is empty.
+      Decision: Yes — both required elements (population sampled and how samples were selected) are present in collocated metadata.
+  ABC-17:
+    answer: "Yes"
+    comments: |
+      Yes case: Programmatic check of wpbc.data — 0 duplicate lines, 0 duplicate ID values across 198 records; data.csv likewise 0 duplicate rows.
+      No case: No genuine argument.
+      Decision: Yes — verified directly on the downloaded files.
+  ABC-18:
+    answer: "Yes"
+    comments: |
+      Yes case: Metadata says 198 instances, 151 nonrecur / 47 recur, lymph-node status missing in 4 cases — the file matches all three exactly, with all 35 enumerated fields present.
+      No case: wpbc.names states "34 attributes" while its own numbered list runs to 35, a documented count inconsistency.
+      Decision: Yes — every record and field the metadata enumerates is present and the counts reconcile; the "34" is a stale header, not missing content.
+  ABC-19:
+    answer: "Yes"
+    comments: |
+      Yes case: All 198 rows have exactly 35 fields; every column holds a single consistent type; outcome is N/R throughout; one missing marker per file (? in wpbc.data, NaN in data.csv, as the API declares).
+      No case: The two distributions use different missing-value markers, though each is internally consistent.
+      Decision: Yes — checked column by column across all entries; types, names and codes are uniform.
+  ABC-20:
+    answer: "No"
+    comments: |
+      Yes case: Column names are lower-case and regular, and roles/types are declared in the API variable table.
+      No case: No schema or minimum information standard; no ontology terms; every units field null (tumour size in cm and node counts appear only in prose); radius1/2/3 is an ad hoc encoding of mean/SE/worst.
+      Decision: No — the naming and typing are a local convention with no domain standard behind them.
+  ABC-21:
+    answer: "Yes"
+    comments: |
+      Yes case: A 198 x 35 numeric table delivered as delimited plain text (wpbc.data, data.csv) — suitable and efficient at this scale, loadable by any analysis tool.
+      No case: No columnar format (Parquet) or typed schema, though neither is warranted for 44 KB.
+      Decision: Yes — CSV is the right format for a small, flat, tabular dataset.
+  ABC-22:
+    answer: "Yes"
+    comments: |
+      Yes case: CSV and plain text throughout; read and rewritten with the Python standard library, no proprietary software involved.
+      No case: No genuine argument.
+      Decision: Yes — fully open formats.
+  ABC-23:
+    answer: "No"
+    not_applicable: false
+    comments: |
+      Yes case: No genuine argument — no ethics text exists anywhere in the collocated metadata.
+      No case: Human-subject clinical data (patient FNA and surgical follow-up); no IRB or ethics-committee statement on the landing page, in wpbc.names, in the API (sensitive_data is null) or in any linked trial registration.
+      Decision: No — human subjects are involved and no ethical review is documented.
+  ABC-24:
+    answer: "No"
+    not_applicable: false
+    comments: |
+      Yes case: Records carry only an opaque ID number and no direct identifiers, suggesting de-identification in practice.
+      No case: No statement of anonymisation, de-identification or privacy status anywhere in the metadata; sensitive_data is null and no privacy policy is linked.
+      Decision: No — the guidance requires the status to be stated; inferring it from the column list does not satisfy it.
+  ABC-25:
+    answer: "No"
+    not_applicable: false
+    comments: |
+      Yes case: No genuine argument — nothing addresses consent or lawful basis.
+      No case: No mention of informed consent, waiver, HIPAA, GDPR or any other lawful basis in the metadata or any linked ethics/trial record; funded_by and purpose are also null.
+      Decision: No — no record of consent and no mention of a legal basis.
+
+result:
+  weighted_score: 447
+  grade: "Caution"

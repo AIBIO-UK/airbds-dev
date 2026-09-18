@@ -1,0 +1,219 @@
+# AIRBDS assessment — AI-Readiness Dataset Scoring Metric v1.0.1
+# Produced by the AIRBDS assessment skill v0.11.0 (testing channel).
+# Scoring performed by the skill's bundled scripts/score.py.
+#
+# NOTE: reviewer.name records the model that performed the assessment.
+# Edit reviewer.name / initials / orcid / affiliation to record yourself
+# before using this file anywhere that expects a named human reviewer.
+#
+# To submit, open a PR at https://github.com/AIBIO-UK/airbds-dev
+
+schema_version: "1.0.1"
+
+reviewer:
+  name: "claude-opus-5"
+  initials: ""
+  orcid: ""
+  affiliation: ""
+  review_date: "2026-09-01T12:23:23Z"
+
+dataset:
+  name: "Single-cell RNA-seq data from Smart-seq2 sequencing of FACS sorted cells (v2)"
+  url: "https://figshare.com/articles/dataset/Single-cell_RNA-seq_data_from_Smart-seq2_sequencing_of_FACS_sorted_cells_v2_/5829687"
+  hosting_resource: "figshare"
+  accession: "10.6084/m9.figshare.5829687 (v8)"
+  comments: |
+    Strong on infrastructure and content: a registered DOI with version-specific suffixes, an explicit
+    CC BY 4.0 licence, per-file MD5 checksums, unrestricted download, and data that stands up to direct
+    inspection — 53,760 cells across 20 tissue matrices matching the stated total exactly, an identical
+    23,433-gene vector in identical order across files, integer counts throughout, no duplicated cells
+    or genes, and Cell Ontology IDs mapping 1:1 to their class labels.
+    The grade is set by two Critical failures costing 160 points. ABC-23: this is mouse data and the
+    deposit carries no ethics or IACUC documentation of any kind — approval exists only in the linked
+    Nature paper, which the metric does not accept. ABC-11: the metadata follows no domain
+    minimum-information standard — no sequencing platform, library protocol, reference genome or
+    annotation build anywhere in the record, so a reuser cannot establish what the counts derive from.
+    Fixing either lifts the dataset to 690 (Bronze); fixing both reaches 770, six points short of Gold.
+    ABC-14 shares a root cause with ABC-11, so one addition — a processing-and-platform record deposited
+    alongside the files — would close both.
+
+process_comments: |
+  Evidence was taken from the Figshare landing page (rendered in a browser, since the page is a
+  JavaScript application that plain HTML fetching renders incompletely), the Figshare REST API record
+  for article 5829687, and the DataCite record for the DOI. No resource needed for the assessment was
+  unreachable. Scoring was performed by the skill's bundled scripts/score.py.
+  ABC-11 and ABC-12 are the two genuinely borderline calls and are the ones most worth re-examining.
+
+  Volume downloaded (per the sampling heuristic: at least 10 files, 10 GB, or 10% of the dataset,
+  whichever is smallest):
+    - 12 files downloaded complete: metadata_FACS.csv (247 plates), annotations_facs.csv (44,949 cells),
+      and 10 of the 20 tissue count matrices (Aorta, Kidney, Diaphragm, Liver, Limb_Muscle, Thymus,
+      Spleen, Trachea, Lung, Tongue).
+    - 92,793,687 bytes transferred = 29.8% of the 311 MB deposit (79,985,279 unique, 25.7%).
+    - 659 MB of content once expanded = 24.5% of the 2.69 GB the deposit holds.
+    - The remaining 10 matrices were read from their headers via HTTP range requests against the zip
+      central directory, giving cell counts and cell IDs for all 20 tissues without full download.
+  The 10 GB limb of the heuristic is inapplicable here: it exceeds the entire 0.311 GB dataset. The
+  binding threshold is therefore 10% (31.1 MB) or 10 files depending on how the dataset is sized, and
+  both are cleared with margin.
+
+answers:
+  ABC-01:
+    answer: "Yes"
+    comments: |
+      Yes case: All 3 files (296 MB) download directly without registration; download_disabled is false; all were retrieved, including members inside FACS.zip.
+      No case: No genuine argument — there is no access control or approval process.
+      Decision: Yes — every entry is reachable by direct download and via the Figshare API.
+  ABC-02:
+    answer: "Yes"
+    comments: |
+      Yes case: metadata_FACS.csv (247 plates) and annotations_facs.csv (44,949 cells) are packaged in the deposit; description, keywords, licence and funding sit on the same page.
+      No case: Some context (protocols, platform) exists only in the linked Nature article, which the metric excludes.
+      Decision: Yes — substantial metadata is collocated with the data, which is what this question asks.
+  ABC-03:
+    answer: "Yes"
+    comments: |
+      Yes case: Every file carries supplied_md5 and computed_md5 in the API record (FACS.zip ef6e44ca2170155052591b5ab9d5d778); delivery is over HTTPS.
+      No case: Checksums are not shown on the rendered landing page, only via the API.
+      Decision: Yes — per-file MD5 hashes are published and both guidance routes (checksum and HTTPS) are met.
+  ABC-04:
+    answer: "Yes"
+    comments: |
+      Yes case: "LICENCE: CC BY 4.0" is displayed on the landing page and returned by the API with its URL.
+      No case: No genuine argument — the licence is explicit and unambiguous.
+      Decision: Yes — an explicit, item-level licence, not a blanket repository disclaimer.
+  ABC-05:
+    answer: "Yes"
+    comments: |
+      Yes case: Creative Commons CC BY 4.0, with license.url in the API and an SPDX identifier (cc-by-4.0) in the DataCite record.
+      No case: No genuine argument.
+      Decision: Yes — a standard licence resolvable by machine through two independent metadata channels.
+  ABC-06:
+    answer: "Yes"
+    comments: |
+      Yes case: Figshare is named in the guidance as a FAIR-aligned general repository; it mints DOIs and exposes DataCite/schema.org metadata.
+      No case: No genuine argument.
+      Decision: Yes — the guidance names FigShare explicitly, and the DOI and DataCite record confirm it in practice.
+  ABC-07:
+    answer: "No"
+    comments: |
+      Yes case: Figshare handles large files well and the deposit is indexed and citable.
+      No case: Figshare is a general-purpose repository; scRNA-seq belongs in GEO, ArrayExpress/BioStudies or the Single Cell Portal, which enforce MINSEQE and link raw reads.
+      Decision: No — the guidance treats general-purpose archives as the alternative to a domain-appropriate one, and no domain-specific tooling or standards apply here.
+  ABC-08:
+    answer: "Yes"
+    comments: |
+      Yes case: Figshare search supports free-text, author, category and keyword filters; 33 keywords and 4 categories are attached, and the DOI resolves directly.
+      No case: Categories include an erroneous "Plant cell and molecular biology", which degrades faceted search slightly.
+      Decision: Yes — the dataset is discoverable both by metadata properties and by direct identifier lookup.
+  ABC-09:
+    answer: "Yes"
+    comments: |
+      Yes case: DOI 10.6084/m9.figshare.5829687, with version-specific DOIs (.v8); registered and resolvable at DataCite.
+      No case: No genuine argument.
+      Decision: Yes — a registered DOI, which the guidance accepts explicitly.
+  ABC-10:
+    answer: "Yes"
+    comments: |
+      Yes case: Eight versions (v1-v8) are listed via the API, each with its own DOI suffix, and the description logs every dated change.
+      No case: No genuine argument.
+      Decision: Yes — this dataset has demonstrably been updated and versioning is fully implemented.
+  ABC-11:
+    answer: "No"
+    comments: |
+      Yes case: Cell types use the Cell Ontology with CL IDs and a cited PURL; fields such as tissue, mouse.sex, FACS.selection are largely self-explanatory.
+      No case: No MINSEQE/MIAME-style record — no sequencing platform, library protocol, reference genome or annotation build; the schema is bespoke CSV, and Figshare's DataCite export is generic bibliographic metadata, not domain metadata.
+      Decision: No — a domain ontology for one field is not a domain metadata standard; the minimum information a reuser needs to interpret the counts is absent.
+  ABC-12:
+    answer: "Yes"
+    comments: |
+      Yes case: The Figshare API response carries doi 10.6084/m9.figshare.5829687.v8, and "Export metadata" yields downloadable DataCite/RIS/BibTeX records containing that DOI.
+      No case: None of the three data files embed the identifier, so a detached copy of FACS.zip alone is not self-identifying.
+      Decision: Yes — the guidance explicitly accepts a downloadable metadata record or the API response, and both carry the DOI.
+  ABC-13:
+    answer: "Yes"
+    comments: |
+      Yes case: The description names the modality directly — "Gene-count tables for FACS sorted cells sequenced with Smart-Seq2" — reinforced by keywords rna-seq and single-cell rna-seq.
+      No case: No genuine argument; the dataset is single-modality and that modality is stated.
+      Decision: Yes — explicitly described, not merely implied by format or repository.
+  ABC-14:
+    answer: "No"
+    comments: |
+      Yes case: The QC threshold is quantified (at least 500 genes, 50,000 reads) and every curation change is dated in the version log.
+      No case: The data are processed gene counts, yet no aligner, reference genome/annotation build, counting tool, parameters or code repository is given anywhere in the record.
+      Decision: No — a stated QC cutoff is a high-level mention without the specifics the guidance requires to reproduce the counts.
+  ABC-15:
+    answer: "Yes"
+    comments: |
+      Yes case: Origin is clear (Tabula Muris Consortium plus three named depositors, one with ORCID; funded by Chan Zuckerberg Biohub) and production is stated (measured — Smart-seq2 on FACS-sorted cells from 20 organs of 7 mice).
+      No case: The processing half of the history is thin, and corrections are narrated rather than traceable to specific files.
+      Decision: Yes — both limbs the guidance requires (who generated it, how it was produced) are documented, with a dated change history.
+  ABC-16:
+    answer: "Yes"
+    comments: |
+      Yes case: Population is specified (7 mice, 20 organs, sex per plate, subtissue); selection is in FACS.selection per plate — "Viable", "Microglia", "CD31+; CD45+; CD31-CD45-Sca1+; ..." — plus the stated QC cutoff.
+      No case: FACS.selection is blank for 7 of 247 plates, and gate labels like "Multiple" (119 plates) are uninformative.
+      Decision: Yes — both the source sampled and the selection criteria are described in collocated metadata, with only minor gaps.
+  ABC-17:
+    answer: "Yes"
+    comments: |
+      Yes case: Across all 20 count matrices no cell ID recurs (53,760 unique); no duplicate gene rows (23,433 unique); no duplicate rows in either CSV; plate.barcode unique in metadata_FACS.csv.
+      No case: FACS.zip carries a __MACOSX/ tree of AppleDouble stubs and .DS_Store alongside the real files.
+      Decision: Yes — the 226-byte __MACOSX stubs are packaging cruft, not repeated records; no actual data is duplicated.
+  ABC-18:
+    answer: "Yes"
+    comments: |
+      Yes case: Summing the headers of all 20 matrices gives exactly 53,760 cells, matching the stated figure; 20 organs = 20 files; the annotations CSV is present as described.
+      No case: Annotations hold 44,949 rows against a stated 44,879; metadata_FACS.csv never labels Aorta or Diaphragm, so those plates cannot be traced at plate level.
+      Decision: Yes — everything the metadata says should be present is present (the headline cell count matches to the unit); the discrepancies are drift, not missing content.
+  ABC-19:
+    answer: "Yes"
+    comments: |
+      Yes case: Aorta and Kidney matrices share an identical 23,433-gene vector in identical order; all values are unnormalised integers; cell IDs follow one well.plate.mouse.n.n scheme; cell_ontology_class to cell_ontology_id mapping is 1:1 across all 82 classes with no conflicts.
+      No case: Quoting style differs between files (4 unquoted, 16 quoted), the index column is unnamed, and mouse.id sometimes holds a compound value ("3_38_F/3_39_F").
+      Decision: Yes — vocabularies, data types and parameter names are consistent throughout; the exceptions are serialisation details, not semantic inconsistency.
+  ABC-20:
+    answer: "Yes"
+    comments: |
+      Yes case: MGI gene symbols for features, Cell Ontology CL IDs for cell types, and raw integer counts — the conventional types for scRNA-seq.
+      No case: No schema or MI standard is declared; Ensembl IDs would be more stable than symbols; columns like Neurog3>0_raw, subsetA_cluster.ids and free_annotation are ad hoc and undocumented.
+      Decision: Yes — the substantive domain vocabularies and data types are standard, which is what the question asks about, despite ad hoc extras.
+  ABC-21:
+    answer: "No"
+    comments: |
+      Yes case: CSV is universally readable and needs no specialised tooling.
+      No case: Dense CSV for a sparse 23,433 x 53,760 count matrix expands to 2.69 GB and forces a full parse to load any subset; the domain norms are HDF5/h5ad, loom or MatrixMarket.
+      Decision: No — the guidance weighs efficiency and suitability to the modality, and dense CSV fails both for single-cell counts.
+  ABC-22:
+    answer: "Yes"
+    comments: |
+      Yes case: Everything is CSV inside a ZIP — both open specifications, readable and rewritable with no proprietary software.
+      No case: No genuine argument.
+      Decision: Yes — the files were read and re-serialised with the Python standard library alone.
+  # Ethics questions — answer "Yes" if dataset has no human/animal subjects
+  ABC-23:
+    answer: "No"
+    not_applicable: false
+    comments: |
+      Yes case: The work was IACUC-approved in practice, and the linked Nature paper (10.1038/s41586-018-0590-4) carries that statement.
+      No case: The record contains no ethics text at all — no IACUC or protocol number, custom_fields is empty, and the only related material is the journal article.
+      Decision: No — the dataset is from 8 mice, so the question applies, and the guidance states a journal-article statement does not count.
+  ABC-24:
+    answer: "Yes"
+    not_applicable: true
+    comments: |
+      Yes case: The dataset is entirely Mus musculus; no human subjects, so the guidance's default applies.
+      No case: No genuine argument.
+      Decision: Yes — no human data, marked Yes per the guidance's not-applicable default.
+  ABC-25:
+    answer: "Yes"
+    not_applicable: true
+    comments: |
+      Yes case: Mouse-only dataset; consent and lawful-basis regimes such as GDPR/HIPAA do not apply.
+      No case: No genuine argument.
+      Decision: Yes — no human data, marked Yes per the guidance's not-applicable default.
+
+# Calculated fields — completed by scripts/score.py
+result:
+  weighted_score: 610
+  grade: "Caution"
