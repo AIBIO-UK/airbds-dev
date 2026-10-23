@@ -6,7 +6,7 @@ artifacts, plus a body of work that carries no version at all:
 
 | Section | Versioned by | Released as |
 |---|---|---|
-| [Metric](#metric) | `schema_version` — 0.3, 0.4, 1.0.0, 1.0.1, 1.0.2 | a new `metric/airbds_metric_v<version>.yaml` |
+| [Metric](#metric) | `schema_version` — 0.3, 0.4, 1.0.0, 1.0.1, 1.0.2, 1.1.0 | a new `metric/airbds_metric_v<version>.yaml` |
 | [Assessment skill](#assessment-skill) | `skills/versions.json`, per channel | the `assessment-skill-development` / `assessment-skill-testing` release builds |
 | [Repository](#repository) | nothing | nothing — recorded by date |
 
@@ -30,8 +30,66 @@ Nothing yet.
 
 ---
 
-## [1.0.2] — current
+## [1.1.0] — current
 
+> **Clearer per-question guidance on integrity, identifiers, processing,
+> completeness, and ethics.** v1.1.0 is a MINOR release, decided upstream by the
+> working group: it rewrites the per-question guidance of seven questions in ways
+> that change how some of them are answered. **The 25 questions, their ids,
+> scopes, grades, and question text, the Critical/Important/Optional weights,
+> every numeric `min_score` threshold, and the top-level reviewer `instructions:`
+> are unchanged from [1.0.2].** Because the guidance now passes cases it
+> previously failed (see below), a dataset re-assessed under v1.1.0 may answer
+> differently, and so score and grade differently, than under v1.0.2. It is
+> authored in its own Google Sheet — a copy of the v1.0.2 sheet with the changes
+> applied — so v1.0.2 stays reproducible from its own source.
+
+### Changed
+- **ABC-03** (integrity mechanism): transfer protocols with built-in integrity
+  checks pass — almost all APIs, including HTTPS/TLS, and HF/XET (the
+  HuggingFace protocol), and SFTP; FTP is "No" unless hashes are available. Direct
+  downloads and cloud containers still need per-file checksums.
+- **ABC-12** (identifier in downloadable metadata): defines "downloadable
+  metadata" (included automatically with the download, in an API response
+  header, or served by the repository as metadata), and accepts a study or sample
+  ID in combination with its source repository.
+- **ABC-14** (transformation and preprocessing steps): runnable code is
+  sufficient even if it is not well documented.
+- **ABC-18** (all expected records and content): "No" now hinges on there being
+  no file manifest and no concrete way of determining the expected content,
+  rather than on the metadata not specifying it.
+- **ABC-23, ABC-24, ABC-25** (Ethics): immortalised cell lines, reference
+  materials, and non-invasive observations of animals pass; secondary datasets
+  pass if they have clear provenance. ABC-25's guidance is also reordered to open
+  with the no-human-data rule, matching ABC-23 and ABC-24.
+- The outgoing v1.0.2 review-template pair was archived to
+  `reviews/archived_templates/review_template_v1.0.2.{yaml,csv}` before the live
+  `reviews/review_template.{yaml,csv}` pair was regenerated to v1.1.0 (version
+  strings plus the guidance text the CSV carries).
+
+### Added
+- `metric/airbds_metric_v1.1.0.{yaml,json,upstream.json}`, generated from the
+  v1.1.0 Google Sheet by
+  `metric/src/scripts/build_metric_from_google_sheet_v1.1.0.py` — a copy of the
+  v1.0.2 generator carrying `VERSION = "1.1.0"` and the new sheet. The sheet's
+  shape is unchanged, so the tab classifiers and readers are identical to v1.0.2.
+  As before the JSON is written by the same build run as the YAML and covered by
+  `--check`; the YAML remains canonical.
+- v1.1.0 joins the weekly upstream drift check
+  (`.github/workflows/metric-upstream-drift-check.yml`), together with v1.0.2,
+  which had not been added when it was released.
+
+---
+
+## [1.0.2] — superseded by [1.1.0]
+
+> **v1.0.2 has been superseded by [1.1.0] and is retained.** [1.1.0] revises the
+> per-question guidance of seven questions; reviews carrying
+> `schema_version: "1.0.2"` still score against it. While current it was the
+> target of the metric, the review template, the sheet→YAML converter, and all
+> three assessment skill channels (see [Assessment skill](#assessment-skill));
+> [1.1.0] is now current.
+>
 > **Reviewer instructions now ask for a data sample to be downloaded.** v1.0.2 is
 > a guidance-only clarification. The metric's top-level reviewer `instructions:`
 > block gains one sentence — *"At least a sample of the dataset should be
