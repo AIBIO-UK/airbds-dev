@@ -388,7 +388,7 @@ workflows here; `production` is published to `airbds-core` by
 `skills/src/scripts/release_skill_to_core.sh`. See
 [`skills/docs/MAINTAINING.md`](skills/docs/MAINTAINING.md).
 
-## [0.13.0] — development, testing (2026-10-23)
+## [0.13.0] — all channels (2026-10-23)
 
 - **Repointed at AIRBDS metric v1.1.0** (was 1.0.2), by moving the `development`
   channel's `assets/airbds_metric.json` symlink to
@@ -406,6 +406,11 @@ workflows here; `production` is published to `airbds-core` by
 - A **MINOR** bump, not a patch: the bundle scores against a different metric
   version, so 0.12.0 → 0.13.0 per the never-a-patch rule in
   [`skills/docs/MAINTAINING.md`](skills/docs/MAINTAINING.md#keeping-the-manifest-in-step).
+- **Promoted to `production`**, published to `airbds-core` as
+  `skills/airbds-assessment-skill.zip` — the `testing` build with its channel
+  token rewritten to `production` by `rechannel_skill_zip.py`. The same commit
+  stamps `airbds-core`'s `skills/README.md` with skill 0.13.0 / metric 1.1.0,
+  moving all three channels to 0.13.0 / metric 1.1.0.
 
 ## [0.12.0] — all channels (2026-09-15)
 
