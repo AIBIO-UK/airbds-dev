@@ -120,6 +120,10 @@ Each version keeps its own generator script. A new version normally reuses the
 current one; a change to the *sheet's shape* means a new generator, not an edit
 to the old one.
 
+Add the new version to the `matrix.version` list in
+[`.github/workflows/metric-upstream-drift-check.yml`](.github/workflows/metric-upstream-drift-check.yml),
+so the weekly drift check covers it.
+
 ## Stage 2 — Regenerate the review template pair
 
 `reviews/review_template.{yaml,csv}` are derived from the metric YAML and must be
@@ -229,6 +233,11 @@ the metric, so:
   below.
 - Update the bundle diagram in [`skills/docs/DESIGN.md`](skills/docs/DESIGN.md),
   which spells out the symlink target.
+- Point the metric path in both skill build workflows'
+  (`.github/workflows/build-assessment-skill-for-{development,test}.yml`)
+  `on.push.paths` at the new `metric/airbds_metric_v<version>.json`. A path
+  filter never follows a symlink, so a stale entry means a later edit to the
+  metric file does not rebuild the published zip.
 
 **Validate `development` before promoting it.** `testing` inherits whatever you
 promote, so get it right here first — two checks:
@@ -350,13 +359,13 @@ is done. Installed production skills pick the new bundle up through
 | # | Stage | Owner doc |
 |---|---|---|
 | 0 | Confirm which bump was decided upstream (PATCH / MINOR / MAJOR) | `metric/README.md` |
-| 1 | Regenerate the metric YAML + JSON for the new version | `metric/src/README.md` |
+| 1 | Regenerate the metric YAML + JSON for the new version; add it to the drift-check matrix | `metric/src/README.md` |
 | 2 | Archive the old review template pair; regenerate the new one | `reviews/src/README.md` |
 | 3 | `CHANGELOG.md` (Metric) | — this file |
 | 3b | Every bump: version-string references in `README.md`, `CITATION.cff`, `LICENSE.md`, `metric/README.md`, tutorials | — this file |
 | 3c | MINOR/MAJOR only: quoted content — `README.md` question table, `metric/README.md` counts + max score. Commit and push | — this file |
 | 4 | `release_metric_to_core.sh` → **merge the PR** | `metric/src/README.md` |
-| 5 | Repoint `development`; restamp `reviews/process_record_template.md`; `versions.json`; `DESIGN.md`; `CHANGELOG.md` (Skill); then promote → `testing` | `skills/docs/MAINTAINING.md` |
+| 5 | Repoint `development`; restamp `reviews/process_record_template.md`; `versions.json`; `DESIGN.md`; build-workflow metric paths; `CHANGELOG.md` (Skill); then promote → `testing` | `skills/docs/MAINTAINING.md` |
 | 5b | Validate `development`: bundled `score.py` on the new metric, plus an interactive smoke test | — this file |
 | 6 | Confirm the channel build republished the release | `skills/docs/MAINTAINING.md` |
 | 7 | `channels.production` first, then `release_skill_to_core.sh` → **merge the PR** | `skills/docs/MAINTAINING.md` |
