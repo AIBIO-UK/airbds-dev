@@ -388,6 +388,25 @@ workflows here; `production` is published to `airbds-core` by
 `skills/src/scripts/release_skill_to_core.sh`. See
 [`skills/docs/MAINTAINING.md`](skills/docs/MAINTAINING.md).
 
+## [0.13.0] — development, testing (2026-10-23)
+
+- **Repointed at AIRBDS metric v1.1.0** (was 1.0.2), by moving the `development`
+  channel's `assets/airbds_metric.json` symlink to
+  `metric/airbds_metric_v1.1.0.json`. v1.1.0 is a MINOR metric release that
+  revises the per-question guidance of seven questions (ABC-03, ABC-12, ABC-14,
+  ABC-18, ABC-23–25); question text, weights, thresholds, and the reviewer
+  `instructions` are unchanged. The skill reads the guidance from the bundled
+  metric, so it assesses against the new guidance with no change to `SKILL.md`'s
+  body, and a dataset may now answer, score, and grade differently than under
+  0.12.0.
+- **The bundled process-record template was restamped to v1.1.0**
+  (`reviews/process_record_template.md`: `schema_version` and prose).
+- **Promoted `development` → `testing`** with `promote_skill_channel.py`, moving
+  `versions.json`'s `testing` entry to 0.13.0 / metric 1.1.0.
+- A **MINOR** bump, not a patch: the bundle scores against a different metric
+  version, so 0.12.0 → 0.13.0 per the never-a-patch rule in
+  [`skills/docs/MAINTAINING.md`](skills/docs/MAINTAINING.md#keeping-the-manifest-in-step).
+
 ## [0.12.0] — all channels (2026-09-15)
 
 - **Repointed at AIRBDS metric v1.0.2** (was 1.0.1), by moving the `development`
